@@ -1,46 +1,51 @@
-local BanList = {}
-local BanListHistory = {}
-local Text = {}
-
+local Text               = {}
+local BanList            = {}
+local BanListLoad        = false
+local BanListHistory     = {}
+local BanListHistoryLoad = false
 
 
 CreateThread(function()
-    local AllListLoad = false
-	
 	if Config.Lang == "fr" then
 		Text = Config.TextFr
 	elseif Config.Lang == "en" then
 		Text = Config.TextEn
 	else
 		print("FIveM-BanSql : Invalid Config.Lang")
-		Wait(2000)
 	end
-
-	loadBanList()
-	loadBanListHistory()
-
-	Wait(2000)
-	  repeat
-        if BanList ~= {} and BanListHistory ~= {} then
-            print(Text.start)
-            AllListLoad = true
-        else
-            print(Text.starterror)
-            Wait(5000)
-			loadBanListHistory()
+	while true do
+		Wait(1000)
+        if BanListLoad == false then
 			loadBanList()
-        end
-      until AllListLoad == true
+			if BanList ~= {} then
+				print(Text.banlistloaded)
+				BanListLoad = true
+			else
+				print(Text.starterror)
+			end
+		end
+		if BanListHistoryLoad == false then
+			loadBanListHistory()
+            if BanListHistory ~= {} then
+				print(Text.historyloaded)
+				BanListHistoryLoad = true
+			else
+				print(Text.starterror)
+			end
+		end
+	end
 end)
 
 
-TriggerEvent('es:addGroupCommand', 'ban:load', "admin", function ()
-  loadBanList()
-  loadBanListHistory()
-  Wait(2000)
-  if BanList ~= {} then
-    TriggerClientEvent('chatMessage', source, "Banlist", {255, 0, 0}, Text.start)
-    BanListLoad = true
+TriggerEvent('es:addGroupCommand', 'ban:load', "admin", function (source)
+  BanListLoad        = false
+  BanListHistoryLoad = false
+  Wait(5000)
+  if BanListLoad == true then
+    TriggerClientEvent('chatMessage', source, "Banlist", {255, 0, 0}, Text.banlistloaded)
+	if BanListHistoryLoad == true then
+		TriggerClientEvent('chatMessage', source, "Banlist", {255, 0, 0}, Text.historyloaded)
+	end
   else
     TriggerClientEvent('chatMessage', source, "Banlist", {255, 0, 0}, Text.loaderror)
   end
@@ -51,7 +56,7 @@ TriggerEvent('es:addGroupCommand', 'ban:history', "admin", function (source, arg
 	local nombre = (tonumber(args[1]))
     local name   = table.concat(args, " ",2)
 	local noresult = 0
-	
+	if name ~= "" then
 		for i = 1, #BanListHistory, 1 do
 			if (tostring(BanListHistory[i].targetplayername)) == tostring(name) then
 				noresult = noresult + 1
@@ -84,11 +89,14 @@ TriggerEvent('es:addGroupCommand', 'ban:history', "admin", function (source, arg
 			else
 				TriggerClientEvent('chatMessage', source, "BanList : ", {255, 0, 0}, Text.noresult)
 			end
+	else
+		TriggerClientEvent('chatMessage', source, "BanList", {255, 0, 0}, Text.invalidname)
+	end
  end
 end)
 
 TriggerEvent('es:addGroupCommand', 'ban:unban', "admin", function (source, args, user)
- if args[1] ~= nil then
+  if args[1] ~= nil then
     local name = table.concat(args, " ")
      MySQL.Async.fetchScalar('SELECT identifier FROM banlist WHERE targetplayername=@name',
     {
@@ -108,7 +116,9 @@ TriggerEvent('es:addGroupCommand', 'ban:unban', "admin", function (source, args,
             TriggerClientEvent('chatMessage', source, "BanList", {255, 0, 0}, Text.invalidname)
         end
     end)
- end
+  else
+	TriggerClientEvent('chatMessage', source, "BanList", {255, 0, 0}, Text.invalidname)
+  end
 end)
 
 TriggerEvent('es:addGroupCommand', 'ban:add', "admin", function (source, args, user)
@@ -116,14 +126,14 @@ TriggerEvent('es:addGroupCommand', 'ban:add', "admin", function (source, args, u
 		local duree = tonumber(args[2])
 		local reason = table.concat(args, " ",3)
 		
-		if reason == nil then
-			reason="Aucune raison"
+		if reason == "" then
+			reason = Text.noreason
 		end
-		if target > 0 then
+		if target ~= nil and target > 0 then
 			local ping = GetPlayerPing(target)
         
-			if ping > 0 then
-				if duree < 365 then
+			if ping ~= nil and ping > 0 then
+				if duree ~= nil and duree < 365 then
 					local sourceplayername = GetPlayerName(source)
 					local targetplayername = GetPlayerName(target)
 					local identifier = GetPlayerIdentifiers(target)[1]
@@ -211,7 +221,7 @@ function permban(source,target,identifier,targetplayername,sourceplayername,dure
 
 				
 	MySQL.Async.execute(
-                'INSERT INTO banlisthistory (identifier,targetplayername,sourceplayername,reason,expiration,timeat.permanent) VALUES (@identifier,@targetplayername,@sourceplayername,@reason,@expiration,@timeat,@permanent)',
+                'INSERT INTO banlisthistory (identifier,targetplayername,sourceplayername,reason,expiration,timeat,permanent) VALUES (@identifier,@targetplayername,@sourceplayername,@reason,@expiration,@timeat,@permanent)',
                 { 
 				['@identifier']       = identifier,
 				['@targetplayername'] = targetplayername,
