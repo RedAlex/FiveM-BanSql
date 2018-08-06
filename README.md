@@ -1,3 +1,49 @@
+
+# FiveM-BanSql
+
+An SQL ban that does not overload the database.
+It precharges the database in a table when opening the server or adding / removing a ban.
+
+# Installation
+1. Copy the project to your resource folder.
+2. Add "start FiveM-BanSql" in your `server.cfg`
+
+# Commands
+___
+1. ** ban: add id days reason ** (Allows ban a connected player)
+ - "id" is the player's number in the list
+ - "days" must be a number to say how many days it will be ban. (0 days mean permanent)
+ - "reason" Ability to register why he is banished. Attention if there is no reason the player will see: "You are banned for: No reason"
+ - ban example: add 3 1 Troll (Will give ban player # 3 for 1 days with Troll reason)
+___
+2. ** ban: unban "Steam Name" **
+ - Deban the player matching the written name.
+ - Example ban: unban Alex Garcio (Will remove from the ban list the player
+___
+3. ** ban: load ** (reload the BanList and the BanListHistory)
+  - Can be used if you edit directly in your database.
+___
+4. ** ban: history option "Steam Name" ** (Allows you to view the ban history of a player offline or online)
+- "option"
+- 0 To display all the banns of a player
+- 1 To display only the first ban
+- 2 To display only the second ban
+- 3 ect ......
+- 4 ect ......
+- Example ban: history 0 Alex Garcio (Go to display all the list of player's bans)
+   
+# Required resource
+- Async
+
+# To do
+- Add a config for text messages to facilitate translation.
+
+# Created by
+- Alex Garcio (https://github.com/RedAlex)
+- Alain Proviste https://github.com/EagleOnee
+
+
+___
 # FiveM-BanSql
 
 Un ban SQL qui ne surcharge pas la base de donnée.
@@ -17,7 +63,7 @@ ___
 ___
 2. **ban:unban "Nom Steam"**
  - Déban le joueur correcpondant au nom écrit.
- - Exemple ban:unban Alex Garcio (Va enlever de la liste de ban le joueur
+ - Exemple ban:unban Alex Garcio (Va enlever de la liste de ban le joueur)
 ___
 3. **ban:load** (   Recharge la BanList et la BanListHistory   )
   - Peut etre utilisé si vous modifiez directement dans votre base de données.
