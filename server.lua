@@ -1,10 +1,20 @@
 local BanList = {}
 local BanListHistory = {}
+local Text = {}
 
 
 
 CreateThread(function()
     local AllListLoad = false
+	
+	if Config.Lang == "fr" then
+		Text = Config.TextFr
+	elseif Config.Lang == "en" then
+		Text = Config.TextEn
+	else
+		print("FIveM-BanSql : Invalid Config.Lang")
+		Wait(2000)
+	end
 
 	loadBanList()
 	loadBanListHistory()
@@ -12,10 +22,10 @@ CreateThread(function()
 	Wait(2000)
 	  repeat
         if BanList ~= {} and BanListHistory ~= {} then
-            print("La BanList et l'historique a ete charger avec succes")
+            print(Text.start)
             AllListLoad = true
         else
-            print("ERROR : La BanList et l'historique n'a pas ete charger nouvelle tentative dans 5 seconde.")
+            print(Text.starterror)
             Wait(5000)
 			loadBanListHistory()
 			loadBanList()
@@ -26,12 +36,13 @@ end)
 
 TriggerEvent('es:addGroupCommand', 'ban:load', "admin", function ()
   loadBanList()
+  loadBanListHistory()
   Wait(2000)
   if BanList ~= {} then
-    TriggerClientEvent('chatMessage', source, "Banlist", {255, 0, 0}, "La liste a été avec succes")
+    TriggerClientEvent('chatMessage', source, "Banlist", {255, 0, 0}, Text.start)
     BanListLoad = true
   else
-    TriggerClientEvent('chatMessage', source, "Banlist", {255, 0, 0}, "ERROR : La BanList n'a pas été charger.")
+    TriggerClientEvent('chatMessage', source, "Banlist", {255, 0, 0}, Text.loaderror)
   end
 end)
 
@@ -53,7 +64,7 @@ TriggerEvent('es:addGroupCommand', 'ban:history', "admin", function (source, arg
 					local calcul1    = expiration - timeat
 					local calcul2    = calcul1 / 86400
 					local calcul2 	 =  math.ceil(calcul2)
-					local resultat = (tostring(BanListHistory[nombre].targetplayername)) .. " , " .. (tostring(BanListHistory[nombre].sourceplayername)) .. " , " .. (tostring(BanListHistory[nombre].reason)) .. " , " .. calcul2 .. " jours "
+					local resultat = (tostring(BanListHistory[nombre].targetplayername)) .. " , " .. (tostring(BanListHistory[nombre].sourceplayername)) .. " , " .. (tostring(BanListHistory[nombre].reason)) .. " , " .. calcul2 .. Text.day
 					
 					TriggerClientEvent('chatMessage', source, "BanList " .. nombre .. " : ", {255, 0, 0}, resultat)
 				elseif nombre == 0 then
@@ -64,14 +75,14 @@ TriggerEvent('es:addGroupCommand', 'ban:history', "admin", function (source, arg
 							local calcul1    = expiration - timeat
 							local calcul2    = calcul1 / 86400
 							local calcul2 	 =  math.ceil(calcul2)					
-							local resultat = (tostring(BanListHistory[i].targetplayername)) .. " , " .. (tostring(BanListHistory[i].sourceplayername)) .. " , " .. (tostring(BanListHistory[i].reason)) .. " , " .. calcul2 .. " jours "
+							local resultat = (tostring(BanListHistory[i].targetplayername)) .. " , " .. (tostring(BanListHistory[i].sourceplayername)) .. " , " .. (tostring(BanListHistory[i].reason)) .. " , " .. calcul2 .. Text.day
 						
 							TriggerClientEvent('chatMessage', source, "BanList " .. i .. " : ", {255, 0, 0}, resultat)
 						end
 					end
 				end
 			else
-				TriggerClientEvent('chatMessage', source, "BanList : ", {255, 0, 0}, "Il n'y a pas autant de résultats !")
+				TriggerClientEvent('chatMessage', source, "BanList : ", {255, 0, 0}, Text.noresult)
 			end
  end
 end)
@@ -92,9 +103,9 @@ TriggerEvent('es:addGroupCommand', 'ban:unban', "admin", function (source, args,
                 function ()
                 loadBanList()
             end)
-            TriggerClientEvent('chatMessage', source, "BanList", {255, 0, 0}, name .. " a été déban")
+            TriggerClientEvent('chatMessage', source, "BanList", {255, 0, 0}, name .. Text.isban)
         else
-            TriggerClientEvent('chatMessage', source, "BanList", {255, 0, 0}, "Le nom n'est pas valide")
+            TriggerClientEvent('chatMessage', source, "BanList", {255, 0, 0}, Text.invalidname)
         end
     end)
  end
@@ -119,20 +130,20 @@ TriggerEvent('es:addGroupCommand', 'ban:add', "admin", function (source, args, u
 				
 					if duree > 0 then
 						ban(source,target,identifier,targetplayername,sourceplayername,duree,reason)
-						DropPlayer(target, "Vous avez ete ban pour " .. reason)
+						DropPlayer(target, Text.yourban .. reason)
 					else
 						permban(source,target,identifier,targetplayername,sourceplayername,duree,reason)
-						DropPlayer(target, "Vous avez ete ban permanant pour " .. reason)
+						DropPlayer(target, Text.yourpermban .. reason)
 					end
 				
 				else
-					TriggerClientEvent('chat:addMessage', source, { args = { '^1SYSTEM', 'Duree du ban incorrecte' } } )
+					TriggerClientEvent('chatMessage', source, "BanList", {255, 0, 0}, Text.invalidtime)
 				end	
 			else
-				TriggerClientEvent('chat:addMessage', source, { args = { '^1SYSTEM', 'ID du joueur incorrect' } } )
+				TriggerClientEvent('chatMessage', source, "BanList", {255, 0, 0}, Text.invalidid)
 			end
 		else
-			TriggerClientEvent('chat:addMessage', source, { args = { '^1SYSTEM', 'ID du joueur incorrect' } } )
+			TriggerClientEvent('chatMessage', source, "BanList", {255, 0, 0}, Text.invalidid)
 		end
 end)
 
@@ -159,7 +170,7 @@ function ban(source,target,identifier,targetplayername,sourceplayername,duree,re
 				},
 				function ()
 				end)
-					TriggerClientEvent('chat:addMessage', source, { args = { '^1SYSTEM', 'Vous avez banni : ' .. targetplayername .. ' pendant ' .. duree .. ' jours parce que ' .. reason } } )
+					TriggerClientEvent('chatMessage', source, "BanList", {255, 0, 0}, Text.youban .. targetplayername .. Text.during .. duree .. Text.forr .. reason)
 					Wait(1000)
 					loadBanList()
 				
@@ -194,7 +205,7 @@ function permban(source,target,identifier,targetplayername,sourceplayername,dure
 				},
 				function()
 				end)
-				TriggerClientEvent('chat:addMessage', source, { args = { '^1SYSTEM', 'Vous avez banni : ' .. targetplayername .. ' de facon permanente parce que ' .. reason } } )
+				TriggerClientEvent('chatMessage', source, "BanList", {255, 0, 0}, Text.youban .. targetplayername .. Text.permban .. reason)
 				Wait(1000)
 				loadBanList()
 
@@ -295,7 +306,7 @@ AddEventHandler('playerConnecting', function (playerName,setKickReason)
 					local txtday     = math.floor(day)
 					local txthrs     = math.floor(hrs)
 					local txtminutes = math.ceil(minutes)
-						setKickReason("Vous etes banni pour : " .. BanList[i].reason .. ". Il reste : " .. txtday .. " Jours " ..txthrs .. " Heures " ..txtminutes .. " Minutes ")
+						setKickReason("Vous etes banni pour : " .. BanList[i].reason .. Text.timeleft .. txtday .. Text.day ..txthrs .. Text.hour ..txtminutes .. Text.minute)
 						CancelEvent()
 				elseif tempsrestant >= 60 and tempsrestant < 1440 then
 					local day        = (tempsrestant / 60) / 24
@@ -304,19 +315,19 @@ AddEventHandler('playerConnecting', function (playerName,setKickReason)
 					local txtday     = math.floor(day)
 					local txthrs     = math.floor(hrs)
 					local txtminutes = math.ceil(minutes)
-						setKickReason("Vous etes banni pour : " .. BanList[i].reason .. ". Il reste : " .. txtday .. " Jours " .. txthrs .. " Heures " .. txtminutes .. " Minutes ")
+						setKickReason("Vous etes banni pour : " .. BanList[i].reason .. Text.timeleft .. txtday .. Text.day .. txthrs .. Text.hour .. txtminutes .. Text.minute)
 						CancelEvent()
 				elseif tempsrestant < 60 then
 					local txtday     = 0
 					local txthrs     = 0
 					local txtminutes = math.ceil(tempsrestant)
-						setKickReason("Vous etes banni pour : " .. BanList[i].reason .. ". Il reste : " .. txtday .. " Jours " .. txthrs .. " Heures " .. txtminutes .. " Minutes ")
+						setKickReason("Vous etes banni pour : " .. BanList[i].reason .. Text.timeleft .. txtday .. Text.day .. txthrs .. Text.hour .. txtminutes .. Text.minute)
 						CancelEvent()
 				end
 		end
 	
 		if (tostring(BanList[i].identifier)) == tostring(steamID) and (tonumber(BanList[i].permanent)) == 1 then
-			setKickReason("Vous etes banni parce que " .. BanList[i].reason .. " de facon permanente, contactez un admin pour plus d'infos")
+			setKickReason(Text.yourpermban .. BanList[i].reason)
 			CancelEvent()
 		end
 	
