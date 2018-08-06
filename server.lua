@@ -182,7 +182,7 @@ end
 function permban(source,target,identifier,targetplayername,sourceplayername,duree,reason)
 	
 	MySQL.Async.execute(
-                'INSERT INTO banlist (identifier,targetplayername,sourceplayername,reason,expiration,timeat) VALUES (@identifier,@targetplayername,@sourceplayername,@reason,@expiration,@timeat)',
+                'INSERT INTO banlist (identifier,targetplayername,sourceplayername,reason,expiration,timeat,permanent) VALUES (@identifier,@targetplayername,@sourceplayername,@reason,@expiration,@timeat,@permanent)',
                 { 
 				['@identifier']       = identifier,
 				['@targetplayername'] = targetplayername,
@@ -200,7 +200,7 @@ function permban(source,target,identifier,targetplayername,sourceplayername,dure
 
 				
 	MySQL.Async.execute(
-                'INSERT INTO banlisthistory (identifier,targetplayername,sourceplayername,reason,expiration,timeat) VALUES (@identifier,@targetplayername,@sourceplayername,@reason,@expiration,@timeat)',
+                'INSERT INTO banlisthistory (identifier,targetplayername,sourceplayername,reason,expiration,timeat.permanent) VALUES (@identifier,@targetplayername,@sourceplayername,@reason,@expiration,@timeat,@permanent)',
                 { 
 				['@identifier']       = identifier,
 				['@targetplayername'] = targetplayername,
