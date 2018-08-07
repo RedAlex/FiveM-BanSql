@@ -1,4 +1,6 @@
 local Text               = {}
+local lastduree          = ""
+local lasttarget         = ""
 local BanList            = {}
 local BanListLoad        = false
 local BanListHistory     = {}
@@ -157,6 +159,71 @@ TriggerEvent('es:addGroupCommand', 'ban:add', "admin", function (source, args, u
 		end
 end)
 
+TriggerEvent('es:addGroupCommand', 'ban:addoff', "admin", function (source, args, user)
+	if args ~= "" then
+		lastduree      = tonumber(args[1])
+		lasttarget     = table.concat(args, " ",2)
+		if lastduree ~= "" then
+			if lastduree ~= "" then
+				TriggerClientEvent('chatMessage', source, "BanList", {255, 0, 0}, lasttarget .. Text.during .. lastduree .. Text.forcontinu)
+			else
+				TriggerClientEvent('chatMessage', source, "BanList", {255, 0, 0}, Text.invalidid)
+			end
+		else
+			TriggerClientEvent('chatMessage', source, "BanList", {255, 0, 0}, Text.invalidtime)
+		end
+	else
+		TriggerClientEvent('chatMessage', source, "BanList", {255, 0, 0}, Text.addoff)
+	end
+end)
+
+TriggerEvent('es:addGroupCommand', 'ban:reason', "admin", function (source, args, user)
+		local duree      = lastduree
+		local target     = lasttarget
+		local reason     = table.concat(args, " ",1)
+		local identifier = ""
+
+		if Config.esx then
+			MySQL.Async.fetchScalar('SELECT identifier FROM users WHERE name=@name',
+			{
+				['@name'] = name
+			}, function(_identifier)
+				if identifier ~= nil then
+					identifier = _identifier
+				end
+			end)
+		else
+			target = nil
+		end
+		
+		if reason == "" then
+			reason = Text.noreason
+		end
+
+		if target ~= nil then
+			if duree ~= nil and duree < 365 then
+				local sourceplayername = GetPlayerName(source)
+				local targetplayername = target
+			
+				if duree > 0 then
+					ban(source,target,identifier,targetplayername,sourceplayername,duree,reason)
+					DropPlayer(target, Text.yourban .. reason)
+					lastduree  = ""
+					lasttarget = ""
+				else
+					permban(source,target,identifier,targetplayername,sourceplayername,duree,reason)
+					DropPlayer(target, Text.yourpermban .. reason)
+					lastduree  = ""
+					lasttarget = ""
+				end
+			
+			else
+				TriggerClientEvent('chatMessage', source, "BanList", {255, 0, 0}, Text.invalidtime)
+			end	
+		else
+			TriggerClientEvent('chatMessage', source, "BanList", {255, 0, 0}, Text.invalidid)
+		end
+end)
 
 
 function ban(source,target,identifier,targetplayername,sourceplayername,duree,reason)
