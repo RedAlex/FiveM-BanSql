@@ -10,13 +10,13 @@ It precharges the database in a table when opening the server or adding / removi
 
 # Commands
 ___
-1. **ban:add id days reason ** (	Allows ban a connected player	)
+1. **ban:add id days reason** (	Allows ban a connected player	)
  - "id" is the player's number in the list
  - "days" must be a number to say how many days it will be ban. (0 days mean permanent)
  - "reason" Ability to register why he is banished. Attention if there is no reason the player will see: "You are banned for: unknown reason"
  - example ban:add 3 1 Troll (Will give ban player # 3 for 1 days with Troll reason)
 ___
-2. **ban:addoff days name (	   Allows ban a offline player	  )
+2. **ban:addoff days name** (	   Allows ban a offline player	  )
  - "days" must be a number to say how many days it will be ban. (0 days mean permanent)
  - "name" is the player's steam name
  - example:addoff 3 Alex Garcio (Will ask you to entry ban:reason to continu)
@@ -24,31 +24,29 @@ ___
  - "reason" Ability to register why he is banished.
  - example ban:reason reason (Will ban player you have entry before for X days and the reason)
 ___
-3. **ban:unban "Steam Name" **
+3. **ban:unban "Steam Name"**
  - Deban the player matching the written name.
  - Example ban:unban Alex Garcio (Will remove from the ban list the player)
 ___
 4. **ban:load ** (reload the BanList and the BanListHistory)
   - Can be used if you edit directly in your database.
 ___
-5. **ban:history option "Steam Name" ** (Allows you to view the ban history of a player offline or online)
+5. **ban:history option** (Allows you to view the ban history of a player offline or online)
 - "option"
-- 0 To display all the banns of a player
+- (Name of a player) To display all the banns of a player
 - 1 To display only the first ban
 - 2 To display only the second ban
 - 3 ect ......
 - 4 ect ......
-- Example ban:history 0 Alex Garcio (Go to display all the list of player's bans)
+- Example ban:history Alex Garcio (Go to display all the list of player's bans)
    
 # Required resource
 - Async
 - Esx (Optional)
 
-# To do
-- Add a config for text messages to facilitate translation.
 
 # Created by
-- Alex Garcio (https://github.com/RedAlex)
+- Alex Garcio https://github.com/RedAlex
 - Alain Proviste https://github.com/EagleOnee
 
 
@@ -86,22 +84,20 @@ ___
 4. **ban:load** (   Recharge la BanList et la BanListHistory   )
   - Peut etre utilisé si vous modifiez directement dans votre base de données.
 ___
-5. **ban:history option "Nom Steam"** (	 Permet d'afficher l'historique de ban d'un joueur hors ligne ou en ligne	)
+5. **ban:history option ** (	 Permet d'afficher l'historique de ban d'un joueur hors ligne ou en ligne	)
 -   "option" 
--		0 Pour afficher tout les bans d'un joueur
+-		(Nom Steam) Pour afficher tout les bans d'un joueur
 -		1 Pour afficher seulement le premier ban
 -		2 Pour afficher seulement le deuxième ban
 -		3 ect......
 -		4 ect......
--   Exemple ban:history 0 Alex Garcio (Va afficher toute la liste des bans du joueur)
+-   Exemple ban:history Alex Garcio (Va afficher toute la liste des bans du joueur)
    
 # Ressource requis
 - Async
 - Esx (Optionel)
 
-# A Faire
-- Ajouter une config pour les messages texte afin de faciliter la traduction.
 
 # Créer par
-- Alex Garcio (https://github.com/RedAlex)
+- Alex Garcio https://github.com/RedAlex
 - Alain Proviste https://github.com/EagleOnee
