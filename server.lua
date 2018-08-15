@@ -120,6 +120,7 @@ TriggerEvent('es:addGroupCommand', 'ban:add', "admin", function (source, args, u
 		local target = tonumber(args[1])
 		local duree = tonumber(args[2])
 		local reason = table.concat(args, " ",3)
+		local permanent = 0
 		
 		if reason == "" then
 			reason = Text.noreason
@@ -134,10 +135,11 @@ TriggerEvent('es:addGroupCommand', 'ban:add', "admin", function (source, args, u
 					local identifier = GetPlayerIdentifiers(target)[1]
 				
 					if duree > 0 then
-						ban(source,identifier,targetplayername,sourceplayername,duree,reason)
+						ban(source,identifier,targetplayername,sourceplayername,duree,reason,permanent)
 						DropPlayer(target, Text.yourban .. reason)
 					else
-						permban(source,identifier,targetplayername,sourceplayername,duree,reason)
+						local permanent = 1
+						ban(source,identifier,targetplayername,sourceplayername,duree,reason,permanent)
 						DropPlayer(target, Text.yourpermban .. reason)
 					end
 				
@@ -176,6 +178,7 @@ TriggerEvent('es:addGroupCommand', 'ban:reason', "admin", function (source, args
 		local duree      = lastduree
 		local name       = lasttarget
 		local reason     = table.concat(args, " ",1)
+		local permanent  = 0
 
 		if Config.esx then
 			MySQL.Async.fetchScalar('SELECT identifier FROM users WHERE name=@name',
@@ -195,11 +198,12 @@ TriggerEvent('es:addGroupCommand', 'ban:reason', "admin", function (source, args
 							local targetplayername = name
 			
 							if duree > 0 then
-								ban(source,steamID,targetplayername,sourceplayername,duree,reason)
+								ban(source,steamID,targetplayername,sourceplayername,duree,reason,permanent)
 								lastduree  = ""
 								lasttarget = ""
 							else
-								permban(source,steamID,targetplayername,sourceplayername,duree,reason)
+								local permanent = 1
+								ban(source,steamID,targetplayername,sourceplayername,duree,reason,permanent)
 								lastduree  = ""
 								lasttarget = ""
 							end
@@ -227,7 +231,7 @@ AddEventHandler('bansql:sendMessage', function(source, message)
 end)
 
 
-function ban(source,identifier,targetplayername,sourceplayername,duree,reason)
+function ban(source,identifier,targetplayername,sourceplayername,duree,reason,permanent)
 --calcul total expiration (en secondes)
 	local expiration = duree * 86400
 	local timeat = os.time()
@@ -237,68 +241,37 @@ function ban(source,identifier,targetplayername,sourceplayername,duree,reason)
 	end
 	
 		MySQL.Async.execute(
-                'INSERT INTO banlist (identifier,targetplayername,sourceplayername,reason,expiration,timeat) VALUES (@identifier,@targetplayername,@sourceplayername,@reason,@expiration,@timeat)',
-                { 
-				['@identifier']       = identifier,
-				['@targetplayername'] = targetplayername,
-				['@sourceplayername'] = sourceplayername,
-				['@reason']           = reason,
-				['@expiration']       = expiration,
-				['@timeat']           = os.time(),
-				},
-				function ()
-				end)
-					TriggerEvent('bansql:sendMessage', source, (Text.youban .. targetplayername .. Text.during .. duree .. Text.forr .. reason))
-					BanListLoad = false
-				
-		MySQL.Async.execute(
-                'INSERT INTO banlisthistory (identifier,targetplayername,sourceplayername,reason,expiration,timeat) VALUES (@identifier,@targetplayername,@sourceplayername,@reason,@expiration,@timeat)',
-                { 
-				['@identifier']       = identifier,
-				['@targetplayername'] = targetplayername,
-				['@sourceplayername'] = sourceplayername,
-				['@reason']           = reason,
-				['@expiration']       = expiration,
-				['@timeat']           = os.time(),
-				},
-				function ()
-				end)
-				BanListHistoryLoad = false
-end
-
-function permban(source,identifier,targetplayername,sourceplayername,duree,reason)
-	
-	MySQL.Async.execute(
                 'INSERT INTO banlist (identifier,targetplayername,sourceplayername,reason,expiration,timeat,permanent) VALUES (@identifier,@targetplayername,@sourceplayername,@reason,@expiration,@timeat,@permanent)',
                 { 
 				['@identifier']       = identifier,
 				['@targetplayername'] = targetplayername,
 				['@sourceplayername'] = sourceplayername,
 				['@reason']           = reason,
-				['@expiration']       = 1,
+				['@expiration']       = expiration,
 				['@timeat']           = os.time(),
-				['@permanent']        = 1,
+				['@permanent']        = permanent,
 				},
-				function()
-				end)
-				TriggerEvent('bansql:sendMessage', source, (Text.youban .. targetplayername .. Text.permban .. reason))
-				loadBanList()
-
+				function ()
+		end)
+		
+		TriggerEvent('bansql:sendMessage', source, (Text.youban .. targetplayername .. Text.during .. duree .. Text.forr .. reason))
+		BanListLoad = false
 				
-	MySQL.Async.execute(
+		MySQL.Async.execute(
                 'INSERT INTO banlisthistory (identifier,targetplayername,sourceplayername,reason,expiration,timeat,permanent) VALUES (@identifier,@targetplayername,@sourceplayername,@reason,@expiration,@timeat,@permanent)',
                 { 
 				['@identifier']       = identifier,
 				['@targetplayername'] = targetplayername,
 				['@sourceplayername'] = sourceplayername,
 				['@reason']           = reason,
-				['@expiration']       = 1,
+				['@expiration']       = expiration,
 				['@timeat']           = os.time(),
-				['@permanent']        = 1,
+				['@permanent']        = permanent,
 				},
-				function()
-				end)
-				loadBanListHistory()
+				function ()
+		end)
+		
+		BanListHistoryLoad = false
 end
 
 function loadBanList()
