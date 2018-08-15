@@ -65,7 +65,7 @@ TriggerEvent('es:addGroupCommand', 'ban:history', "admin", function (source, arg
 					local calcul1    = expiration - timeat
 					local calcul2    = calcul1 / 86400
 					local calcul2 	 =  math.ceil(calcul2)
-					local resultat = (tostring(BanListHistory[nombre].targetplayername)) .. " , " .. (tostring(BanListHistory[nombre].sourceplayername)) .. " , " .. (tostring(BanListHistory[nombre].reason)) .. " , " .. calcul2 .. Text.day
+					local resultat   = (tostring(BanListHistory[nombre].targetplayername)) .. " , " .. (tostring(BanListHistory[nombre].sourceplayername)) .. " , " .. (tostring(BanListHistory[nombre].reason)) .. " , " .. calcul2 .. Text.day
 					
 					TriggerEvent('bansql:sendMessage', source, (nombre .." : ".. resultat))
 			else
@@ -76,7 +76,7 @@ TriggerEvent('es:addGroupCommand', 'ban:history', "admin", function (source, arg
 							local calcul1    = expiration - timeat
 							local calcul2    = calcul1 / 86400
 							local calcul2 	 =  math.ceil(calcul2)					
-							local resultat = (tostring(BanListHistory[i].targetplayername)) .. " , " .. (tostring(BanListHistory[i].sourceplayername)) .. " , " .. (tostring(BanListHistory[i].reason)) .. " , " .. calcul2 .. Text.day
+							local resultat   = (tostring(BanListHistory[i].targetplayername)) .. " , " .. (tostring(BanListHistory[i].sourceplayername)) .. " , " .. (tostring(BanListHistory[i].reason)) .. " , " .. calcul2 .. Text.day
 
 							TriggerEvent('bansql:sendMessage', source, (i .." : ".. resultat))
 						end
@@ -117,9 +117,9 @@ TriggerEvent('es:addGroupCommand', 'ban:unban', "admin", function (source, args,
 end)
 
 TriggerEvent('es:addGroupCommand', 'ban:add', "admin", function (source, args, user)
-		local target = tonumber(args[1])
-		local duree = tonumber(args[2])
-		local reason = table.concat(args, " ",3)
+		local target    = tonumber(args[1])
+		local duree     = tonumber(args[2])
+		local reason    = table.concat(args, " ",3)
 		local permanent = 0
 		
 		if reason == "" then
@@ -132,14 +132,16 @@ TriggerEvent('es:addGroupCommand', 'ban:add', "admin", function (source, args, u
 				if duree ~= nil and duree < 365 then
 					local sourceplayername = GetPlayerName(source)
 					local targetplayername = GetPlayerName(target)
-					local identifier = GetPlayerIdentifiers(target)[1]
+					local identifier 	   = GetPlayerIdentifiers(target)[1]
+					local license          = GetPlayerIdentifiers(source)[2]
+					local playerip         = GetPlayerIdentifiers(source)[3]
 				
 					if duree > 0 then
-						ban(source,identifier,targetplayername,sourceplayername,duree,reason,permanent)
+						ban(source,identifier,license,playerip,targetplayername,sourceplayername,duree,reason,permanent)
 						DropPlayer(target, Text.yourban .. reason)
 					else
 						local permanent = 1
-						ban(source,identifier,targetplayername,sourceplayername,duree,reason,permanent)
+						ban(source,identifier,license,playerip,targetplayername,sourceplayername,duree,reason,permanent)
 						DropPlayer(target, Text.yourpermban .. reason)
 					end
 				
@@ -157,8 +159,8 @@ end)
 
 TriggerEvent('es:addGroupCommand', 'ban:addoff', "admin", function (source, args, user)
 	if args ~= "" then
-		lastduree      = tonumber(args[1])
-		lasttarget     = table.concat(args, " ",2)
+		lastduree  = tonumber(args[1])
+		lasttarget = table.concat(args, " ",2)
 		if lastduree ~= "" and lastduree ~= nil then
 			if lasttarget ~= "" and lasttarget ~= nil then
 				TriggerEvent('bansql:sendMessage', source, (lasttarget .. Text.during .. lastduree .. Text.forcontinu))
@@ -188,33 +190,46 @@ TriggerEvent('es:addGroupCommand', 'ban:reason', "admin", function (source, args
 
 				if identifier ~= nil then
 					local steamID = identifier
-						if reason == "" then
-							reason = Text.noreason
-						end
 
-						if name ~= nil then
-							if duree ~= nil and duree < 365 then
-							local sourceplayername = GetPlayerName(source)
-							local targetplayername = name
-			
-							if duree > 0 then
-								ban(source,steamID,targetplayername,sourceplayername,duree,reason,permanent)
-								lastduree  = ""
-								lasttarget = ""
-							else
-								local permanent = 1
-								ban(source,steamID,targetplayername,sourceplayername,duree,reason,permanent)
-								lastduree  = ""
-								lasttarget = ""
+					MySQL.Async.fetchScalar('SELECT license FROM users WHERE name=@name',
+					{
+						['@name']       = name
+					}, function(license)
+
+						if identifier ~= nil then
+							local fivemID = license						
+
+							if reason == "" then
+								reason = Text.noreason
 							end
-			
-						else
-							TriggerEvent('bansql:sendMessage', source, Text.invalidtime)
-						end	
-					else
-						TriggerEvent('bansql:sendMessage', source, Text.invalidid)
-					end
+
+								if name ~= nil then
+									if duree ~= nil and duree < 365 then
+										local sourceplayername = GetPlayerName(source)
+
+										if duree > 0 then
+											ban(source,steamID,fivemID,playerip,name,sourceplayername,duree,reason,permanent)
+											lastduree  = ""
+											lasttarget = ""
+										else
+											local permanent = 1
+											ban(source,steamID,fivemID,playerip,name,sourceplayername,duree,reason,permanent)
+											lastduree  = ""
+											lasttarget = ""
+										end
+
+									else
+										TriggerEvent('bansql:sendMessage', source, Text.invalidtime)
+									end	
+								else
+									TriggerEvent('bansql:sendMessage', source, Text.invalidid)
+								end
+						end
+					end)
+				else
+					TriggerEvent('bansql:sendMessage', source, Text.invalidid)
 				end
+
 			end)
 		else
 --			Here use futur BanUserList to find info
@@ -231,19 +246,21 @@ AddEventHandler('bansql:sendMessage', function(source, message)
 end)
 
 
-function ban(source,identifier,targetplayername,sourceplayername,duree,reason,permanent)
+function ban(source,identifier,license,playerip,targetplayername,sourceplayername,duree,reason,permanent)
 --calcul total expiration (en secondes)
 	local expiration = duree * 86400
-	local timeat = os.time()
+	local timeat     = os.time()
 	
 	if expiration < os.time() then
 		expiration = os.time()+expiration
 	end
 	
 		MySQL.Async.execute(
-                'INSERT INTO banlist (identifier,targetplayername,sourceplayername,reason,expiration,timeat,permanent) VALUES (@identifier,@targetplayername,@sourceplayername,@reason,@expiration,@timeat,@permanent)',
+                'INSERT INTO banlist (identifier,license,playerip,targetplayername,sourceplayername,reason,expiration,timeat,permanent) VALUES (@identifier,@license,@playerip,@targetplayername,@sourceplayername,@reason,@expiration,@timeat,@permanent)',
                 { 
 				['@identifier']       = identifier,
+				['@license']          = license,
+				['@playerip']         = playerip,
 				['@targetplayername'] = targetplayername,
 				['@sourceplayername'] = sourceplayername,
 				['@reason']           = reason,
@@ -258,9 +275,11 @@ function ban(source,identifier,targetplayername,sourceplayername,duree,reason,pe
 		BanListLoad = false
 				
 		MySQL.Async.execute(
-                'INSERT INTO banlisthistory (identifier,targetplayername,sourceplayername,reason,expiration,timeat,permanent) VALUES (@identifier,@targetplayername,@sourceplayername,@reason,@expiration,@timeat,@permanent)',
+                'INSERT INTO banlisthistory (identifier,license,playerip,targetplayername,sourceplayername,reason,expiration,timeat,permanent) VALUES (@identifier,@license,@playerip,@targetplayername,@sourceplayername,@reason,@expiration,@timeat,@permanent)',
                 { 
 				['@identifier']       = identifier,
+				['@license']          = license,
+				['@playerip']         = playerip,
 				['@targetplayername'] = targetplayername,
 				['@sourceplayername'] = sourceplayername,
 				['@reason']           = reason,
@@ -283,10 +302,12 @@ function loadBanList()
 
       for i=1, #identifiers, 1 do
         table.insert(BanList, {
-			identifier  = identifiers[i].identifier,
-			reason      = identifiers[i].reason,
-			expiration  = identifiers[i].expiration,
-			permanent   = identifiers[i].permanent
+			identifier = identifiers[i].identifier,
+			license    = identifiers[i].license,
+			playerip   = identifiers[i].playerip,
+			reason     = identifiers[i].reason,
+			expiration = identifiers[i].expiration,
+			permanent  = identifiers[i].permanent
           })
       end
     end
@@ -303,6 +324,8 @@ function loadBanListHistory()
       for i=1, #identifiers, 1 do
         table.insert(BanListHistory, {
 			identifier       = identifiers[i].identifier,
+			license          = identifiers[i].license,
+			playerip         = identifiers[i].playerip,
 			targetplayername = identifiers[i].targetplayername,
 			sourceplayername = identifiers[i].sourceplayername,
 			reason           = identifiers[i].reason,
@@ -331,7 +354,10 @@ end
 
 
 AddEventHandler('playerConnecting', function (playerName,setKickReason)
-    local steamID = GetPlayerIdentifiers(source)[1]
+    local steamID  = GetPlayerIdentifiers(source)[1]
+	local license  = GetPlayerIdentifiers(source)[2]
+	local playerip = GetPlayerIdentifiers(source)[3]
+
 	
 	--Si Banlist pas chargée
 	if (Banlist == {}) then
@@ -344,7 +370,7 @@ AddEventHandler('playerConnecting', function (playerName,setKickReason)
     end
 	
 	for i = 1, #BanList, 1 do
-		if (tostring(BanList[i].identifier)) == tostring(steamID) and (tonumber(BanList[i].expiration)) > os.time() and (tonumber(BanList[i].permanent)) == 0 then
+		if ((tostring(BanList[i].identifier)) == tostring(steamID) or (tostring(BanList[i].license)) == tostring(license) or (tostring(BanList[i].playerip)) == tostring(playerip)) and (tonumber(BanList[i].expiration)) > os.time() and (tonumber(BanList[i].permanent)) == 0 then
 			local tempsrestant     = (((tonumber(BanList[i].expiration)) - os.time())/60)
 				if tempsrestant >= 1440 then
 					local day        = (tempsrestant / 60) / 24
@@ -373,12 +399,12 @@ AddEventHandler('playerConnecting', function (playerName,setKickReason)
 				end
 		end
 	
-		if (tostring(BanList[i].identifier)) == tostring(steamID) and (tonumber(BanList[i].permanent)) == 1 then
+		if ((tostring(BanList[i].identifier)) == tostring(steamID) or (tostring(BanList[i].license)) == tostring(license) or (tostring(BanList[i].playerip)) == tostring(playerip)) and (tonumber(BanList[i].permanent)) == 1 then
 			setKickReason(Text.yourpermban .. BanList[i].reason)
 			CancelEvent()
 		end
 	
-		if (tostring(BanList[i].identifier)) == tostring(steamID) and (tonumber(BanList[i].expiration)) < os.time() and (tonumber(BanList[i].permanent)) == 0 then
+		if ((tostring(BanList[i].identifier)) == tostring(steamID) or (tostring(BanList[i].license)) == tostring(license) or (tostring(BanList[i].playerip)) == tostring(playerip)) and (tonumber(BanList[i].expiration)) < os.time() and (tonumber(BanList[i].permanent)) == 0 then
 			deletebanned(steamID)
 		end
 	
