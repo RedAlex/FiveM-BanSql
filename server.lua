@@ -255,6 +255,15 @@ function ban(source,identifier,license,playerip,targetplayername,sourceplayernam
 		expiration = os.time()+expiration
 	end
 	
+		table.insert(BanList, {
+			identifier = identifier,
+			license    = license,
+			playerip   = playerip,
+			reason     = reason,
+			expiration = expiration,
+			permanent  = permanent
+          })
+
 		MySQL.Async.execute(
                 'INSERT INTO banlist (identifier,license,playerip,targetplayername,sourceplayername,reason,expiration,timeat,permanent) VALUES (@identifier,@license,@playerip,@targetplayername,@sourceplayername,@reason,@expiration,@timeat,@permanent)',
                 { 
@@ -272,7 +281,6 @@ function ban(source,identifier,license,playerip,targetplayername,sourceplayernam
 		end)
 		
 		TriggerEvent('bansql:sendMessage', source, (Text.youban .. targetplayername .. Text.during .. duree .. Text.forr .. reason))
-		BanListLoad = false
 				
 		MySQL.Async.execute(
                 'INSERT INTO banlisthistory (identifier,license,playerip,targetplayername,sourceplayername,reason,expiration,timeat,permanent) VALUES (@identifier,@license,@playerip,@targetplayername,@sourceplayername,@reason,@expiration,@timeat,@permanent)',
@@ -408,7 +416,6 @@ AddEventHandler('playerConnecting', function (playerName,setKickReason)
 			deletebanned(steamID)
 		end
 	
-		break
 	end
 	
 end)
