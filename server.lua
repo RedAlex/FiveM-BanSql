@@ -133,8 +133,8 @@ TriggerEvent('es:addGroupCommand', 'ban', "admin", function (source, args, user)
 					local sourceplayername = GetPlayerName(source)
 					local targetplayername = GetPlayerName(target)
 					local identifier 	   = GetPlayerIdentifiers(target)[1]
-					local license          = GetPlayerIdentifiers(source)[2]
-					local playerip         = GetPlayerIdentifiers(source)[3]
+					local license          = GetPlayerIdentifiers(target)[2]
+					local playerip         = GetPlayerIdentifiers(target)[3]
 				
 					if duree > 0 then
 						ban(source,identifier,license,playerip,targetplayername,sourceplayername,duree,reason,permanent)
