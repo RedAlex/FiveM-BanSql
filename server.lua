@@ -181,6 +181,7 @@ TriggerEvent('es:addGroupCommand', 'reason', "admin", function (source, args, us
 		local name       = lasttarget
 		local reason     = table.concat(args, " ",1)
 		local permanent  = 0
+		local playerip   = "0.0.0.0"
 
 		if Config.esx then
 			MySQL.Async.fetchScalar('SELECT identifier FROM users WHERE name=@name',
