@@ -5,8 +5,11 @@ An SQL ban that does not overload the database.
 It precharges the database in a table when opening the server or adding / removing a ban.
 
 # Installation
-1. Copy the project to your resource folder.
-2. Add "start FiveM-BanSql" in your `server.cfg`
+1. Download the .Zip from this repository.
+2. Extract it with your favorite program.
+3. Copy the project to your ressource folder.
+4.Don't forget to import the .sql file to your database.
+5. Add "start FiveM-BanSql" in your `server.cfg`
 
 # Commands
 ___
@@ -57,8 +60,12 @@ Un ban SQL qui ne surcharge pas la base de donnée.
 Il précharge la base de données dans une table lors de l'ouverture du serveur ou à l'ajout/retrait d'un ban.
 
 # Installation
-1. Copiez le projet dans votre dossier ressource.
-2. Ajoutez "start FiveM-BanSql" dans votre `server.cfg`
+1. Téléchargez le .Zip
+2. Extractez-le avec votre programme favori.
+3. Copiez le projet dans votre dossier ressource.
+4. N'oubliez pas d'importer le .sql a votre base de données.
+5. Ajoutez "start FiveM-BanSql" dans votre `server.cfg`
+
 
 # Commandes
 ___
