@@ -189,7 +189,9 @@ TriggerEvent('es:addGroupCommand', 'reason', "admin", function (source, args, us
 				['@name']       = name
 			}, function(identifier)
 
-				if identifier ~= nil then
+				if identifier == nil then
+					TriggerEvent('bansql:sendMessage', source, Text.invalidid)
+				else
 					local steamID = identifier
 
 					MySQL.Async.fetchScalar('SELECT license FROM users WHERE name=@name',
@@ -197,14 +199,14 @@ TriggerEvent('es:addGroupCommand', 'reason', "admin", function (source, args, us
 						['@name']       = name
 					}, function(license)
 
-						if identifier ~= nil then
+						if license ~= nil then
 							local fivemID = license						
 
 							if reason == "" then
 								reason = Text.noreason
 							end
 
-								if name ~= nil then
+								if name ~= "" then
 									if duree ~= nil and duree < 365 then
 										local sourceplayername = GetPlayerName(source)
 
@@ -227,8 +229,6 @@ TriggerEvent('es:addGroupCommand', 'reason', "admin", function (source, args, us
 								end
 						end
 					end)
-				else
-					TriggerEvent('bansql:sendMessage', source, Text.invalidid)
 				end
 
 			end)
