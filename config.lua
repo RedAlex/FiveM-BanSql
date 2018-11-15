@@ -1,7 +1,15 @@
-Config        = {}
-Config.Lang   = 'fr'
-Config.esx    = true --Turn this true if you are using esx
-
+Config                   = {}
+Config.Lang              = 'fr'
+Config.esx               = true --Turn this true if you are using esx
+Config.EnableDiscordLink = true -- only turn this on if you want link the log to a discord
+Config.webhookban        = "https://discordapp.com/api/webhooks/473571126690316298/oJZBU9YLz9ksOCG_orlf-wpMZ2pkFedfpEsC34DN_iHO0CBBp6X06W3mMJ2RvMMK7vIO"
+Config.webhookunban      = "https://discordapp.com/api/webhooks/473571126690316298/oJZBU9YLz9ksOCG_orlf-wpMZ2pkFedfpEsC34DN_iHO0CBBp6X06W3mMJ2RvMMK7vIO"
+Config.green             = 56108
+Config.grey              = 8421504
+Config.red               = 16711680
+Config.orange            = 16744192
+Config.blue              = 2061822
+Config.purple            = 11750815
 
 Config.TextFr = {
 	start         = "La BanList et l'historique a ete charger avec succes",
@@ -16,7 +24,8 @@ Config.TextFr = {
 	noreason      = "Raison Inconnue",
 	during        = " pendant : ",
 	noresult      = "Il n'y a pas autant de résultats !",
-	isban         = " a été déban",
+	isban         = " a été ban",
+	isunban       = " a été déban",
 	invalidid     = "ID du joueur incorrect",
 	invalidname   = "Le nom n'est pas valide",
 	invalidtime   = "Duree du ban incorrecte",
@@ -29,6 +38,7 @@ Config.TextFr = {
 	day           = " Jours ",
 	hour          = " Heures ",
 	minute        = " Minutes ",
+	by            = "par",
 }
 
 
@@ -45,7 +55,8 @@ Config.TextEn = {
 	noreason      = "unknown reason",
 	during        = " during : ",
 	noresult      = "There are not as many results!",
-	isban         = " was unban",
+	isban         = " was ban",
+	isunban       = " was unban",
 	invalidid     = "Player ID incorrect",
 	invalidname   = "The name is not valid",
 	invalidtime   = "Bad ban duration",
@@ -58,4 +69,5 @@ Config.TextEn = {
 	day           = " Days ",
 	hour          = " Hours ",
 	minute        = " Minutes ",
+	by            = "by",
 }

@@ -106,7 +106,12 @@ TriggerEvent('es:addGroupCommand', 'unban', "admin", function (source, args, use
                 function ()
                 loadBanList()
             end)
-			TriggerEvent('bansql:sendMessage', source, name .. Text.isban)
+			if Config.EnableDiscordLink then
+				local sourceplayername = GetPlayerName(source)
+				local message = (name .. Text.isunban .." ".. Text.by .." ".. sourceplayername)
+				sendToDiscord(Config.webhookunban, "BanSql", message, Config.green)
+			end
+			TriggerEvent('bansql:sendMessage', source, name .. Text.isunban)
         else
 			TriggerEvent('bansql:sendMessage', source, Text.invalidname)
         end
@@ -246,6 +251,23 @@ AddEventHandler('bansql:sendMessage', function(source, message)
 	end
 end)
 
+function sendToDiscord (canal, name, message, color)
+  -- Modify here your discordWebHook username = name, content = message,embeds = embeds
+local DiscordWebHook = canal
+local embeds = {
+    {
+        ["title"]= message,
+        ["type"]= "rich",
+        ["color"] = color,
+        ["footer"]=  {
+        ["text"]= "BanSql_logs",
+       },
+    }
+}
+
+  if message == nil or message == '' then return FALSE end
+  PerformHttpRequest(DiscordWebHook, function(err, text, headers) end, 'POST', json.encode({ username = name,embeds = embeds}), { ['Content-Type'] = 'application/json' })
+end
 
 function ban(source,identifier,license,playerip,targetplayername,sourceplayername,duree,reason,permanent)
 --calcul total expiration (en secondes)
@@ -264,6 +286,11 @@ function ban(source,identifier,license,playerip,targetplayername,sourceplayernam
 			expiration = expiration,
 			permanent  = permanent
           })
+
+		if Config.EnableDiscordLink then
+			local message = (identifier .." ".. license .." ".. playerip .." ".. targetplayername .. Text.isban .." ".. duree .. Text.forr .. reason .." ".. Text.by .." ".. sourceplayername)
+			sendToDiscord(Config.webhookban, "BanSql", message, Config.red)
+		end
 
 		MySQL.Async.execute(
                 'INSERT INTO banlist (identifier,license,playerip,targetplayername,sourceplayername,reason,expiration,timeat,permanent) VALUES (@identifier,@license,@playerip,@targetplayername,@sourceplayername,@reason,@expiration,@timeat,@permanent)',
