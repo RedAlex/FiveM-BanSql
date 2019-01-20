@@ -415,7 +415,7 @@ AddEventHandler('playerConnecting', function (playerName,setKickReason)
 					local txtday     = math.floor(day)
 					local txthrs     = math.floor(hrs)
 					local txtminutes = math.ceil(minutes)
-						setKickReason("Vous etes banni pour : " .. BanList[i].reason .. Text.timeleft .. txtday .. Text.day ..txthrs .. Text.hour ..txtminutes .. Text.minute)
+						setKickReason(Text.yourban .. BanList[i].reason .. Text.timeleft .. txtday .. Text.day ..txthrs .. Text.hour ..txtminutes .. Text.minute)
 						CancelEvent()
 				elseif tempsrestant >= 60 and tempsrestant < 1440 then
 					local day        = (tempsrestant / 60) / 24
@@ -424,13 +424,13 @@ AddEventHandler('playerConnecting', function (playerName,setKickReason)
 					local txtday     = math.floor(day)
 					local txthrs     = math.floor(hrs)
 					local txtminutes = math.ceil(minutes)
-						setKickReason("Vous etes banni pour : " .. BanList[i].reason .. Text.timeleft .. txtday .. Text.day .. txthrs .. Text.hour .. txtminutes .. Text.minute)
+						setKickReason(Text.yourban .. BanList[i].reason .. Text.timeleft .. txtday .. Text.day .. txthrs .. Text.hour .. txtminutes .. Text.minute)
 						CancelEvent()
 				elseif tempsrestant < 60 then
 					local txtday     = 0
 					local txthrs     = 0
 					local txtminutes = math.ceil(tempsrestant)
-						setKickReason("Vous etes banni pour : " .. BanList[i].reason .. Text.timeleft .. txtday .. Text.day .. txthrs .. Text.hour .. txtminutes .. Text.minute)
+						setKickReason(Text.yourban .. BanList[i].reason .. Text.timeleft .. txtday .. Text.day .. txthrs .. Text.hour .. txtminutes .. Text.minute)
 						CancelEvent()
 				end
 		end
