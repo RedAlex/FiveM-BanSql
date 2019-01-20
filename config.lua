@@ -1,7 +1,7 @@
 Config                   = {}
-Config.Lang              = 'fr'
+Config.Lang              = 'fr' --Set lang (fr-en)
 Config.esx               = true --Turn this true if you are using esx
-Config.EnableDiscordLink = true -- only turn this on if you want link the log to a discord
+Config.EnableDiscordLink = false -- only turn this on if you want link the log to a discord
 Config.webhookban        = "https://discordapp.com/api/webhooks/473571126690316298/oJZBU9YLz9ksOCG_orlf-wpMZ2pkFedfpEsC34DN_iHO0CBBp6X06W3mMJ2RvMMK7vIO"
 Config.webhookunban      = "https://discordapp.com/api/webhooks/473571126690316298/oJZBU9YLz9ksOCG_orlf-wpMZ2pkFedfpEsC34DN_iHO0CBBp6X06W3mMJ2RvMMK7vIO"
 Config.green             = 56108
