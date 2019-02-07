@@ -401,7 +401,7 @@ AddEventHandler('playerConnecting', function (playerName,setKickReason)
 	end
 
     if steamID == false then
-		setKickReason("Vous devez ouvrir steam !")
+		setKickReason(Text.invalidsteam)
 		CancelEvent()
     end
 	
