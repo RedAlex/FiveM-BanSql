@@ -39,7 +39,7 @@ CreateThread(function()
 end)
 
 
-TriggerEvent('es:addGroupCommand', 'banreload', "admin", function (source)
+TriggerEvent('es:addGroupCommand', 'banreload', Config.permission, function (source)
   BanListLoad        = false
   BanListHistoryLoad = false
   Wait(5000)
@@ -53,7 +53,7 @@ TriggerEvent('es:addGroupCommand', 'banreload', "admin", function (source)
   end
 end)
 
-TriggerEvent('es:addGroupCommand', 'banhistory', "admin", function (source, args, user)
+TriggerEvent('es:addGroupCommand', 'banhistory', Config.permission, function (source, args, user)
  if args[1] ~= nil and BanListHistory ~= {} then
 	local nombre = (tonumber(args[1]))
 	local name   = table.concat(args, " ",1)
@@ -90,7 +90,7 @@ TriggerEvent('es:addGroupCommand', 'banhistory', "admin", function (source, args
   end
 end)
 
-TriggerEvent('es:addGroupCommand', 'unban', "admin", function (source, args, user)
+TriggerEvent('es:addGroupCommand', 'unban', Config.permission, function (source, args, user)
   if args[1] ~= nil then
     local name = table.concat(args, " ")
      MySQL.Async.fetchScalar('SELECT identifier FROM banlist WHERE targetplayername=@name',
@@ -121,7 +121,7 @@ TriggerEvent('es:addGroupCommand', 'unban', "admin", function (source, args, use
   end
 end)
 
-TriggerEvent('es:addGroupCommand', 'ban', "admin", function (source, args, user)
+TriggerEvent('es:addGroupCommand', 'ban', Config.permission, function (source, args, user)
 		local target    = tonumber(args[1])
 		local duree     = tonumber(args[2])
 		local reason    = table.concat(args, " ",3)
@@ -162,7 +162,7 @@ TriggerEvent('es:addGroupCommand', 'ban', "admin", function (source, args, user)
 		end
 end)
 
-TriggerEvent('es:addGroupCommand', 'banoffline', "admin", function (source, args, user)
+TriggerEvent('es:addGroupCommand', 'banoffline', Config.permission, function (source, args, user)
 	if args ~= "" then
 		lastduree  = tonumber(args[1])
 		lasttarget = table.concat(args, " ",2)
@@ -181,7 +181,7 @@ TriggerEvent('es:addGroupCommand', 'banoffline', "admin", function (source, args
 	end
 end)
 
-TriggerEvent('es:addGroupCommand', 'reason', "admin", function (source, args, user)
+TriggerEvent('es:addGroupCommand', 'reason', Config.permission, function (source, args, user)
 		local duree      = lastduree
 		local name       = lasttarget
 		local reason     = table.concat(args, " ",1)

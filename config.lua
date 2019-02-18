@@ -1,6 +1,12 @@
 Config                   = {}
+
+--GENERAL
 Config.Lang              = 'fr' --Set lang (fr-en)
 Config.esx               = true --Turn this true if you are using esx
+Config.permission        = "admin" --Permission need to use FiveM-BanSql commands (mod-admin-superadmin)
+
+
+--WEBHOOK
 Config.EnableDiscordLink = false -- only turn this on if you want link the log to a discord
 Config.webhookban        = "https://discordapp.com/api/webhooks/473571126690316298/oJZBU9YLz9ksOCG_orlf-wpMZ2pkFedfpEsC34DN_iHO0CBBp6X06W3mMJ2RvMMK7vIO"
 Config.webhookunban      = "https://discordapp.com/api/webhooks/473571126690316298/oJZBU9YLz9ksOCG_orlf-wpMZ2pkFedfpEsC34DN_iHO0CBBp6X06W3mMJ2RvMMK7vIO"
@@ -11,6 +17,8 @@ Config.orange            = 16744192
 Config.blue              = 2061822
 Config.purple            = 11750815
 
+
+--LANGUAGE
 Config.TextFr = {
 	start         = "La BanList et l'historique a ete charger avec succes",
 	starterror    = "ERROR : La BanList ou l'historique n'a pas ete charger nouvelle tentative.",
@@ -26,7 +34,7 @@ Config.TextFr = {
 	noresult      = "Il n'y a pas autant de résultats !",
 	isban         = " a été ban",
 	isunban       = " a été déban",
-	invalidsteam =  "Vous devriez ouvrir steam",
+	invalidsteam  =  "Vous devriez ouvrir steam",
 	invalidid     = "ID du joueur incorrect",
 	invalidname   = "Le nom n'est pas valide",
 	invalidtime   = "Duree du ban incorrecte",
@@ -58,7 +66,7 @@ Config.TextEn = {
 	noresult      = "There are not as many results!",
 	isban         = " was ban",
 	isunban       = " was unban",
-	invalidsteam =  "You should open steam",
+	invalidsteam  =  "You should open steam",
 	invalidid     = "Player ID incorrect",
 	invalidname   = "The name is not valid",
 	invalidtime   = "Bad ban duration",
