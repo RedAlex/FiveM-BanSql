@@ -5,8 +5,8 @@ version '1.0.3'
 server_scripts {
 	'@async/async.lua',
 	'@mysql-async/lib/MySQL.lua',
-	'server.lua',
-	'config.lua'
+	'config.lua',
+	'server.lua'
 }
 
 dependencies {
