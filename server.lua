@@ -448,7 +448,7 @@ AddEventHandler('playerConnecting', function (playerName,setKickReason)
 			playerip = v
 		end
 	end
-	
+
 	--Si Banlist pas chargée
 	if (Banlist == {}) then
 		Citizen.Wait(1000)
@@ -458,18 +458,26 @@ AddEventHandler('playerConnecting', function (playerName,setKickReason)
 		setKickReason(Text.invalidsteam)
 		CancelEvent()
     end
-	
+
 	for i = 1, #BanList, 1 do
-		if ((tostring(BanList[i].identifier)) == tostring(steamID) 
+		if 
+			((tostring(BanList[i].identifier)) == tostring(steamID) 
 			or (tostring(BanList[i].license)) == tostring(license) 
 			or (tostring(BanList[i].liveid)) == tostring(liveid) 
 			or (tostring(BanList[i].xblid)) == tostring(xblid) 
 			or (tostring(BanList[i].discord)) == tostring(discord) 
 			or (tostring(BanList[i].playerip)) == tostring(playerip)) 
-			and (tonumber(BanList[i].expiration)) > os.time() 
-			and (tonumber(BanList[i].permanent)) == 0 then
-		
-			local tempsrestant     = (((tonumber(BanList[i].expiration)) - os.time())/60)
+		then
+
+			if (tonumber(BanList[i].permanent)) == 1 then
+
+				setKickReason(Text.yourpermban .. BanList[i].reason)
+				CancelEvent()
+				break
+
+			elseif (tonumber(BanList[i].expiration)) > os.time() then
+
+				local tempsrestant     = (((tonumber(BanList[i].expiration)) - os.time())/60)
 				if tempsrestant >= 1440 then
 					local day        = (tempsrestant / 60) / 24
 					local hrs        = (day - math.floor(day)) * 24
@@ -479,6 +487,7 @@ AddEventHandler('playerConnecting', function (playerName,setKickReason)
 					local txtminutes = math.ceil(minutes)
 						setKickReason(Text.yourban .. BanList[i].reason .. Text.timeleft .. txtday .. Text.day ..txthrs .. Text.hour ..txtminutes .. Text.minute)
 						CancelEvent()
+						break
 				elseif tempsrestant >= 60 and tempsrestant < 1440 then
 					local day        = (tempsrestant / 60) / 24
 					local hrs        = tempsrestant / 60
@@ -488,39 +497,26 @@ AddEventHandler('playerConnecting', function (playerName,setKickReason)
 					local txtminutes = math.ceil(minutes)
 						setKickReason(Text.yourban .. BanList[i].reason .. Text.timeleft .. txtday .. Text.day .. txthrs .. Text.hour .. txtminutes .. Text.minute)
 						CancelEvent()
+						break
 				elseif tempsrestant < 60 then
 					local txtday     = 0
 					local txthrs     = 0
 					local txtminutes = math.ceil(tempsrestant)
 						setKickReason(Text.yourban .. BanList[i].reason .. Text.timeleft .. txtday .. Text.day .. txthrs .. Text.hour .. txtminutes .. Text.minute)
 						CancelEvent()
+						break
 				end
-		end
-	
-		if ((tostring(BanList[i].identifier)) == tostring(steamID) 
-			or (tostring(BanList[i].license)) == tostring(license) 
-			or (tostring(BanList[i].liveid)) == tostring(liveid) 
-			or (tostring(BanList[i].xblid)) == tostring(xblid) 
-			or (tostring(BanList[i].discord)) == tostring(discord) 
-			or (tostring(BanList[i].playerip)) == tostring(playerip)) 
-			and (tonumber(BanList[i].permanent)) == 1 then
-				setKickReason(Text.yourpermban .. BanList[i].reason)
-				CancelEvent()
-		end
-	
-		if ((tostring(BanList[i].identifier)) == tostring(steamID) 
-			or (tostring(BanList[i].license)) == tostring(license) 
-			or (tostring(BanList[i].liveid)) == tostring(liveid) 
-			or (tostring(BanList[i].xblid)) == tostring(xblid) 
-			or (tostring(BanList[i].discord)) == tostring(discord) 
-			or (tostring(BanList[i].playerip)) == tostring(playerip)) 
-			and (tonumber(BanList[i].expiration)) < os.time() 
-			and (tonumber(BanList[i].permanent)) == 0 then
+
+			elseif (tonumber(BanList[i].expiration)) < os.time() and (tonumber(BanList[i].permanent)) == 0 then
+
 				deletebanned(steamID)
+				break
+
+			end
 		end
-	
+
 	end
-	
+
 end)
 
 
