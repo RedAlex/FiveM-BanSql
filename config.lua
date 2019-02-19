@@ -2,7 +2,6 @@ Config                   = {}
 
 --GENERAL
 Config.Lang              = 'fr' --Set lang (fr-en)
-Config.esx               = true --Turn this true if you are using esx
 Config.permission        = "admin" --Permission need to use FiveM-BanSql commands (mod-admin-superadmin)
 
 

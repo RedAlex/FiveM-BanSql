@@ -200,67 +200,48 @@ TriggerEvent('es:addGroupCommand', 'banoffline', Config.permission, function (so
 end)
 
 TriggerEvent('es:addGroupCommand', 'reason', Config.permission, function (source, args, user)
-		local duree      = lastduree
-		local name       = lasttarget
-		local reason     = table.concat(args, " ",1)
-		local permanent  = 0
-		local playerip   = "0.0.0.0"
-		local liveid     = "offlineban"
-		local xblid      = "offlineban"
-		local discord    = "offlineban"
+	local duree            = lastduree
+	local name             = lasttarget
+	local reason           = table.concat(args, " ",1)
+	local permanent        = 0
+	local playerip         = "0.0.0.0"
+	local liveid           = "no info"
+	local xblid            = "no info"
+	local discord          = "no info"
+	local sourceplayername = GetPlayerName(source)
 
-		if Config.esx then
-			MySQL.Async.fetchScalar('SELECT identifier FROM users WHERE name=@name',
+	if name ~= "" then
+		if duree ~= nil and duree < 365 then
+			if reason == "" then
+				reason = Text.noreason
+			end
+
+			MySQL.Async.fetchAll('SELECT * FROM baninfo WHERE playername = @playername', 
 			{
-				['@name']       = name
-			}, function(identifier)
+				['@playername'] = name
+			}, function(data)
 
-				if identifier == nil then
-					TriggerEvent('bansql:sendMessage', source, Text.invalidid)
+				if data ~= nil then
+					if duree > 0 then
+						ban(source,data[1].identifier,data[1].license,data[1].liveid,data[1].xblid,data[1].discord,data[1].playerip,name,sourceplayername,duree,reason,permanent)
+						lastduree  = ""
+						lasttarget = ""
+					else
+						local permanent = 1
+						ban(source,data[1].identifier,data[1].license,data[1].liveid,data[1].xblid,data[1].discord,data[1].playerip,name,sourceplayername,duree,reason,permanent)
+						lastduree  = ""
+						lasttarget = ""
+					end
 				else
-					local steamID = identifier
-
-					MySQL.Async.fetchScalar('SELECT license FROM users WHERE name=@name',
-					{
-						['@name']       = name
-					}, function(license)
-
-						if license ~= nil then
-							local fivemID = license						
-
-							if reason == "" then
-								reason = Text.noreason
-							end
-
-								if name ~= "" then
-									if duree ~= nil and duree < 365 then
-										local sourceplayername = GetPlayerName(source)
-
-										if duree > 0 then
-											ban(source,steamID,fivemID,liveid,xblid,discord,playerip,name,sourceplayername,duree,reason,permanent)
-											lastduree  = ""
-											lasttarget = ""
-										else
-											local permanent = 1
-											ban(source,steamID,fivemID,liveid,xblid,discord,playerip,name,sourceplayername,duree,reason,permanent)
-											lastduree  = ""
-											lasttarget = ""
-										end
-
-									else
-										TriggerEvent('bansql:sendMessage', source, Text.invalidtime)
-									end	
-								else
-									TriggerEvent('bansql:sendMessage', source, Text.invalidid)
-								end
-						end
-					end)
+					TriggerEvent('bansql:sendMessage', source, Text.invalidid)
 				end
-
 			end)
 		else
---			Here use futur BanUserList to find info
-		end
+			TriggerEvent('bansql:sendMessage', source, Text.invalidtime)
+		end	
+	else
+		TriggerEvent('bansql:sendMessage', source, Text.invalidid)
+	end
 end)
 
 -- console / rcon can also utilize es:command events, but breaks since the source isn't a connected player, ending up in error messages
@@ -517,6 +498,73 @@ AddEventHandler('playerConnecting', function (playerName,setKickReason)
 
 	end
 
+end)
+
+AddEventHandler('es:playerLoaded',function(source)
+  CreateThread(function()
+  Wait(5000)
+	local steamID  = "no info"
+	local license  = "no info"
+	local liveid   = "no info"
+	local xblid    = "no info"
+	local discord  = "no info"
+	local playerip = "no info"
+	local playername = GetPlayerName(source)
+
+	for k,v in ipairs(GetPlayerIdentifiers(source))do
+		if string.sub(v, 1, string.len("steam:")) == "steam:" then
+			steamID = v
+		elseif string.sub(v, 1, string.len("license:")) == "license:" then
+			license = v
+		elseif string.sub(v, 1, string.len("live:")) == "live:" then
+			liveid = v
+		elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
+			xblid  = v
+		elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
+			discord = v
+		elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
+			playerip = v
+		end
+	end
+
+		MySQL.Async.fetchAll('SELECT * FROM `baninfo` WHERE `identifier` = @identifier', {
+			['@identifier'] = steamID
+		}, function(data)
+		local found = false
+			for i=1, #data, 1 do
+				if data[i].identifier == steamID then
+					found = true
+				end
+			end
+			if not found then
+				MySQL.Async.execute('INSERT INTO baninfo (identifier,license,liveid,xblid,discord,playerip,playername) VALUES (@identifier,@license,@liveid,@xblid,@discord,@playerip,@playername)', 
+					{ 
+					['@identifier'] = steamID,
+					['@license']    = license,
+					['@liveid']     = liveid,
+					['@xblid']      = xblid,
+					['@discord']    = discord,
+					['@playerip']   = playerip,
+					['@playername'] = playername
+					},
+					function ()
+				end)
+			else
+				MySQL.Async.execute('UPDATE `baninfo` SET `license` = @license, `liveid` = @liveid, `xblid` = @xblid, `discord` = @discord, `playerip` = @playerip, `playername` = @playername WHERE `identifier` = @identifier', 
+					{ 
+					['@identifier'] = steamID,
+					['@license']    = license,
+					['@liveid']     = liveid,
+					['@xblid']      = xblid,
+					['@discord']    = discord,
+					['@playerip']   = playerip,
+					['@playername'] = playername
+					},
+					function ()
+				end)
+			end
+		end)
+  end)
 end)
 
 
