@@ -221,7 +221,7 @@ TriggerEvent('es:addGroupCommand', 'reason', Config.permission, function (source
 				['@playername'] = name
 			}, function(data)
 
-				if data ~= nil then
+				if data[1] ~= nil then
 					if duree > 0 then
 						ban(source,data[1].identifier,data[1].license,data[1].liveid,data[1].xblid,data[1].discord,data[1].playerip,name,sourceplayername,duree,reason,permanent)
 						lastduree  = ""
@@ -275,6 +275,7 @@ function ban(source,identifier,license,liveid,xblid,discord,playerip,targetplaye
 --calcul total expiration (en secondes)
 	local expiration = duree * 86400
 	local timeat     = os.time()
+	local message
 	
 	if expiration < os.time() then
 		expiration = os.time()+expiration
@@ -292,10 +293,8 @@ function ban(source,identifier,license,liveid,xblid,discord,playerip,targetplaye
 			permanent  = permanent
           })
 
-		if Config.EnableDiscordLink then
-			local message = (identifier .." ".. license .." ".. liveid .." ".. xblid .." ".. discord .." ".. playerip .." ".. targetplayername .. Text.isban .." ".. duree .. Text.forr .. reason .." ".. Text.by .." ".. sourceplayername)
-			sendToDiscord(Config.webhookban, "BanSql", message, Config.red)
-		end
+
+
 
 		MySQL.Async.execute(
                 'INSERT INTO banlist (identifier,license,liveid,xblid,discord,playerip,targetplayername,sourceplayername,reason,expiration,timeat,permanent) VALUES (@identifier,@license,@liveid,@xblid,@discord,@playerip,@targetplayername,@sourceplayername,@reason,@expiration,@timeat,@permanent)',
@@ -315,9 +314,18 @@ function ban(source,identifier,license,liveid,xblid,discord,playerip,targetplaye
 				},
 				function ()
 		end)
-		
-		TriggerEvent('bansql:sendMessage', source, (Text.youban .. targetplayername .. Text.during .. duree .. Text.forr .. reason))
-				
+
+		if permanent == 0 then
+			TriggerEvent('bansql:sendMessage', source, (Text.youban .. targetplayername .. Text.during .. duree .. Text.forr .. reason))
+			message = (identifier .." ".. license .." ".. liveid .." ".. xblid .." ".. discord .." ".. playerip .." ".. targetplayername .. Text.isban .." ".. duree .. Text.forr .. reason .." ".. Text.by .." ".. sourceplayername)
+		else
+			TriggerEvent('bansql:sendMessage', source, (Text.youban .. targetplayername .. Text.permban .. reason))
+			message = (identifier .." ".. license .." ".. liveid .." ".. xblid .." ".. discord .." ".. playerip .." ".. targetplayername .. Text.isban .." ".. Text.permban .. reason .." ".. Text.by .." ".. sourceplayername)
+		end
+		if Config.EnableDiscordLink then
+			sendToDiscord(Config.webhookban, "BanSql", message, Config.red)
+		end
+
 		MySQL.Async.execute(
                 'INSERT INTO banlisthistory (identifier,license,liveid,xblid,discord,playerip,targetplayername,sourceplayername,reason,expiration,timeat,permanent) VALUES (@identifier,@license,@liveid,@xblid,@discord,@playerip,@targetplayername,@sourceplayername,@reason,@expiration,@timeat,@permanent)',
                 { 
