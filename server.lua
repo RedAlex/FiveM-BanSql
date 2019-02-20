@@ -124,9 +124,9 @@ end)
 TriggerEvent('es:addGroupCommand', 'ban', Config.permission, function (source, args, user)
 	local identifier
 	local license
-	local liveid
-	local xblid
-	local discord
+	local liveid    = "no info"
+	local xblid     = "no info"
+	local discord   = "no info"
 	local playerip
 	local target    = tonumber(args[1])
 	local duree     = tonumber(args[2])
