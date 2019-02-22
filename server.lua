@@ -415,12 +415,12 @@ end
 
 
 AddEventHandler('playerConnecting', function (playerName,setKickReason)
-	local steamID  = "no info"
-	local license  = "no info"
-	local liveid   = "no info"
-	local xblid    = "no info"
-	local discord  = "no info"
-	local playerip = "no info"
+	local steamID  = "empty"
+	local license  = "empty"
+	local liveid   = "empty"
+	local xblid    = "empty"
+	local discord  = "empty"
+	local playerip = "empty"
 
 	for k,v in ipairs(GetPlayerIdentifiers(source))do
 		if string.sub(v, 1, string.len("steam:")) == "steam:" then
