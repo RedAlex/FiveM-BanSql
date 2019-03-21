@@ -38,8 +38,16 @@ CreateThread(function()
 	end
 end)
 
+TriggerEvent('es:addGroupCommand', 'bansql', Config.permission, function (source)
+	TriggerEvent('bansql:sendMessage', source, Text.cmdban)
+	TriggerEvent('bansql:sendMessage', source, Text.cmdbanoff)
+	TriggerEvent('bansql:sendMessage', source, Text.cmdunban)
+	TriggerEvent('bansql:sendMessage', source, Text.cmdhistory)
+	TriggerEvent('bansql:sendMessage', source, Text.cmdbanreload)
+end)
 
-TriggerEvent('es:addGroupCommand', 'banreload', Config.permission, function (source)
+
+TriggerEvent('es:addGroupCommand', 'sqlbanreload', Config.permission, function (source)
   BanListLoad        = false
   BanListHistoryLoad = false
   Wait(5000)
@@ -53,7 +61,7 @@ TriggerEvent('es:addGroupCommand', 'banreload', Config.permission, function (sou
   end
 end)
 
-TriggerEvent('es:addGroupCommand', 'banhistory', Config.permission, function (source, args, user)
+TriggerEvent('es:addGroupCommand', 'sqlbanhistory', Config.permission, function (source, args, user)
  if args[1] ~= nil and BanListHistory ~= {} then
 	local nombre = (tonumber(args[1]))
 	local name   = table.concat(args, " ",1)
@@ -86,11 +94,11 @@ TriggerEvent('es:addGroupCommand', 'banhistory', Config.permission, function (so
 		TriggerEvent('bansql:sendMessage', source, Text.invalidname)
 	end
   else
-	TriggerEvent('bansql:sendMessage', source, Text.addhistory)
+	TriggerEvent('bansql:sendMessage', source, Text.cmdhistory)
   end
 end)
 
-TriggerEvent('es:addGroupCommand', 'unban', Config.permission, function (source, args, user)
+TriggerEvent('es:addGroupCommand', 'sqlunban', Config.permission, function (source, args, user)
   if args[1] ~= nil then
     local name = table.concat(args, " ")
      MySQL.Async.fetchScalar('SELECT identifier FROM banlist WHERE targetplayername=@name',
@@ -117,11 +125,11 @@ TriggerEvent('es:addGroupCommand', 'unban', Config.permission, function (source,
         end
     end)
   else
-	TriggerEvent('bansql:sendMessage', source, Text.invalidname)
+	TriggerEvent('bansql:sendMessage', source, Text.cmdunban)
   end
 end)
 
-TriggerEvent('es:addGroupCommand', 'ban', Config.permission, function (source, args, user)
+TriggerEvent('es:addGroupCommand', 'sqlban', Config.permission, function (source, args, user)
 	local identifier
 	local license
 	local liveid    = "no info"
@@ -132,7 +140,8 @@ TriggerEvent('es:addGroupCommand', 'ban', Config.permission, function (source, a
 	local duree     = tonumber(args[2])
 	local reason    = table.concat(args, " ",3)
 	local permanent = 0
-		
+
+	if args[1] ~= nil then		
 		if reason == "" then
 			reason = Text.noreason
 		end
@@ -176,11 +185,13 @@ TriggerEvent('es:addGroupCommand', 'ban', Config.permission, function (source, a
 			end
 		else
 			TriggerEvent('bansql:sendMessage', source, Text.invalidid)
-			TriggerEvent('bansql:sendMessage', source, Text.add)
 		end
+	else
+		TriggerEvent('bansql:sendMessage', source, Text.cmdban)
+	end
 end)
 
-TriggerEvent('es:addGroupCommand', 'banoffline', Config.permission, function (source, args, user)
+TriggerEvent('es:addGroupCommand', 'sqlbanoffline', Config.permission, function (source, args, user)
 	if args ~= "" then
 		lastduree  = tonumber(args[1])
 		lasttarget = table.concat(args, " ",2)
@@ -192,14 +203,14 @@ TriggerEvent('es:addGroupCommand', 'banoffline', Config.permission, function (so
 			end
 		else
 			TriggerEvent('bansql:sendMessage', source, Text.invalidtime)
-			TriggerEvent('bansql:sendMessage', source, Text.addoff)
+			TriggerEvent('bansql:sendMessage', source, Text.cmdbanoff)
 		end
 	else
-		TriggerEvent('bansql:sendMessage', source, Text.addoff)
+		TriggerEvent('bansql:sendMessage', source, Text.cmdbanoff)
 	end
 end)
 
-TriggerEvent('es:addGroupCommand', 'reason', Config.permission, function (source, args, user)
+TriggerEvent('es:addGroupCommand', 'sqlreason', Config.permission, function (source, args, user)
 	local duree            = lastduree
 	local name             = lasttarget
 	local reason           = table.concat(args, " ",1)

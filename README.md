@@ -13,39 +13,47 @@ It precharges the database in a table when opening the server or adding / removi
 
 # Commands
 ___
-1. **ban id days reason** (	Allows ban a connected player	)
+1. **sqlban id days reason** (	Allows ban a connected player	)
  - "id" is the player's number in the list
  - "days" must be a number to say how many days it will be ban. (0 days mean permanent)
  - "reason" Ability to register why he is banished. Attention if there is no reason the player will see: "You are banned for: unknown reason"
- - example /ban 3 1 Troll (Will give ban player # 3 for 1 days with Troll reason)
+ - example /sqlban 3 1 Troll (Will give ban player # 3 for 1 days with Troll reason)
 ___
-2. **banoffline days name** (	   Allows ban a offline player	  )
+
+2. **sqlbanoffline days name** (	   Allows ban a offline player	  )
  - "days" must be a number to say how many days it will be ban. (0 days mean permanent)
  - "name" is the player's steam name
- - example /banoffline 3 Alex Garcio (Will ask you to entry ban:reason to continu)
-2.1 ***reason (reason)
+ - example /sqlbanoffline 3 Alex Garcio (Will ask you to entry ban:reason to continu)
+2.1 ***sqlreason (reason)
  - "reason" Ability to register why he is banished.
- - example /reason reason (Will ban player you have entry before for X days and the reason)
+ - example /sqlreason reason (Will ban player you have entry before for X days and the reason)
 ___
-3. **unban "Steam Name"**
+
+3. **sqlunban "Steam Name"**
  - Deban the player matching the written name.
- - Example ban:unban Alex Garcio (Will remove from the ban list the player)
+ - Example sqlunban Alex Garcio (Will remove from the ban list the player)
 ___
-4. **banreload ** (reload the BanList and the BanListHistory)
+
+4. **sqlbanreload ** (reload the BanList and the BanListHistory)
   - Can be used if you edit directly in your database.
 ___
-5. **banhistory option** (Allows you to view the ban history of a player offline or online)
+
+5. **sqlbanhistory option** (Allows you to view the ban history of a player offline or online)
 - "option"
 - (Name of a player) To display all the banns of a player
 - 1 To display only the first ban
 - 2 To display only the second ban
 - 3 ect ......
 - 4 ect ......
-- Example /banhistory Alex Garcio (Go to display all the list of player's bans)
-   
+- Example /sqlbanhistory Alex Garcio (Go to display all the list of player's bans)
+___
+
+6. **bansql** (Will show in game commands)
+- Example /bansql
+
+
 # Required resource
 - Async
-- Esx (Optional)
 
 
 # Created by
@@ -69,40 +77,47 @@ Il précharge la base de données dans une table lors de l'ouverture du serveur 
 
 # Commandes
 ___
-1. **ban id jours raison** (  Permet de ban un joueur connecté 	)
+1. **sqlban id jours raison** (  Permet de ban un joueur connecté 	)
  -  "id" correspond au chiffre du joueur dans la liste
  -  "jours" doit être un chiffre pour dire combien de jours il va etre ban. (0 jours veux dire permanent)
  -  "raison" Possibilité d'inscrire pourquoi il est bani. Attention si il n'y a pas de raison le joueur va voir : "Vous etes banni pour : Raison Inconnue"
- -  exemple /ban 3 1 Troll (Va donner bannir le joueur #3 pour 1 jours avec la raison Troll)
+ -  exemple /sqlban 3 1 Troll (Va donner bannir le joueur #3 pour 1 jours avec la raison Troll)
 ___
 
-2. **banoffline jours nom (	   Vous permet de ban un jours hors ligne	)
+2. **sqlbanoffline jours nom (	   Vous permet de ban un jours hors ligne	)
  -  "jours" doit être un chiffre pour dire combien de jours il va etre ban. (0 jours veux dire permanent)
  -  "nom" correspond au nom steam du joueur
- - example:addoff 3 Alex Garcio (Va vous demander de faire ban:reason pour continuer)
-2.1 ***reason (reason)
+ - example /sqlbanoffline 3 Alex Garcio (Va vous demander de faire ban:reason pour continuer)
+2.1 ***sqlreason (reason)
  - "reason" Possibilité d'inscrire pourquoi il est bani.
- - example /reason reason (Va donner bannir le joueur que vous avez entré plus tot pour la raison entrer ici)
+ - example /sqlreason reason (Va donner bannir le joueur que vous avez entré plus tot pour la raison entrer ici)
 ___
-3. **ban:unban "Nom Steam"**
+
+3. **sqlunban "Nom Steam"**
  - Déban le joueur correcpondant au nom écrit.
- - Exemple unban Alex Garcio (Va enlever de la liste de ban le joueur)
+ - Exemple /sqlunban Alex Garcio (Va enlever de la liste de ban le joueur)
 ___
-4. **banreload** (   Recharge la BanList et la BanListHistory   )
+
+4. **sqlbanreload** (   Recharge la BanList et la BanListHistory   )
   - Peut etre utilisé si vous modifiez directement dans votre base de données.
 ___
-5. **banhistory option ** (	 Permet d'afficher l'historique de ban d'un joueur hors ligne ou en ligne	)
+
+5. **sqlbanhistory option ** (	 Permet d'afficher l'historique de ban d'un joueur hors ligne ou en ligne	)
 -   "option" 
 -		(Nom Steam) Pour afficher tout les bans d'un joueur
 -		1 Pour afficher seulement le premier ban
 -		2 Pour afficher seulement le deuxième ban
 -		3 ect......
 -		4 ect......
--   Exemple /banhistory Alex Garcio (Va afficher toute la liste des bans du joueur)
-   
+-   Exemple /sqlbanhistory Alex Garcio (Va afficher toute la liste des bans du joueur)
+___
+
+6. **bansql** (Affiche les commandes en jeu)
+- Example /bansql
+
+
 # Ressource requis
 - Async
-- Esx (Optionel)
 
 
 # Créer par
