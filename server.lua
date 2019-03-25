@@ -62,12 +62,12 @@ TriggerEvent('es:addGroupCommand', 'sqlbanreload', Config.permission, function (
 end)
 
 TriggerEvent('es:addGroupCommand', 'sqlbanhistory', Config.permission, function (source, args, user)
- if args[1] ~= nil and BanListHistory ~= {} then
+ if args[1] and BanListHistory then
 	local nombre = (tonumber(args[1]))
 	local name   = table.concat(args, " ",1)
 	if name ~= "" then
 
-			if nombre ~= nil and nombre > 0 then
+			if nombre and nombre > 0 then
 					local expiration = BanListHistory[nombre].expiration
 					local timeat     = BanListHistory[nombre].timeat
 					local calcul1    = expiration - timeat
@@ -99,30 +99,38 @@ TriggerEvent('es:addGroupCommand', 'sqlbanhistory', Config.permission, function 
 end)
 
 TriggerEvent('es:addGroupCommand', 'sqlunban', Config.permission, function (source, args, user)
-  if args[1] ~= nil then
-    local name = table.concat(args, " ")
-     MySQL.Async.fetchScalar('SELECT identifier FROM banlist WHERE targetplayername=@name',
-    {
-        ['@name'] = name
-    }, function(identifier)
-        if identifier ~= nil then
-            MySQL.Async.execute(
-            'DELETE FROM banlist WHERE targetplayername=@name',
-            {
-              ['@name']  = name
-            },
-                function ()
-                loadBanList()
-            end)
-			if Config.EnableDiscordLink then
-				local sourceplayername = GetPlayerName(source)
-				local message = (name .. Text.isunban .." ".. Text.by .." ".. sourceplayername)
-				sendToDiscord(Config.webhookunban, "BanSql", message, Config.green)
+  if args[1] then
+    local target = table.concat(args, " ")
+	MySQL.Async.fetchAll('SELECT * FROM banlist WHERE targetplayername like @playername', 
+	{
+		['@playername'] = ("%"..target.."%")
+	}, function(data)
+		if data[1] then
+			if #data > 1 then
+				TriggerEvent('bansql:sendMessage', source, Text.toomanyresult)
+				for i=1, #data, 1 do
+					TriggerEvent('bansql:sendMessage', source, data[i].targetplayername)
+				end
+			else
+				MySQL.Async.execute(
+				'DELETE FROM banlist WHERE targetplayername = @name',
+				{
+				  ['@name']  = data[1].targetplayername
+				},
+					function ()
+					loadBanList()
+					if Config.EnableDiscordLink then
+						local sourceplayername = GetPlayerName(source)
+						local message = (data[1].targetplayername .. Text.isunban .." ".. Text.by .." ".. sourceplayername)
+						sendToDiscord(Config.webhookunban, "BanSql", message, Config.green)
+					end
+					TriggerEvent('bansql:sendMessage', source, data[1].targetplayername .. Text.isunban)
+				end)
 			end
-			TriggerEvent('bansql:sendMessage', source, name .. Text.isunban)
-        else
+		else
 			TriggerEvent('bansql:sendMessage', source, Text.invalidname)
-        end
+		end
+
     end)
   else
 	TriggerEvent('bansql:sendMessage', source, Text.cmdunban)
@@ -141,15 +149,15 @@ TriggerEvent('es:addGroupCommand', 'sqlban', Config.permission, function (source
 	local reason    = table.concat(args, " ",3)
 	local permanent = 0
 
-	if args[1] ~= nil then		
+	if args[1] then		
 		if reason == "" then
 			reason = Text.noreason
 		end
-		if target ~= nil and target > 0 then
+		if target and target > 0 then
 			local ping = GetPlayerPing(target)
         
-			if ping ~= nil and ping > 0 then
-				if duree ~= nil and duree < 365 then
+			if ping and ping > 0 then
+				if duree and duree < 365 then
 					local sourceplayername = GetPlayerName(source)
 					local targetplayername = GetPlayerName(target)
 						for k,v in ipairs(GetPlayerIdentifiers(target))do
@@ -194,12 +202,29 @@ end)
 TriggerEvent('es:addGroupCommand', 'sqlbanoffline', Config.permission, function (source, args, user)
 	if args ~= "" then
 		lastduree  = tonumber(args[1])
-		lasttarget = table.concat(args, " ",2)
-		if lastduree ~= "" and lastduree ~= nil then
-			if lasttarget ~= "" and lasttarget ~= nil then
-				TriggerEvent('bansql:sendMessage', source, (lasttarget .. Text.during .. lastduree .. Text.forcontinu))
+		target     = table.concat(args, " ",2)
+		if lastduree ~= "" then
+			if target ~= "" then
+				MySQL.Async.fetchAll('SELECT * FROM baninfo WHERE playername like @playername', 
+				{
+					['@playername'] = ("%"..target.."%")
+				}, function(data)
+					if data[1] then
+						if #data > 1 then
+							TriggerEvent('bansql:sendMessage', source, Text.toomanyresult)
+							for i=1, #data, 1 do
+								TriggerEvent('bansql:sendMessage', source, data[i].playername)
+							end
+						else
+							lasttarget = data[1].playername
+							TriggerEvent('bansql:sendMessage', source, (lasttarget .. Text.during .. lastduree .. Text.forcontinu))
+						end
+					else
+						TriggerEvent('bansql:sendMessage', source, Text.invalidname)
+					end
+				end)
 			else
-				TriggerEvent('bansql:sendMessage', source, Text.invalidid)
+				TriggerEvent('bansql:sendMessage', source, Text.invalidname)
 			end
 		else
 			TriggerEvent('bansql:sendMessage', source, Text.invalidtime)
@@ -222,7 +247,7 @@ TriggerEvent('es:addGroupCommand', 'sqlreason', Config.permission, function (sou
 	local sourceplayername = GetPlayerName(source)
 
 	if name ~= "" then
-		if duree ~= nil and duree < 365 then
+		if duree and duree < 365 then
 			if reason == "" then
 				reason = Text.noreason
 			end
@@ -232,7 +257,7 @@ TriggerEvent('es:addGroupCommand', 'sqlreason', Config.permission, function (sou
 				['@playername'] = name
 			}, function(data)
 
-				if data[1] ~= nil then
+				if data[1] then
 					if duree > 0 then
 						ban(source,data[1].identifier,data[1].license,data[1].liveid,data[1].xblid,data[1].discord,data[1].playerip,name,sourceplayername,duree,reason,permanent)
 						lastduree  = ""
