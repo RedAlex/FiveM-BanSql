@@ -5,16 +5,9 @@ local BanList            = {}
 local BanListLoad        = false
 local BanListHistory     = {}
 local BanListHistoryLoad = false
-
+if Config.Lang == "fr" then Text = Config.TextFr elseif Config.Lang == "en" then Text = Config.TextEn else print("FIveM-BanSql : Invalid Config.Lang") end
 
 CreateThread(function()
-	if Config.Lang == "fr" then
-		Text = Config.TextFr
-	elseif Config.Lang == "en" then
-		Text = Config.TextEn
-	else
-		print("FIveM-BanSql : Invalid Config.Lang")
-	end
 	while true do
 		Wait(1000)
         if BanListLoad == false then
@@ -38,15 +31,6 @@ CreateThread(function()
 	end
 end)
 
-TriggerEvent('es:addGroupCommand', 'bansql', Config.permission, function (source)
-	TriggerEvent('bansql:sendMessage', source, Text.cmdban)
-	TriggerEvent('bansql:sendMessage', source, Text.cmdbanoff)
-	TriggerEvent('bansql:sendMessage', source, Text.cmdunban)
-	TriggerEvent('bansql:sendMessage', source, Text.cmdhistory)
-	TriggerEvent('bansql:sendMessage', source, Text.cmdbanreload)
-end)
-
-
 TriggerEvent('es:addGroupCommand', 'sqlbanreload', Config.permission, function (source)
   BanListLoad        = false
   BanListHistoryLoad = false
@@ -59,7 +43,9 @@ TriggerEvent('es:addGroupCommand', 'sqlbanreload', Config.permission, function (
   else
 	TriggerEvent('bansql:sendMessage', source, Text.loaderror)
   end
-end)
+end, function(source, args, user)
+	TriggerClientEvent('chat:addMessage', source, { args = { '^1SYSTEM ', 'Insufficient Permissions.' } })
+end, {help = Text.reload})
 
 TriggerEvent('es:addGroupCommand', 'sqlbanhistory', Config.permission, function (source, args, user)
  if args[1] and BanListHistory then
@@ -96,7 +82,9 @@ TriggerEvent('es:addGroupCommand', 'sqlbanhistory', Config.permission, function 
   else
 	TriggerEvent('bansql:sendMessage', source, Text.cmdhistory)
   end
-end)
+end, function(source, args, user)
+	TriggerClientEvent('chat:addMessage', source, { args = { '^1SYSTEM ', 'Insufficient Permissions.' } })
+end, {help = Text.history, params = {{name = "name", help = Text.steamname}, }})
 
 TriggerEvent('es:addGroupCommand', 'sqlunban', Config.permission, function (source, args, user)
   if args[1] then
@@ -135,7 +123,9 @@ TriggerEvent('es:addGroupCommand', 'sqlunban', Config.permission, function (sour
   else
 	TriggerEvent('bansql:sendMessage', source, Text.cmdunban)
   end
-end)
+end, function(source, args, user)
+	TriggerClientEvent('chat:addMessage', source, { args = { '^1SYSTEM ', 'Insufficient Permissions.' } })
+end, {help = Text.unban, params = {{name = "name", help = Text.steamname}}})
 
 TriggerEvent('es:addGroupCommand', 'sqlban', Config.permission, function (source, args, user)
 	local identifier
@@ -197,7 +187,9 @@ TriggerEvent('es:addGroupCommand', 'sqlban', Config.permission, function (source
 	else
 		TriggerEvent('bansql:sendMessage', source, Text.cmdban)
 	end
-end)
+end, function(source, args, user)
+	TriggerClientEvent('chat:addMessage', source, { args = { '^1SYSTEM ', 'Insufficient Permissions.' } })
+end, {help = Text.ban, params = {{name = "id"}, {name = "day", help = Text.dayhelp}, {name = "reason", help = Text.reason}}})
 
 TriggerEvent('es:addGroupCommand', 'sqlbanoffline', Config.permission, function (source, args, user)
 	if args ~= "" then
@@ -233,7 +225,9 @@ TriggerEvent('es:addGroupCommand', 'sqlbanoffline', Config.permission, function 
 	else
 		TriggerEvent('bansql:sendMessage', source, Text.cmdbanoff)
 	end
-end)
+end, function(source, args, user)
+	TriggerClientEvent('chat:addMessage', source, { args = { '^1SYSTEM ', 'Insufficient Permissions.' } })
+end, {help = Text.banoff, params = {{name = "day", help = Text.dayhelp}, {name = "name", help = Text.steamname}}})
 
 TriggerEvent('es:addGroupCommand', 'sqlreason', Config.permission, function (source, args, user)
 	local duree            = lastduree
@@ -278,12 +272,14 @@ TriggerEvent('es:addGroupCommand', 'sqlreason', Config.permission, function (sou
 	else
 		TriggerEvent('bansql:sendMessage', source, Text.invalidid)
 	end
-end)
+end, function(source, args, user)
+	TriggerClientEvent('chat:addMessage', source, { args = { '^1SYSTEM ', 'Insufficient Permissions.' } })
+end, {help = Text.banoff, params = {{name = "reason", help = Text.reason}}})
 
 -- console / rcon can also utilize es:command events, but breaks since the source isn't a connected player, ending up in error messages
 AddEventHandler('bansql:sendMessage', function(source, message)
 	if source ~= 0 then
-		TriggerClientEvent('chat:addMessage', source, { args = { '^1Banlist', message } } )
+		TriggerClientEvent('chat:addMessage', source, { args = { '^1Banlist ', message } } )
 	else
 		print('SqlBan: ' .. message)
 	end
