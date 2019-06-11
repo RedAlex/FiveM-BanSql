@@ -31,6 +31,36 @@ CreateThread(function()
 	end
 end)
 
+CreateThread(function()
+	while Config.MultiServerSync do
+		Wait(30000)
+		MySQL.Async.fetchAll(
+		'SELECT * FROM banlist',
+		{},
+		function (data)
+			if #data ~= #BanList then
+			  BanList = {}
+
+			  for i=1, #data, 1 do
+				table.insert(BanList, {
+					identifier = data[i].identifier,
+					license    = data[i].license,
+					liveid     = data[i].liveid,
+					xblid      = data[i].xblid,
+					discord    = data[i].discord,
+					playerip   = data[i].playerip,
+					reason     = data[i].reason,
+					expiration = data[i].expiration,
+					permanent  = data[i].permanent
+				  })
+			  end
+			loadBanListHistory()
+			end
+		end
+		)
+	end
+end)
+
 TriggerEvent('es:addGroupCommand', 'sqlbanreload', Config.permission, function (source)
   BanListLoad        = false
   BanListHistoryLoad = false
