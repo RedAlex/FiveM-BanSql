@@ -10,7 +10,6 @@ CREATE TABLE IF NOT EXISTS banlist (
   sourceplayername varchar(32) COLLATE utf8mb4_bin NOT NULL,
   reason varchar(255) NOT NULL,
   timeat varchar(50) NOT NULL,
-  added datetime DEFAULT CURRENT_TIMESTAMP,
   expiration varchar(50) NOT NULL,
   permanent int(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
@@ -28,7 +27,7 @@ CREATE TABLE IF NOT EXISTS banlisthistory (
   sourceplayername varchar(32) COLLATE utf8mb4_bin NOT NULL,
   reason varchar(255) NOT NULL,
   timeat int(11) NOT NULL,
-  added datetime DEFAULT CURRENT_TIMESTAMP,
+  added varchar(40) NOT NULL,
   expiration int(11) NOT NULL,
   permanent int(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;

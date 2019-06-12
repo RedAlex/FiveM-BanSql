@@ -50,6 +50,7 @@ CreateThread(function()
 					discord    = data[i].discord,
 					playerip   = data[i].playerip,
 					reason     = data[i].reason,
+					added      = data[i].added,
 					expiration = data[i].expiration,
 					permanent  = data[i].permanent
 				  })
@@ -88,8 +89,8 @@ TriggerEvent('es:addGroupCommand', 'sqlbanhistory', Config.permission, function 
 					local timeat     = BanListHistory[nombre].timeat
 					local calcul1    = expiration - timeat
 					local calcul2    = calcul1 / 86400
-					local calcul2 	 =  math.ceil(calcul2)
-					local resultat   = (tostring(BanListHistory[nombre].targetplayername)) .. " , " .. (tostring(BanListHistory[nombre].sourceplayername)) .. " , " .. (tostring(BanListHistory[nombre].reason)) .. " , " .. calcul2 .. Text.day
+					local calcul2 	 = math.ceil(calcul2)
+					local resultat   = tostring(BanListHistory[nombre].targetplayername.." , "..BanListHistory[nombre].sourceplayername.." , "..BanListHistory[nombre].reason.." , "..calcul2..Text.day.." , "..BanListHistory[nombre].added)
 					
 					TriggerEvent('bansql:sendMessage', source, (nombre .." : ".. resultat))
 			else
@@ -99,8 +100,8 @@ TriggerEvent('es:addGroupCommand', 'sqlbanhistory', Config.permission, function 
 							local timeat     = BanListHistory[i].timeat
 							local calcul1    = expiration - timeat
 							local calcul2    = calcul1 / 86400
-							local calcul2 	 =  math.ceil(calcul2)					
-							local resultat   = (tostring(BanListHistory[i].targetplayername)) .. " , " .. (tostring(BanListHistory[i].sourceplayername)) .. " , " .. (tostring(BanListHistory[i].reason)) .. " , " .. calcul2 .. Text.day
+							local calcul2 	 = math.ceil(calcul2)					
+							local resultat   = tostring(BanListHistory[i].targetplayername.." , "..BanListHistory[i].sourceplayername.." , "..BanListHistory[i].reason.." , "..calcul2..Text.day.." , "..BanListHistory[nombre].added)
 
 							TriggerEvent('bansql:sendMessage', source, (i .." : ".. resultat))
 						end
@@ -337,6 +338,7 @@ function ban(source,identifier,license,liveid,xblid,discord,playerip,targetplaye
 --calcul total expiration (en secondes)
 	local expiration = duree * 86400
 	local timeat     = os.time()
+	local added      = os.date()
 	local message
 	
 	if expiration < os.time() then
@@ -371,7 +373,7 @@ function ban(source,identifier,license,liveid,xblid,discord,playerip,targetplaye
 				['@sourceplayername'] = sourceplayername,
 				['@reason']           = reason,
 				['@expiration']       = expiration,
-				['@timeat']           = os.time(),
+				['@timeat']           = timeat,
 				['@permanent']        = permanent,
 				},
 				function ()
@@ -389,7 +391,7 @@ function ban(source,identifier,license,liveid,xblid,discord,playerip,targetplaye
 		end
 
 		MySQL.Async.execute(
-                'INSERT INTO banlisthistory (identifier,license,liveid,xblid,discord,playerip,targetplayername,sourceplayername,reason,expiration,timeat,permanent) VALUES (@identifier,@license,@liveid,@xblid,@discord,@playerip,@targetplayername,@sourceplayername,@reason,@expiration,@timeat,@permanent)',
+                'INSERT INTO banlisthistory (identifier,license,liveid,xblid,discord,playerip,targetplayername,sourceplayername,reason,added,expiration,timeat,permanent) VALUES (@identifier,@license,@liveid,@xblid,@discord,@playerip,@targetplayername,@sourceplayername,@reason,@added,@expiration,@timeat,@permanent)',
                 { 
 				['@identifier']       = identifier,
 				['@license']          = license,
@@ -400,8 +402,9 @@ function ban(source,identifier,license,liveid,xblid,discord,playerip,targetplaye
 				['@targetplayername'] = targetplayername,
 				['@sourceplayername'] = sourceplayername,
 				['@reason']           = reason,
+				['@added']            = added,
 				['@expiration']       = expiration,
-				['@timeat']           = os.time(),
+				['@timeat']           = timeat,
 				['@permanent']        = permanent,
 				},
 				function ()
@@ -411,67 +414,65 @@ function ban(source,identifier,license,liveid,xblid,discord,playerip,targetplaye
 end
 
 function loadBanList()
-  MySQL.Async.fetchAll(
-    'SELECT * FROM banlist',
-    {},
-    function (data)
-      BanList = {}
+	MySQL.Async.fetchAll(
+		'SELECT * FROM banlist',
+		{},
+		function (data)
+		  BanList = {}
 
-      for i=1, #data, 1 do
-        table.insert(BanList, {
-			identifier = data[i].identifier,
-			license    = data[i].license,
-			liveid     = data[i].liveid,
-			xblid      = data[i].xblid,
-			discord    = data[i].discord,
-			playerip   = data[i].playerip,
-			reason     = data[i].reason,
-			expiration = data[i].expiration,
-			permanent  = data[i].permanent
-          })
-      end
-    end
-  )
+		  for i=1, #data, 1 do
+			table.insert(BanList, {
+				identifier = data[i].identifier,
+				license    = data[i].license,
+				liveid     = data[i].liveid,
+				xblid      = data[i].xblid,
+				discord    = data[i].discord,
+				playerip   = data[i].playerip,
+				reason     = data[i].reason,
+				expiration = data[i].expiration,
+				permanent  = data[i].permanent
+			  })
+		  end
+    end)
 end
 
 function loadBanListHistory()
-  MySQL.Async.fetchAll(
-    'SELECT * FROM banlisthistory',
-    {},
-    function (data)
-      BanListHistory = {}
+	MySQL.Async.fetchAll(
+		'SELECT * FROM banlisthistory',
+		{},
+		function (data)
+		  BanListHistory = {}
 
-      for i=1, #data, 1 do
-        table.insert(BanListHistory, {
-			identifier       = data[i].identifier,
-			license          = data[i].license,
-			liveid           = data[i].liveid,
-			xblid            = data[i].xblid,
-			discord          = data[i].discord,
-			playerip         = data[i].playerip,
-			targetplayername = data[i].targetplayername,
-			sourceplayername = data[i].sourceplayername,
-			reason           = data[i].reason,
-			expiration       = data[i].expiration,
-			permanent        = data[i].permanent,
-			timeat           = data[i].timeat
-          })
-      end
-    end
-  )
+		  for i=1, #data, 1 do
+			table.insert(BanListHistory, {
+				identifier       = data[i].identifier,
+				license          = data[i].license,
+				liveid           = data[i].liveid,
+				xblid            = data[i].xblid,
+				discord          = data[i].discord,
+				playerip         = data[i].playerip,
+				targetplayername = data[i].targetplayername,
+				sourceplayername = data[i].sourceplayername,
+				reason           = data[i].reason,
+				added            = data[i].added,
+				expiration       = data[i].expiration,
+				permanent        = data[i].permanent,
+				timeat           = data[i].timeat
+			  })
+		  end
+    end)
 end
 
 
 function deletebanned(identifier) 
-
-MySQL.Async.execute(
-            'DELETE FROM banlist WHERE identifier=@identifier',
-            {
-              ['@identifier']  = identifier
-            },
-                function ()
-                loadBanList()
-            end)
+	MySQL.Async.execute(
+		'DELETE FROM banlist WHERE identifier=@identifier',
+		{
+		  ['@identifier']  = identifier
+		},
+		function ()
+			loadBanList()
+	end)
 end
 
 
