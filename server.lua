@@ -141,7 +141,7 @@ TriggerEvent('es:addGroupCommand', 'sqlunban', Config.permission, function (sour
 					if Config.EnableDiscordLink then
 						local sourceplayername = GetPlayerName(source)
 						local message = (data[1].targetplayername .. Text.isunban .." ".. Text.by .." ".. sourceplayername)
-						sendToDiscord(Config.webhookunban, "BanSql", message, Config.green)
+						sendToDiscord(Config.webhookunban, message)
 					end
 					TriggerEvent('bansql:sendMessage', source, data[1].targetplayername .. Text.isunban)
 				end)
@@ -316,22 +316,9 @@ AddEventHandler('bansql:sendMessage', function(source, message)
 	end
 end)
 
-function sendToDiscord (canal, name, message, color)
-  -- Modify here your discordWebHook username = name, content = message,embeds = embeds
-local DiscordWebHook = canal
-local embeds = {
-    {
-        ["title"]= message,
-        ["type"]= "rich",
-        ["color"] = color,
-        ["footer"]=  {
-        ["text"]= "BanSql_logs",
-       },
-    }
-}
-
-  if message == nil or message == '' then return FALSE end
-  PerformHttpRequest(DiscordWebHook, function(err, text, headers) end, 'POST', json.encode({ username = name,embeds = embeds}), { ['Content-Type'] = 'application/json' })
+function sendToDiscord(canal,message)
+	local DiscordWebHook = canal
+	PerformHttpRequest(DiscordWebHook, function(err, text, headers) end, 'POST', json.encode({content = message}), { ['Content-Type'] = 'application/json' })
 end
 
 function ban(source,identifier,license,liveid,xblid,discord,playerip,targetplayername,sourceplayername,duree,reason,permanent)
@@ -381,13 +368,13 @@ function ban(source,identifier,license,liveid,xblid,discord,playerip,targetplaye
 
 		if permanent == 0 then
 			TriggerEvent('bansql:sendMessage', source, (Text.youban .. targetplayername .. Text.during .. duree .. Text.forr .. reason))
-			message = (identifier .." ".. license .." ".. liveid .." ".. xblid .." ".. discord .." ".. playerip .." ".. targetplayername .. Text.isban .." ".. duree .. Text.forr .. reason .." ".. Text.by .." ".. sourceplayername)
+			message = (targetplayername .. Text.isban .." ".. duree .. Text.forr .. reason .." ".. Text.by .." ".. sourceplayername.."```"..identifier .."\n".. license .."\n".. liveid .."\n".. xblid .."\n".. discord .."\n".. playerip .."```")
 		else
 			TriggerEvent('bansql:sendMessage', source, (Text.youban .. targetplayername .. Text.permban .. reason))
-			message = (identifier .." ".. license .." ".. liveid .." ".. xblid .." ".. discord .." ".. playerip .." ".. targetplayername .. Text.isban .." ".. Text.permban .. reason .." ".. Text.by .." ".. sourceplayername)
+			message = (targetplayername .. Text.isban .." ".. Text.permban .. reason .." ".. Text.by .." ".. sourceplayername.."```"..identifier .."\n".. license .."\n".. liveid .."\n".. xblid .."\n".. discord .."\n".. playerip .."```")
 		end
 		if Config.EnableDiscordLink then
-			sendToDiscord(Config.webhookban, "BanSql", message, Config.red)
+			sendToDiscord(Config.webhookban, message)
 		end
 
 		MySQL.Async.execute(
