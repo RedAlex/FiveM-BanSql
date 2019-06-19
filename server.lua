@@ -56,6 +56,7 @@ CreateThread(function()
 				  })
 			  end
 			loadBanListHistory()
+			TriggerClientEvent('BanSql:Respond', -1)
 			end
 		end
 		)
@@ -316,6 +317,178 @@ AddEventHandler('bansql:sendMessage', function(source, message)
 	end
 end)
 
+AddEventHandler('playerConnecting', function (playerName,setKickReason)
+	local steamID  = "empty"
+	local license  = "empty"
+	local liveid   = "empty"
+	local xblid    = "empty"
+	local discord  = "empty"
+	local playerip = "empty"
+
+	for k,v in ipairs(GetPlayerIdentifiers(source))do
+		if string.sub(v, 1, string.len("steam:")) == "steam:" then
+			steamID = v
+		elseif string.sub(v, 1, string.len("license:")) == "license:" then
+			license = v
+		elseif string.sub(v, 1, string.len("live:")) == "live:" then
+			liveid = v
+		elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
+			xblid  = v
+		elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
+			discord = v
+		elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
+			playerip = v
+		end
+	end
+
+	--Si Banlist pas chargée
+	if (Banlist == {}) then
+		Citizen.Wait(1000)
+	end
+
+    if steamID == false then
+		setKickReason(Text.invalidsteam)
+		CancelEvent()
+    end
+
+	for i = 1, #BanList, 1 do
+		if 
+			((tostring(BanList[i].identifier)) == tostring(steamID) 
+			or (tostring(BanList[i].license)) == tostring(license) 
+			or (tostring(BanList[i].liveid)) == tostring(liveid) 
+			or (tostring(BanList[i].xblid)) == tostring(xblid) 
+			or (tostring(BanList[i].discord)) == tostring(discord) 
+			or (tostring(BanList[i].playerip)) == tostring(playerip)) 
+		then
+
+			if (tonumber(BanList[i].permanent)) == 1 then
+
+				setKickReason(Text.yourpermban .. BanList[i].reason)
+				CancelEvent()
+				break
+
+			elseif (tonumber(BanList[i].expiration)) > os.time() then
+
+				local tempsrestant     = (((tonumber(BanList[i].expiration)) - os.time())/60)
+				if tempsrestant >= 1440 then
+					local day        = (tempsrestant / 60) / 24
+					local hrs        = (day - math.floor(day)) * 24
+					local minutes    = (hrs - math.floor(hrs)) * 60
+					local txtday     = math.floor(day)
+					local txthrs     = math.floor(hrs)
+					local txtminutes = math.ceil(minutes)
+						setKickReason(Text.yourban .. BanList[i].reason .. Text.timeleft .. txtday .. Text.day ..txthrs .. Text.hour ..txtminutes .. Text.minute)
+						CancelEvent()
+						break
+				elseif tempsrestant >= 60 and tempsrestant < 1440 then
+					local day        = (tempsrestant / 60) / 24
+					local hrs        = tempsrestant / 60
+					local minutes    = (hrs - math.floor(hrs)) * 60
+					local txtday     = math.floor(day)
+					local txthrs     = math.floor(hrs)
+					local txtminutes = math.ceil(minutes)
+						setKickReason(Text.yourban .. BanList[i].reason .. Text.timeleft .. txtday .. Text.day .. txthrs .. Text.hour .. txtminutes .. Text.minute)
+						CancelEvent()
+						break
+				elseif tempsrestant < 60 then
+					local txtday     = 0
+					local txthrs     = 0
+					local txtminutes = math.ceil(tempsrestant)
+						setKickReason(Text.yourban .. BanList[i].reason .. Text.timeleft .. txtday .. Text.day .. txthrs .. Text.hour .. txtminutes .. Text.minute)
+						CancelEvent()
+						break
+				end
+
+			elseif (tonumber(BanList[i].expiration)) < os.time() and (tonumber(BanList[i].permanent)) == 0 then
+
+				deletebanned(steamID)
+				break
+
+			end
+		end
+
+	end
+
+end)
+
+AddEventHandler('es:playerLoaded',function(source)
+	CreateThread(function()
+	Wait(5000)
+		local steamID  = "no info"
+		local license  = "no info"
+		local liveid   = "no info"
+		local xblid    = "no info"
+		local discord  = "no info"
+		local playerip = "no info"
+		local playername = GetPlayerName(source)
+
+		for k,v in ipairs(GetPlayerIdentifiers(source))do
+			if string.sub(v, 1, string.len("steam:")) == "steam:" then
+				steamID = v
+			elseif string.sub(v, 1, string.len("license:")) == "license:" then
+				license = v
+			elseif string.sub(v, 1, string.len("live:")) == "live:" then
+				liveid = v
+			elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
+				xblid  = v
+			elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
+				discord = v
+			elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
+				playerip = v
+			end
+		end
+
+		MySQL.Async.fetchAll('SELECT * FROM `baninfo` WHERE `identifier` = @identifier', {
+			['@identifier'] = steamID
+		}, function(data)
+		local found = false
+			for i=1, #data, 1 do
+				if data[i].identifier == steamID then
+					found = true
+				end
+			end
+			if not found then
+				MySQL.Async.execute('INSERT INTO baninfo (identifier,license,liveid,xblid,discord,playerip,playername) VALUES (@identifier,@license,@liveid,@xblid,@discord,@playerip,@playername)', 
+					{ 
+					['@identifier'] = steamID,
+					['@license']    = license,
+					['@liveid']     = liveid,
+					['@xblid']      = xblid,
+					['@discord']    = discord,
+					['@playerip']   = playerip,
+					['@playername'] = playername
+					},
+					function ()
+				end)
+			else
+				MySQL.Async.execute('UPDATE `baninfo` SET `license` = @license, `liveid` = @liveid, `xblid` = @xblid, `discord` = @discord, `playerip` = @playerip, `playername` = @playername WHERE `identifier` = @identifier', 
+					{ 
+					['@identifier'] = steamID,
+					['@license']    = license,
+					['@liveid']     = liveid,
+					['@xblid']      = xblid,
+					['@discord']    = discord,
+					['@playerip']   = playerip,
+					['@playername'] = playername
+					},
+					function ()
+				end)
+			end
+		end)
+		if Config.MultiServerSync then
+			doublecheck(source)
+		end
+	end)
+end)
+
+
+RegisterServerEvent('BanSql:CheckMe')
+AddEventHandler('BanSql:CheckMe', function()
+	doublecheck(source)
+	
+end)
+
+
 function sendToDiscord(canal,message)
 	local DiscordWebHook = canal
 	PerformHttpRequest(DiscordWebHook, function(err, text, headers) end, 'POST', json.encode({content = message}), { ['Content-Type'] = 'application/json' })
@@ -450,7 +623,6 @@ function loadBanListHistory()
     end)
 end
 
-
 function deletebanned(identifier) 
 	MySQL.Async.execute(
 		'DELETE FROM banlist WHERE identifier=@identifier',
@@ -462,173 +634,60 @@ function deletebanned(identifier)
 	end)
 end
 
+function doublecheck(player)
+	if GetPlayerIdentifiers(player) then
+		local steamID  = "empty"
+		local license  = "empty"
+		local liveid   = "empty"
+		local xblid    = "empty"
+		local discord  = "empty"
+		local playerip = "empty"
 
-
-AddEventHandler('playerConnecting', function (playerName,setKickReason)
-	local steamID  = "empty"
-	local license  = "empty"
-	local liveid   = "empty"
-	local xblid    = "empty"
-	local discord  = "empty"
-	local playerip = "empty"
-
-	for k,v in ipairs(GetPlayerIdentifiers(source))do
-		if string.sub(v, 1, string.len("steam:")) == "steam:" then
-			steamID = v
-		elseif string.sub(v, 1, string.len("license:")) == "license:" then
-			license = v
-		elseif string.sub(v, 1, string.len("live:")) == "live:" then
-			liveid = v
-		elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
-			xblid  = v
-		elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
-			discord = v
-		elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
-			playerip = v
-		end
-	end
-
-	--Si Banlist pas chargée
-	if (Banlist == {}) then
-		Citizen.Wait(1000)
-	end
-
-    if steamID == false then
-		setKickReason(Text.invalidsteam)
-		CancelEvent()
-    end
-
-	for i = 1, #BanList, 1 do
-		if 
-			((tostring(BanList[i].identifier)) == tostring(steamID) 
-			or (tostring(BanList[i].license)) == tostring(license) 
-			or (tostring(BanList[i].liveid)) == tostring(liveid) 
-			or (tostring(BanList[i].xblid)) == tostring(xblid) 
-			or (tostring(BanList[i].discord)) == tostring(discord) 
-			or (tostring(BanList[i].playerip)) == tostring(playerip)) 
-		then
-
-			if (tonumber(BanList[i].permanent)) == 1 then
-
-				setKickReason(Text.yourpermban .. BanList[i].reason)
-				CancelEvent()
-				break
-
-			elseif (tonumber(BanList[i].expiration)) > os.time() then
-
-				local tempsrestant     = (((tonumber(BanList[i].expiration)) - os.time())/60)
-				if tempsrestant >= 1440 then
-					local day        = (tempsrestant / 60) / 24
-					local hrs        = (day - math.floor(day)) * 24
-					local minutes    = (hrs - math.floor(hrs)) * 60
-					local txtday     = math.floor(day)
-					local txthrs     = math.floor(hrs)
-					local txtminutes = math.ceil(minutes)
-						setKickReason(Text.yourban .. BanList[i].reason .. Text.timeleft .. txtday .. Text.day ..txthrs .. Text.hour ..txtminutes .. Text.minute)
-						CancelEvent()
-						break
-				elseif tempsrestant >= 60 and tempsrestant < 1440 then
-					local day        = (tempsrestant / 60) / 24
-					local hrs        = tempsrestant / 60
-					local minutes    = (hrs - math.floor(hrs)) * 60
-					local txtday     = math.floor(day)
-					local txthrs     = math.floor(hrs)
-					local txtminutes = math.ceil(minutes)
-						setKickReason(Text.yourban .. BanList[i].reason .. Text.timeleft .. txtday .. Text.day .. txthrs .. Text.hour .. txtminutes .. Text.minute)
-						CancelEvent()
-						break
-				elseif tempsrestant < 60 then
-					local txtday     = 0
-					local txthrs     = 0
-					local txtminutes = math.ceil(tempsrestant)
-						setKickReason(Text.yourban .. BanList[i].reason .. Text.timeleft .. txtday .. Text.day .. txthrs .. Text.hour .. txtminutes .. Text.minute)
-						CancelEvent()
-						break
-				end
-
-			elseif (tonumber(BanList[i].expiration)) < os.time() and (tonumber(BanList[i].permanent)) == 0 then
-
-				deletebanned(steamID)
-				break
-
+		for k,v in ipairs(GetPlayerIdentifiers(player))do
+			if string.sub(v, 1, string.len("steam:")) == "steam:" then
+				steamID = v
+			elseif string.sub(v, 1, string.len("license:")) == "license:" then
+				license = v
+			elseif string.sub(v, 1, string.len("live:")) == "live:" then
+				liveid = v
+			elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
+				xblid  = v
+			elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
+				discord = v
+			elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
+				playerip = v
 			end
 		end
 
-	end
+		for i = 1, #BanList, 1 do
+			if 
+				((tostring(BanList[i].identifier)) == tostring(steamID) 
+				or (tostring(BanList[i].license)) == tostring(license) 
+				or (tostring(BanList[i].liveid)) == tostring(liveid) 
+				or (tostring(BanList[i].xblid)) == tostring(xblid) 
+				or (tostring(BanList[i].discord)) == tostring(discord) 
+				or (tostring(BanList[i].playerip)) == tostring(playerip)) 
+			then
 
-end)
+				if (tonumber(BanList[i].permanent)) == 1 then
+					DropPlayer(player, Text.yourban .. BanList[i].reason)
+					break
 
-AddEventHandler('es:playerLoaded',function(source)
-  CreateThread(function()
-  Wait(5000)
-	local steamID  = "no info"
-	local license  = "no info"
-	local liveid   = "no info"
-	local xblid    = "no info"
-	local discord  = "no info"
-	local playerip = "no info"
-	local playername = GetPlayerName(source)
+				elseif (tonumber(BanList[i].expiration)) > os.time() then
 
-	for k,v in ipairs(GetPlayerIdentifiers(source))do
-		if string.sub(v, 1, string.len("steam:")) == "steam:" then
-			steamID = v
-		elseif string.sub(v, 1, string.len("license:")) == "license:" then
-			license = v
-		elseif string.sub(v, 1, string.len("live:")) == "live:" then
-			liveid = v
-		elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
-			xblid  = v
-		elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
-			discord = v
-		elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
-			playerip = v
-		end
-	end
+					local tempsrestant     = (((tonumber(BanList[i].expiration)) - os.time())/60)
+					if tempsrestant > 0 then
+						DropPlayer(player, Text.yourban .. BanList[i].reason)
+						break
+					end
 
-		MySQL.Async.fetchAll('SELECT * FROM `baninfo` WHERE `identifier` = @identifier', {
-			['@identifier'] = steamID
-		}, function(data)
-		local found = false
-			for i=1, #data, 1 do
-				if data[i].identifier == steamID then
-					found = true
+				elseif (tonumber(BanList[i].expiration)) < os.time() and (tonumber(BanList[i].permanent)) == 0 then
+
+					deletebanned(steamID)
+					break
+
 				end
 			end
-			if not found then
-				MySQL.Async.execute('INSERT INTO baninfo (identifier,license,liveid,xblid,discord,playerip,playername) VALUES (@identifier,@license,@liveid,@xblid,@discord,@playerip,@playername)', 
-					{ 
-					['@identifier'] = steamID,
-					['@license']    = license,
-					['@liveid']     = liveid,
-					['@xblid']      = xblid,
-					['@discord']    = discord,
-					['@playerip']   = playerip,
-					['@playername'] = playername
-					},
-					function ()
-				end)
-			else
-				MySQL.Async.execute('UPDATE `baninfo` SET `license` = @license, `liveid` = @liveid, `xblid` = @xblid, `discord` = @discord, `playerip` = @playerip, `playername` = @playername WHERE `identifier` = @identifier', 
-					{ 
-					['@identifier'] = steamID,
-					['@license']    = license,
-					['@liveid']     = liveid,
-					['@xblid']      = xblid,
-					['@discord']    = discord,
-					['@playerip']   = playerip,
-					['@playername'] = playername
-					},
-					function ()
-				end)
-			end
-		end)
-  end)
-end)
-
-
-
-
-
-
-
-
+		end
+	end
+end
