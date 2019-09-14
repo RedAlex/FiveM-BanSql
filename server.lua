@@ -1,6 +1,4 @@
 local Text               = {}
-local lastduree          = ""
-local lasttarget         = ""
 local BanList            = {}
 local BanListLoad        = false
 local BanListHistory     = {}
@@ -223,28 +221,64 @@ end, function(source, args, user)
 	TriggerClientEvent('chat:addMessage', source, { args = { '^1SYSTEM ', 'Insufficient Permissions.' } })
 end, {help = Text.ban, params = {{name = "id"}, {name = "day", help = Text.dayhelp}, {name = "reason", help = Text.reason}}})
 
-TriggerEvent('es:addGroupCommand', 'sqlbanoffline', Config.permission, function (source, args, user)
+TriggerEvent('es:addGroupCommand', 'sqlsearch', Config.permission, function (source, args, user)
 	if args ~= "" then
-		lastduree  = tonumber(args[1])
-		target     = table.concat(args, " ",2)
-		if lastduree ~= "" then
-			if target ~= "" then
-				MySQL.Async.fetchAll('SELECT * FROM baninfo WHERE playername like @playername', 
-				{
-					['@playername'] = ("%"..target.."%")
-				}, function(data)
-					if data[1] then
-						if #data > 1 then
-							TriggerEvent('bansql:sendMessage', source, Text.toomanyresult)
-							for i=1, #data, 1 do
-								TriggerEvent('bansql:sendMessage', source, data[i].playername)
-							end
-						else
-							lasttarget = data[1].playername
-							TriggerEvent('bansql:sendMessage', source, (lasttarget .. Text.during .. lastduree .. Text.forcontinu))
+		local target = table.concat(args, " ")
+		if target ~= "" then
+			MySQL.Async.fetchAll('SELECT * FROM baninfo WHERE playername like @playername', 
+			{
+				['@playername'] = ("%"..target.."%")
+			}, function(data)
+				if data[1] then
+					if #data < 50 then
+						for i=1, #data, 1 do
+							TriggerEvent('bansql:sendMessage', source, data[i].id.." "..data[i].playername)
 						end
 					else
-						TriggerEvent('bansql:sendMessage', source, Text.invalidname)
+						TriggerEvent('bansql:sendMessage', source, Text.toomanyresult)
+					end
+				else
+					TriggerEvent('bansql:sendMessage', source, Text.invalidname)
+				end
+			end)
+		else
+			TriggerEvent('bansql:sendMessage', source, Text.invalidname)
+		end
+	else
+		TriggerEvent('bansql:sendMessage', source, Text.cmdbanoff)
+	end
+end, function(source, args, user)
+	TriggerClientEvent('chat:addMessage', source, { args = { '^1SYSTEM ', 'Insufficient Permissions.' } })
+end, {help = Text.bansearch, params = {{name = "name", help = Text.steamname}}})
+
+TriggerEvent('es:addGroupCommand', 'sqlbanoffline', Config.permission, function (source, args, user)
+	if args ~= "" then
+		local target           = tonumber(args[1])
+		local duree            = tonumber(args[2])
+		local reason           = table.concat(args, " ",3)
+		local sourceplayername = GetPlayerName(source)
+
+		if duree ~= "" then
+			if target ~= "" then
+				MySQL.Async.fetchAll('SELECT * FROM baninfo WHERE id = @id', 
+				{
+					['@id'] = target
+				}, function(data)
+					if data[1] then
+						if duree and duree < 365 then
+							if reason == "" then
+								reason = Text.noreason
+							end
+							if duree > 0 then --Here if not perm ban
+								ban(source,data[1].identifier,data[1].license,data[1].liveid,data[1].xblid,data[1].discord,data[1].playerip,data[1].playername,sourceplayername,duree,reason,0)
+							else --Here if perm ban
+								ban(source,data[1].identifier,data[1].license,data[1].liveid,data[1].xblid,data[1].discord,data[1].playerip,data[1].playername,sourceplayername,duree,reason,1)
+							end
+						else
+							TriggerEvent('bansql:sendMessage', source, Text.invalidtime)
+						end
+					else
+						TriggerEvent('bansql:sendMessage', source, Text.invalidid)
 					end
 				end)
 			else
@@ -259,51 +293,12 @@ TriggerEvent('es:addGroupCommand', 'sqlbanoffline', Config.permission, function 
 	end
 end, function(source, args, user)
 	TriggerClientEvent('chat:addMessage', source, { args = { '^1SYSTEM ', 'Insufficient Permissions.' } })
-end, {help = Text.banoff, params = {{name = "day", help = Text.dayhelp}, {name = "name", help = Text.steamname}}})
+end, {help = Text.banoff, params = {{name = "permid", help = Text.permid}, {name = "day", help = Text.dayhelp}, {name = "reason", help = Text.reason}}})
 
 TriggerEvent('es:addGroupCommand', 'sqlreason', Config.permission, function (source, args, user)
-	local duree            = lastduree
-	local name             = lasttarget
-	local reason           = table.concat(args, " ",1)
-	local permanent        = 0
-	local playerip         = "0.0.0.0"
-	local liveid           = "no info"
-	local xblid            = "no info"
-	local discord          = "no info"
-	local sourceplayername = GetPlayerName(source)
 
-	if name ~= "" then
-		if duree and duree < 365 then
-			if reason == "" then
-				reason = Text.noreason
-			end
 
-			MySQL.Async.fetchAll('SELECT * FROM baninfo WHERE playername = @playername', 
-			{
-				['@playername'] = name
-			}, function(data)
 
-				if data[1] then
-					if duree > 0 then
-						ban(source,data[1].identifier,data[1].license,data[1].liveid,data[1].xblid,data[1].discord,data[1].playerip,name,sourceplayername,duree,reason,permanent)
-						lastduree  = ""
-						lasttarget = ""
-					else
-						local permanent = 1
-						ban(source,data[1].identifier,data[1].license,data[1].liveid,data[1].xblid,data[1].discord,data[1].playerip,name,sourceplayername,duree,reason,permanent)
-						lastduree  = ""
-						lasttarget = ""
-					end
-				else
-					TriggerEvent('bansql:sendMessage', source, Text.invalidid)
-				end
-			end)
-		else
-			TriggerEvent('bansql:sendMessage', source, Text.invalidtime)
-		end	
-	else
-		TriggerEvent('bansql:sendMessage', source, Text.invalidid)
-	end
 end, function(source, args, user)
 	TriggerClientEvent('chat:addMessage', source, { args = { '^1SYSTEM ', 'Insufficient Permissions.' } })
 end, {help = Text.banoff, params = {{name = "reason", help = Text.reason}}})
