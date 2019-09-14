@@ -295,14 +295,6 @@ end, function(source, args, user)
 	TriggerClientEvent('chat:addMessage', source, { args = { '^1SYSTEM ', 'Insufficient Permissions.' } })
 end, {help = Text.banoff, params = {{name = "permid", help = Text.permid}, {name = "day", help = Text.dayhelp}, {name = "reason", help = Text.reason}}})
 
-TriggerEvent('es:addGroupCommand', 'sqlreason', Config.permission, function (source, args, user)
-
-
-
-end, function(source, args, user)
-	TriggerClientEvent('chat:addMessage', source, { args = { '^1SYSTEM ', 'Insufficient Permissions.' } })
-end, {help = Text.banoff, params = {{name = "reason", help = Text.reason}}})
-
 -- console / rcon can also utilize es:command events, but breaks since the source isn't a connected player, ending up in error messages
 AddEventHandler('bansql:sendMessage', function(source, message)
 	if source ~= 0 then
