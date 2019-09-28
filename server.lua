@@ -333,7 +333,7 @@ AddEventHandler('playerConnecting', function (playerName,setKickReason)
 		Citizen.Wait(1000)
 	end
 
-    if steamID == false then
+    if steamID == "n/a" and Config.ForceSteam then
 		setKickReason(Text.invalidsteam)
 		CancelEvent()
     end
