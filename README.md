@@ -90,7 +90,7 @@ ___
  -  "jours" doit être un chiffre pour dire combien de jours il va etre ban. (0 jours veux dire permanent)
  -  "raison" Possibilité d'inscrire pourquoi il est bani. Attention si il n'y a pas de raison le joueur va voir : "Vous etes banni pour : Raison Inconnue"
  - example /sqlbanoffline 1 1 Triche (Va bannir le premier joueur de la base de donnée 1 jours pour Triche)
-2.1 ***sqlreason (nom)
+2.1 ***sqlsearch (nom)
  -  "nom" correspond au nom steam du joueur
  - example /sqlreason reason (Va donner bannir le joueur que vous avez entré plus tot pour la raison entrer ici)
 ___

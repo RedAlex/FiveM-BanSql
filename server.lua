@@ -160,9 +160,9 @@ end, {help = Text.unban, params = {{name = "name", help = Text.steamname}}})
 TriggerEvent('es:addGroupCommand', 'sqlban', Config.permission, function (source, args, user)
 	local identifier
 	local license
-	local liveid    = "no info"
-	local xblid     = "no info"
-	local discord   = "no info"
+	local liveid
+	local xblid
+	local discord
 	local playerip
 	local target    = tonumber(args[1])
 	local duree     = tonumber(args[2])
@@ -305,12 +305,12 @@ AddEventHandler('bansql:sendMessage', function(source, message)
 end)
 
 AddEventHandler('playerConnecting', function (playerName,setKickReason)
-	local steamID  = "empty"
-	local license  = "empty"
-	local liveid   = "empty"
-	local xblid    = "empty"
-	local discord  = "empty"
-	local playerip = "empty"
+	local steamID  = "n/a"
+	local license  = "n/a"
+	local liveid   = "n/a"
+	local xblid    = "n/a"
+	local discord  = "n/a"
+	local playerip = "n/a"
 
 	for k,v in ipairs(GetPlayerIdentifiers(source))do
 		if string.sub(v, 1, string.len("steam:")) == "steam:" then
