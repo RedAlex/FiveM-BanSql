@@ -486,8 +486,7 @@ function ban(source,license,identifier,liveid,xblid,discord,playerip,targetplaye
 	local expiration = duree * 86400
 	local timeat     = os.time()
 	local added      = os.date()
-	local message
-	
+
 	if expiration < os.time() then
 		expiration = os.time()+expiration
 	end
@@ -528,12 +527,25 @@ function ban(source,license,identifier,liveid,xblid,discord,playerip,targetplaye
 
 		if permanent == 0 then
 			TriggerEvent('bansql:sendMessage', source, (Text.youban .. targetplayername .. Text.during .. duree .. Text.forr .. reason))
-			message = (targetplayername .. Text.isban .." ".. duree .. Text.forr .. reason .." ".. Text.by .." ".. sourceplayername.."```"..identifier .."\n".. license .."\n".. liveid .."\n".. xblid .."\n".. discord .."\n".. playerip .."```")
 		else
 			TriggerEvent('bansql:sendMessage', source, (Text.youban .. targetplayername .. Text.permban .. reason))
-			message = (targetplayername .. Text.isban .." ".. Text.permban .. reason .." ".. Text.by .." ".. sourceplayername.."```"..identifier .."\n".. license .."\n".. liveid .."\n".. xblid .."\n".. discord .."\n".. playerip .."```")
 		end
+
 		if Config.EnableDiscordLink then
+			local license1,identifier1,liveid1,xblind1,discord1,playerip1,targetplayername1,sourceplayername1,message
+			if not license          then license1          = "N/A" else license1          = license          end
+			if not identifier       then identifier1       = "N/A" else identifier1       = identifier       end
+			if not liveid           then liveid1           = "N/A" else liveid1           = liveid           end
+			if not xblind           then xblind1           = "N/A" else xblind1           = xblind           end
+			if not discord          then discord1          = "N/A" else discord1          = discord          end
+			if not playerip         then playerip1         = "N/A" else playerip1         = playerip         end
+			if not targetplayername then targetplayername1 = "N/A" else targetplayername1 = targetplayername end
+			if not sourceplayername then sourceplayername1 = "N/A" else sourceplayername1 = sourceplayername end
+			if permanent == 0 then
+				message = (targetplayername1..Text.isban.." "..duree..Text.forr..reason.." "..Text.by.." "..sourceplayername1.."```"..identifier1.."\n"..license1.."\n"..liveid1.."\n"..xblid1.."\n"..discord1.."\n"..playerip1.."```")
+			else
+				message = (targetplayername1..Text.isban.." "..Text.permban..reason.." "..Text.by.." "..sourceplayername1.."```"..identifier1.."\n"..license1.."\n"..liveid1.."\n"..xblid1.."\n"..discord1.."\n"..playerip1.."```")
+			end
 			sendToDiscord(Config.webhookban, message)
 		end
 
