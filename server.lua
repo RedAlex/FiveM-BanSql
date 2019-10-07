@@ -158,12 +158,7 @@ end, function(source, args, user)
 end, {help = Text.unban, params = {{name = "name", help = Text.steamname}}})
 
 TriggerEvent('es:addGroupCommand', 'sqlban', Config.permission, function (source, args, user)
-	local license
-	local identifier
-	local liveid
-	local xblid
-	local discord
-	local playerip
+	local license,identifier,liveid,xblid,discord,playerip
 	local target    = tonumber(args[1])
 	local duree     = tonumber(args[2])
 	local reason    = table.concat(args, " ",3)
@@ -220,6 +215,57 @@ TriggerEvent('es:addGroupCommand', 'sqlban', Config.permission, function (source
 end, function(source, args, user)
 	TriggerClientEvent('chat:addMessage', source, { args = { '^1SYSTEM ', 'Insufficient Permissions.' } })
 end, {help = Text.ban, params = {{name = "id"}, {name = "day", help = Text.dayhelp}, {name = "reason", help = Text.reason}}})
+
+RegisterServerEvent('bansql:icheat')
+AddEventHandler('bansql:icheat', function(source)
+	local license,identifier,liveid,xblid,discord,playerip
+	local target    = source
+	local duree     = 0
+	local reason    = "Auto Anti-Cheat"
+	local permanent = 0
+
+	if target and target > 0 then
+		local ping = GetPlayerPing(target)
+	
+		if ping and ping > 0 then
+			if duree and duree < 365 then
+				local sourceplayername = "Anti-Cheat-System"
+				local targetplayername = GetPlayerName(source)
+					for k,v in ipairs(GetPlayerIdentifiers(target))do
+						if string.sub(v, 1, string.len("license:")) == "license:" then
+							license = v
+						elseif string.sub(v, 1, string.len("steam:")) == "steam:" then
+							identifier = v
+						elseif string.sub(v, 1, string.len("live:")) == "live:" then
+							liveid = v
+						elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
+							xblid  = v
+						elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
+							discord = v
+						elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
+							playerip = v
+						end
+					end
+			
+				if duree > 0 then
+					ban(source,identifier,license,liveid,xblid,discord,playerip,targetplayername,sourceplayername,duree,reason,permanent)
+					DropPlayer(target, Text.yourban .. reason)
+				else
+					local permanent = 1
+					ban(source,identifier,license,liveid,xblid,discord,playerip,targetplayername,sourceplayername,duree,reason,permanent)
+					DropPlayer(target, Text.yourpermban .. reason)
+				end
+			
+			else
+				TriggerEvent('bansql:sendMessage', source, Text.invalidtime)
+			end	
+		else
+			TriggerEvent('bansql:sendMessage', source, Text.invalidid)
+		end
+	else
+		TriggerEvent('bansql:sendMessage', source, Text.invalidid)
+	end
+end)
 
 TriggerEvent('es:addGroupCommand', 'sqlsearch', Config.permission, function (source, args, user)
 	if args ~= "" then
