@@ -16,10 +16,10 @@ Config.webhookunban      = "https://discordapp.com/api/webhooks/4735711266903162
 --LANGUAGE
 Config.TextFr = {
 	start         = "La BanList et l'historique a ete charger avec succes",
-	starterror    = "ERROR : La BanList ou l'historique n'a pas ete charger nouvelle tentative.",
+	starterror    = "ERREUR : La BanList ou l'historique n'a pas ete charger nouvelle tentative.",
 	banlistloaded = "La BanList a ete charger avec succes.",
 	historyloaded = "La BanListHistory a ete charger avec succes.",
-	loaderror     = "ERROR : La BanList n a pas été charger.",
+	loaderror     = "ERREUR : La BanList n a pas été charger.",
 	noreason      = "Raison Inconnue",
 	during        = " pendant : ",
 	noresult      = "Il n'y a pas autant de résultats !",
