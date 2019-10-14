@@ -214,14 +214,20 @@ end, function(source, args, user)
 	TriggerClientEvent('chat:addMessage', source, { args = { '^1SYSTEM ', 'Insufficient Permissions.' } })
 end, {help = Text.ban, params = {{name = "id"}, {name = "day", help = Text.dayhelp}, {name = "reason", help = Text.reason}}})
 
+--How to use from server side : TriggerEvent("BanSql:ICheat", "Auto-Cheat Custom Reason",TargetId)
 RegisterServerEvent('BanSql:ICheat')
-AddEventHandler('BanSql:ICheat', function(reason)
-	local license,identifier,liveid,xblid,discord,playerip
-	local target    = source
+AddEventHandler('BanSql:ICheat', function(reason,servertarget)
+	local license,identifier,liveid,xblid,discord,playerip,target
 	local duree     = 0
 	local reason    = reason
 
 	if not reason then reason = "Auto Anti-Cheat" end
+
+	if source == 0 then
+		target = servertarget
+	else
+		target = source
+	end
 
 	if target and target > 0 then
 		local ping = GetPlayerPing(target)
