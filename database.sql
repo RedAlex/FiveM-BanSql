@@ -41,5 +41,5 @@ CREATE TABLE IF NOT EXISTS baninfo (
   xblid varchar(21) COLLATE utf8mb4_bin DEFAULT NULL,
   discord varchar(30) COLLATE utf8mb4_bin DEFAULT NULL,
   playerip varchar(25) COLLATE utf8mb4_bin DEFAULT NULL,
-  playername varchar(32) COLLATE utf8mb4_bin DEFAULT NULL,
+  playername varchar(32) COLLATE utf8mb4_bin DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
