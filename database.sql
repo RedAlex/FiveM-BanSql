@@ -17,8 +17,8 @@ CREATE TABLE IF NOT EXISTS banlist (
 DROP TABLE IF EXISTS banlisthistory;
 CREATE TABLE IF NOT EXISTS banlisthistory (
   id int(11) AUTO_INCREMENT PRIMARY KEY,
-  identifier varchar(25) COLLATE utf8mb4_bin DEFAULT NULL,
   license varchar(50) COLLATE utf8mb4_bin DEFAULT NULL,
+  identifier varchar(25) COLLATE utf8mb4_bin DEFAULT NULL,
   liveid varchar(21) COLLATE utf8mb4_bin DEFAULT NULL,
   xblid varchar(21) COLLATE utf8mb4_bin DEFAULT NULL,
   discord varchar(30) COLLATE utf8mb4_bin DEFAULT NULL,
@@ -35,8 +35,8 @@ CREATE TABLE IF NOT EXISTS banlisthistory (
 DROP TABLE IF EXISTS baninfo;
 CREATE TABLE IF NOT EXISTS baninfo (
   id int(11) AUTO_INCREMENT PRIMARY KEY,
-  identifier varchar(25) COLLATE utf8mb4_bin DEFAULT NULL,
   license varchar(50) COLLATE utf8mb4_bin DEFAULT NULL,
+  identifier varchar(25) COLLATE utf8mb4_bin DEFAULT NULL,
   liveid varchar(21) COLLATE utf8mb4_bin DEFAULT NULL,
   xblid varchar(21) COLLATE utf8mb4_bin DEFAULT NULL,
   discord varchar(30) COLLATE utf8mb4_bin DEFAULT NULL,
