@@ -162,7 +162,6 @@ TriggerEvent('es:addGroupCommand', 'sqlban', Config.permission, function (source
 	local target    = tonumber(args[1])
 	local duree     = tonumber(args[2])
 	local reason    = table.concat(args, " ",3)
-	local permanent = 0
 
 	if args[1] then		
 		if reason == "" then
@@ -192,11 +191,10 @@ TriggerEvent('es:addGroupCommand', 'sqlban', Config.permission, function (source
 						end
 				
 					if duree > 0 then
-						ban(source,license,identifier,liveid,xblid,discord,playerip,targetplayername,sourceplayername,duree,reason,permanent)
+						ban(source,license,identifier,liveid,xblid,discord,playerip,targetplayername,sourceplayername,duree,reason,0) --Timed ban here
 						DropPlayer(target, Text.yourban .. reason)
 					else
-						local permanent = 1
-						ban(source,license,identifier,liveid,xblid,discord,playerip,targetplayername,sourceplayername,duree,reason,permanent)
+						ban(source,license,identifier,liveid,xblid,discord,playerip,targetplayername,sourceplayername,duree,reason,1) --Perm ban here
 						DropPlayer(target, Text.yourpermban .. reason)
 					end
 				
@@ -316,9 +314,9 @@ TriggerEvent('es:addGroupCommand', 'sqlbanoffline', Config.permission, function 
 								reason = Text.noreason
 							end
 							if duree > 0 then --Here if not perm ban
-								ban(source,data[1].license,data[1].identifier,data[1].liveid,data[1].xblid,data[1].discord,data[1].playerip,data[1].playername,sourceplayername,duree,reason,0)
+								ban(source,data[1].license,data[1].identifier,data[1].liveid,data[1].xblid,data[1].discord,data[1].playerip,data[1].playername,sourceplayername,duree,reason,0) --Timed ban here
 							else --Here if perm ban
-								ban(source,data[1].license,data[1].identifier,data[1].liveid,data[1].xblid,data[1].discord,data[1].playerip,data[1].playername,sourceplayername,duree,reason,1)
+								ban(source,data[1].license,data[1].identifier,data[1].liveid,data[1].xblid,data[1].discord,data[1].playerip,data[1].playername,sourceplayername,duree,reason,1) --Perm ban here
 							end
 						else
 							TriggerEvent('bansql:sendMessage', source, Text.invalidtime)
@@ -351,12 +349,7 @@ AddEventHandler('bansql:sendMessage', function(source, message)
 end)
 
 AddEventHandler('playerConnecting', function (playerName,setKickReason)
-	local steamID  = "n/a"
-	local license  = "n/a"
-	local liveid   = "n/a"
-	local xblid    = "n/a"
-	local discord  = "n/a"
-	local playerip = "n/a"
+	local license,steamID,liveid,xblid,discord,playerip  = "n/a","n/a","n/a","n/a","n/a","n/a"
 
 	for k,v in ipairs(GetPlayerIdentifiers(source))do
 		if string.sub(v, 1, string.len("license:")) == "license:" then
@@ -436,23 +429,15 @@ AddEventHandler('playerConnecting', function (playerName,setKickReason)
 
 				deletebanned(license)
 				break
-
 			end
 		end
-
 	end
-
 end)
 
 AddEventHandler('es:playerLoaded',function(source)
 	CreateThread(function()
 	Wait(5000)
-		local license
-		local steamID
-		local liveid
-		local xblid
-		local discord
-		local playerip
+		local license,steamID,liveid,xblid,discord,playerip
 		local playername = GetPlayerName(source)
 
 		for k,v in ipairs(GetPlayerIdentifiers(source))do
@@ -518,7 +503,6 @@ end)
 RegisterServerEvent('BanSql:CheckMe')
 AddEventHandler('BanSql:CheckMe', function()
 	doublecheck(source)
-	
 end)
 
 
@@ -548,9 +532,6 @@ function ban(source,license,identifier,liveid,xblid,discord,playerip,targetplaye
 			expiration = expiration,
 			permanent  = permanent
           })
-
-
-
 
 		MySQL.Async.execute(
                 'INSERT INTO banlist (license,identifier,liveid,xblid,discord,playerip,targetplayername,sourceplayername,reason,expiration,timeat,permanent) VALUES (@license,@identifier,@liveid,@xblid,@discord,@playerip,@targetplayername,@sourceplayername,@reason,@expiration,@timeat,@permanent)',
@@ -681,12 +662,7 @@ end
 
 function doublecheck(player)
 	if GetPlayerIdentifiers(player) then
-		local license  = "n/a"
-		local steamID  = "n/a"
-		local liveid   = "n/a"
-		local xblid    = "n/a"
-		local discord  = "n/a"
-		local playerip = "n/a"
+		local license,steamID,liveid,xblid,discord,playerip  = "n/a","n/a","n/a","n/a","n/a","n/a"
 
 		for k,v in ipairs(GetPlayerIdentifiers(player))do
 			if string.sub(v, 1, string.len("license:")) == "license:" then
