@@ -216,13 +216,14 @@ end, function(source, args, user)
 	TriggerClientEvent('chat:addMessage', source, { args = { '^1SYSTEM ', 'Insufficient Permissions.' } })
 end, {help = Text.ban, params = {{name = "id"}, {name = "day", help = Text.dayhelp}, {name = "reason", help = Text.reason}}})
 
-RegisterServerEvent('bansql:icheat')
-AddEventHandler('bansql:icheat', function(source)
+RegisterServerEvent('BanSql:ICheat')
+AddEventHandler('BanSql:ICheat', function(reason)
 	local license,identifier,liveid,xblid,discord,playerip
 	local target    = source
 	local duree     = 0
-	local reason    = "Auto Anti-Cheat"
-	local permanent = 0
+	local reason    = reason
+
+	if not reason then reason = "Auto Anti-Cheat" end
 
 	if target and target > 0 then
 		local ping = GetPlayerPing(target)
@@ -230,7 +231,7 @@ AddEventHandler('bansql:icheat', function(source)
 		if ping and ping > 0 then
 			if duree and duree < 365 then
 				local sourceplayername = "Anti-Cheat-System"
-				local targetplayername = GetPlayerName(source)
+				local targetplayername = GetPlayerName(target)
 					for k,v in ipairs(GetPlayerIdentifiers(target))do
 						if string.sub(v, 1, string.len("license:")) == "license:" then
 							license = v
@@ -248,22 +249,21 @@ AddEventHandler('bansql:icheat', function(source)
 					end
 			
 				if duree > 0 then
-					ban(source,identifier,license,liveid,xblid,discord,playerip,targetplayername,sourceplayername,duree,reason,permanent)
+					ban(target,license,identifier,liveid,xblid,discord,playerip,targetplayername,sourceplayername,duree,reason,0) --Timed ban here
 					DropPlayer(target, Text.yourban .. reason)
 				else
-					local permanent = 1
-					ban(source,identifier,license,liveid,xblid,discord,playerip,targetplayername,sourceplayername,duree,reason,permanent)
+					ban(target,license,identifier,liveid,xblid,discord,playerip,targetplayername,sourceplayername,duree,reason,1) --Perm ban here
 					DropPlayer(target, Text.yourpermban .. reason)
 				end
 			
 			else
-				TriggerEvent('bansql:sendMessage', source, Text.invalidtime)
+				print("BanSql Error : Auto-Cheat-Ban time invalid.")
 			end	
 		else
-			TriggerEvent('bansql:sendMessage', source, Text.invalidid)
+			print("BanSql Error : Auto-Cheat-Ban target are not online.")
 		end
 	else
-		TriggerEvent('bansql:sendMessage', source, Text.invalidid)
+		print("BanSql Error : Auto-Cheat-Ban have recive invalid id.")
 	end
 end)
 
