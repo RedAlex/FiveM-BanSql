@@ -8,7 +8,7 @@ It precharges the database in a table when opening the server or adding / removi
 1. Download the .Zip from this repository.
 2. Extract it with your favorite program.
 3. Copy the project to your ressource folder.
-4.Don't forget to import the .sql file to your database.
+4. Don't forget to import the .sql file to your database.
 5. Add "start FiveM-BanSql" in your `server.cfg`
 
 # Commands
@@ -20,13 +20,14 @@ ___
  - example /sqlban 3 1 Troll (Will give ban player # 3 for 1 days with Troll reason)
 ___
 
-2. **sqlbanoffline days name** (	   Allows ban a offline player	  )
+2. **sqlbanoffline permid days reason** (	   Allows ban a offline player	  )
+ - "permid" get from command sqlsearch
  - "days" must be a number to say how many days it will be ban. (0 days mean permanent)
+ - "reason" Ability to register why he is banished. Attention if there is no reason the player will see: "You are banned for: unknown reason"
+ - example /sqlbanoffline 1 1 cheating (Will ban first player in database 1 day for cheating)
+2.1 ***sqlsearch (name)
  - "name" is the player's steam name
- - example /sqlbanoffline 3 Alex Garcio (Will ask you to entry ban:reason to continu)
-2.1 ***sqlreason (reason)
- - "reason" Ability to register why he is banished.
- - example /sqlreason reason (Will ban player you have entry before for X days and the reason)
+ - example /sqlsearch name (Will show you permid and name of found players)
 ___
 
 3. **sqlunban "Steam Name"**
@@ -84,12 +85,13 @@ ___
  -  exemple /sqlban 3 1 Troll (Va donner bannir le joueur #3 pour 1 jours avec la raison Troll)
 ___
 
-2. **sqlbanoffline jours nom (	   Vous permet de ban un jours hors ligne	)
+2. **sqlbanoffline permid jours raison (	   Vous permet de ban un jours hors ligne	)
+ -  "permid" correspond au chiffre du joueur dans la liste
  -  "jours" doit être un chiffre pour dire combien de jours il va etre ban. (0 jours veux dire permanent)
+ -  "raison" Possibilité d'inscrire pourquoi il est bani. Attention si il n'y a pas de raison le joueur va voir : "Vous etes banni pour : Raison Inconnue"
+ - example /sqlbanoffline 1 1 Triche (Va bannir le premier joueur de la base de donnée 1 jours pour Triche)
+2.1 ***sqlsearch (nom)
  -  "nom" correspond au nom steam du joueur
- - example /sqlbanoffline 3 Alex Garcio (Va vous demander de faire ban:reason pour continuer)
-2.1 ***sqlreason (reason)
- - "reason" Possibilité d'inscrire pourquoi il est bani.
  - example /sqlreason reason (Va donner bannir le joueur que vous avez entré plus tot pour la raison entrer ici)
 ___
 

@@ -3,6 +3,7 @@ Config                   = {}
 --GENERAL
 Config.Lang              = 'fr'    --Set lang (fr-en)
 Config.permission        = "admin" --Permission need to use FiveM-BanSql commands (mod-admin-superadmin)
+Config.ForceSteam        = true    --Set to false if you not use steam auth
 Config.MultiServerSync   = false   --This will check if a ban is add in the sql all 30 second, use it only if you have more then 1 server (true-false)
 
 
@@ -15,11 +16,10 @@ Config.webhookunban      = "https://discordapp.com/api/webhooks/4735711266903162
 --LANGUAGE
 Config.TextFr = {
 	start         = "La BanList et l'historique a ete charger avec succes",
-	starterror    = "ERROR : La BanList ou l'historique n'a pas ete charger nouvelle tentative.",
+	starterror    = "ERREUR : La BanList ou l'historique n'a pas ete charger nouvelle tentative.",
 	banlistloaded = "La BanList a ete charger avec succes.",
 	historyloaded = "La BanListHistory a ete charger avec succes.",
-	loaderror     = "ERROR : La BanList n a pas été charger.",
-	forcontinu    = " jours. Pour continuer entrer /sqlreason (Raison du ban)",
+	loaderror     = "ERREUR : La BanList n a pas été charger.",
 	noreason      = "Raison Inconnue",
 	during        = " pendant : ",
 	noresult      = "Il n'y a pas autant de résultats !",
@@ -30,7 +30,7 @@ Config.TextFr = {
 	invalidname   = "Le nom n'est pas valide",
 	invalidtime   = "Duree du ban incorrecte",
 	yourban       = "Vous avez ete ban pour : ",
-	yourpermban   = "Vous avez ete ban permanant pour : ",
+	yourpermban   = "Vous avez ete ban permanent pour : ",
 	youban        = "Vous avez banni : ",
 	forr          = " jours. Pour : ",
 	permban       = " de facon permanente pour : ",
@@ -42,8 +42,10 @@ Config.TextFr = {
 	by            = "par",
 	ban           = "Bannir un joueurs qui est en ligne",
 	banoff        = "Bannir un joueurs qui est hors ligne",
+	bansearch     = "Trouver l'id permanent d'un joueur qui est hors ligne",
 	dayhelp       = "Nombre de jours",
 	reason        = "Raison du ban",
+	permid        = "Trouver l'id permanent avec la commande (sqlsearch)",
 	history       = "Affiche tout les bans d'un joueur",
 	reload        = "Recharge la BanList et la BanListHistory",
 	unban         = "Retirez un ban de la liste",
@@ -85,5 +87,5 @@ Config.TextEn = {
 	history       = "Shows all previous bans for a certain player",
 	reload        = "Refreshes the ban list and history.",
 	unban         = "Unban a player.",
-	steamname     = "Steam name",
+	steamname     = "Steam name"
 }
