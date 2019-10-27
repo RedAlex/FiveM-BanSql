@@ -565,11 +565,11 @@ function ban(source,license,identifier,liveid,xblid,discord,playerip,targetplaye
 		end
 
 		if Config.EnableDiscordLink then
-			local license1,identifier1,liveid1,xblind1,discord1,playerip1,targetplayername1,sourceplayername1,message
+			local license1,identifier1,liveid1,xblid1,discord1,playerip1,targetplayername1,sourceplayername1,message
 			if not license          then license1          = "N/A" else license1          = license          end
 			if not identifier       then identifier1       = "N/A" else identifier1       = identifier       end
 			if not liveid           then liveid1           = "N/A" else liveid1           = liveid           end
-			if not xblind           then xblind1           = "N/A" else xblind1           = xblind           end
+			if not xblid            then xblid1            = "N/A" else xblid1            = xblid           end
 			if not discord          then discord1          = "N/A" else discord1          = discord          end
 			if not playerip         then playerip1         = "N/A" else playerip1         = playerip         end
 			if not targetplayername then targetplayername1 = "N/A" else targetplayername1 = targetplayername end
