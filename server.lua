@@ -223,7 +223,7 @@ AddEventHandler('BanSql:ICheat', function(reason,servertarget)
 
 	if not reason then reason = "Auto Anti-Cheat" end
 
-	if source == 0 then
+	if tostring(source) == "" then
 		target = tonumber(servertarget)
 	else
 		target = source
