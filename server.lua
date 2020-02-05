@@ -100,7 +100,7 @@ TriggerEvent('es:addGroupCommand', 'sqlbanhistory', Config.permission, function 
 							local calcul1    = expiration - timeat
 							local calcul2    = calcul1 / 86400
 							local calcul2 	 = math.ceil(calcul2)					
-							local resultat   = tostring(BanListHistory[i].targetplayername.." , "..BanListHistory[i].sourceplayername.." , "..BanListHistory[i].reason.." , "..calcul2..Text.day.." , "..BanListHistory[nombre].added)
+							local resultat   = tostring(BanListHistory[i].targetplayername.." , "..BanListHistory[i].sourceplayername.." , "..BanListHistory[i].reason.." , "..calcul2..Text.day.." , "..BanListHistory[i].added)
 
 							TriggerEvent('bansql:sendMessage', source, (i .." : ".. resultat))
 						end
