@@ -1,8 +1,12 @@
+--WEBHOOK STUFF
+local webhookban = "https://discordapp.com/api/webhooks/473571126690316298/oJZBU9YLz9ksOCG_orlf-wpMZ2pkFedfpEsC34DN_iHO0CBBp6X06W3mMJ2RvMMK7vIO" -- PUT YOUR WEBHOOK
+local webhookunban = "https://discordapp.com/api/webhooks/473571126690316298/oJZBU9YLz9ksOCG_orlf-wpMZ2pkFedfpEsC34DN_iHO0CBBp6X06W3mMJ2RvMMK7vIO" -- PUT YOUR WEBHOOK
+
 function cmdban(source, args)
 	local license,identifier,liveid,xblid,discord,playerip
-	local target    = tonumber(args[1])
-	local duree     = tonumber(args[2])
-	local reason    = table.concat(args, " ",3)
+	local target  = tonumber(args[1])
+	local duree = tonumber(args[2])
+	local reason = table.concat(args, " ",3)
 
 	if args[1] then		
 		if reason == "" then
@@ -61,8 +65,7 @@ end
 function cmdunban(source, args)
 	if args[1] then
 	local target = table.concat(args, " ")
-	MySQL.Async.fetchAll('SELECT * FROM banlist WHERE targetplayername like @playername', 
-	{
+	MySQL.Async.fetchAll('SELECT * FROM banlist WHERE targetplayername like @playername', {
 		['@playername'] = ("%"..target.."%")
 	}, function(data)
 		if data[1] then
@@ -72,9 +75,7 @@ function cmdunban(source, args)
 					TriggerEvent('bansql:sendMessage', source, data[i].targetplayername)
 				end
 			else
-				MySQL.Async.execute(
-				'DELETE FROM banlist WHERE targetplayername = @name',
-				{
+				MySQL.Async.execute('DELETE FROM banlist WHERE targetplayername = @name',{
 				  ['@name']  = data[1].targetplayername
 				},
 					function ()
@@ -87,7 +88,7 @@ function cmdunban(source, args)
 							sourceplayername = "Console"
 						end
 						local message = (data[1].targetplayername .. Text.isunban .." ".. Text.by .." ".. sourceplayername)
-						sendToDiscord(Config.webhookunban, message)
+						sendToDiscord(webhookunban, message)
 					end
 					TriggerEvent('bansql:sendMessage', source, data[1].targetplayername .. Text.isunban)
 				end)
@@ -105,8 +106,7 @@ end
 function cmdsearch(source, args)
 	local target = table.concat(args, " ")
 	if target ~= "" then
-		MySQL.Async.fetchAll('SELECT * FROM baninfo WHERE playername like @playername', 
-		{
+		MySQL.Async.fetchAll('SELECT * FROM baninfo WHERE playername like @playername', {
 			['@playername'] = ("%"..target.."%")
 		}, function(data)
 			if data[1] then
@@ -128,9 +128,9 @@ end
 
 function cmdbanoffline(source, args)
 	if args ~= "" then
-		local target           = tonumber(args[1])
-		local duree            = tonumber(args[2])
-		local reason           = table.concat(args, " ",3)
+		local target = tonumber(args[1])
+		local duree = tonumber(args[2])
+		local reason = table.concat(args, " ",3)
 		local sourceplayername = ""
 		if source ~= 0 then
 			sourceplayername = GetPlayerName(source)
@@ -140,8 +140,7 @@ function cmdbanoffline(source, args)
 
 		if duree ~= "" then
 			if target ~= "" then
-				MySQL.Async.fetchAll('SELECT * FROM baninfo WHERE id = @id', 
-				{
+				MySQL.Async.fetchAll('SELECT * FROM baninfo WHERE id = @id',{
 					['@id'] = target
 				}, function(data)
 					if data[1] then
@@ -180,22 +179,22 @@ function cmdbanhistory(source, args)
 		if name ~= "" then
 			if nombre and nombre > 0 then
 				local expiration = BanListHistory[nombre].expiration
-				local timeat     = BanListHistory[nombre].timeat
-				local calcul1    = expiration - timeat
-				local calcul2    = calcul1 / 86400
-				local calcul2 	 = math.ceil(calcul2)
-				local resultat   = tostring(BanListHistory[nombre].targetplayername.." , "..BanListHistory[nombre].sourceplayername.." , "..BanListHistory[nombre].reason.." , "..calcul2..Text.day.." , "..BanListHistory[nombre].added)
+				local timeat = BanListHistory[nombre].timeat
+				local calcul1 = expiration - timeat
+				local calcul2 = calcul1 / 86400
+				local calcul2 = math.ceil(calcul2)
+				local resultat = tostring(BanListHistory[nombre].targetplayername.." , "..BanListHistory[nombre].sourceplayername.." , "..BanListHistory[nombre].reason.." , "..calcul2..Text.day.." , "..BanListHistory[nombre].added)
 
 				TriggerEvent('bansql:sendMessage', source, (nombre .." : ".. resultat))
 			else
 				for i = 1, #BanListHistory, 1 do
 					if (tostring(BanListHistory[i].targetplayername)) == tostring(name) then
 						local expiration = BanListHistory[i].expiration
-						local timeat     = BanListHistory[i].timeat
-						local calcul1    = expiration - timeat
-						local calcul2    = calcul1 / 86400
-						local calcul2 	 = math.ceil(calcul2)					
-						local resultat   = tostring(BanListHistory[i].targetplayername.." , "..BanListHistory[i].sourceplayername.." , "..BanListHistory[i].reason.." , "..calcul2..Text.day.." , "..BanListHistory[i].added)
+						local timeat = BanListHistory[i].timeat
+						local calcul1 = expiration - timeat
+						local calcul2 = calcul1 / 86400
+						local calcul2 = math.ceil(calcul2)					
+						local resultat = tostring(BanListHistory[i].targetplayername.." , "..BanListHistory[i].sourceplayername.." , "..BanListHistory[i].reason.." , "..calcul2..Text.day.." , "..BanListHistory[i].added)
 
 						TriggerEvent('bansql:sendMessage', source, (i .." : ".. resultat))
 					end
@@ -215,34 +214,31 @@ function sendToDiscord(canal,message)
 end
 
 function ban(source,license,identifier,liveid,xblid,discord,playerip,targetplayername,sourceplayername,duree,reason,permanent)
-	MySQL.Async.fetchAll('SELECT * FROM banlist WHERE targetplayername like @playername', 
-	{
+	MySQL.Async.fetchAll('SELECT * FROM banlist WHERE targetplayername like @playername',{
 		['@playername'] = ("%"..targetplayername.."%")
 	}, function(data)
 		if not data[1] then
 			local expiration = duree * 86400 --calcul total expiration (en secondes)
-			local timeat     = os.time()
-			local added      = os.date()
+			local timeat = os.time()
+			local added = os.date()
 
 			if expiration < os.time() then
 				expiration = os.time()+expiration
 			end
 			
 			table.insert(BanList, {
-				license    = license,
+				license = license,
 				identifier = identifier,
-				liveid     = liveid,
-				xblid      = xblid,
-				discord    = discord,
-				playerip   = playerip,
-				reason     = reason,
+				liveid = liveid,
+				xblid = xblid,
+				discord = discord,
+				playerip = playerip,
+				reason = reason,
 				expiration = expiration,
-				permanent  = permanent
+				permanent = permanent
 			  })
 
-			MySQL.Async.execute(
-					'INSERT INTO banlist (license,identifier,liveid,xblid,discord,playerip,targetplayername,sourceplayername,reason,expiration,timeat,permanent) VALUES (@license,@identifier,@liveid,@xblid,@discord,@playerip,@targetplayername,@sourceplayername,@reason,@expiration,@timeat,@permanent)',
-					{ 
+			MySQL.Async.execute('INSERT INTO banlist (license,identifier,liveid,xblid,discord,playerip,targetplayername,sourceplayername,reason,expiration,timeat,permanent) VALUES (@license,@identifier,@liveid,@xblid,@discord,@playerip,@targetplayername,@sourceplayername,@reason,@expiration,@timeat,@permanent)',{ 
 					['@license']          = license,
 					['@identifier']       = identifier,
 					['@liveid']           = liveid,
@@ -255,8 +251,7 @@ function ban(source,license,identifier,liveid,xblid,discord,playerip,targetplaye
 					['@expiration']       = expiration,
 					['@timeat']           = timeat,
 					['@permanent']        = permanent,
-					},
-					function ()
+					},function ()
 			end)
 
 			if permanent == 0 then
@@ -267,12 +262,12 @@ function ban(source,license,identifier,liveid,xblid,discord,playerip,targetplaye
 
 			if Config.EnableDiscordLink then
 				local license1,identifier1,liveid1,xblid1,discord1,playerip1,targetplayername1,sourceplayername1,message
-				if not license          then license1          = "N/A" else license1          = license          end
-				if not identifier       then identifier1       = "N/A" else identifier1       = identifier       end
-				if not liveid           then liveid1           = "N/A" else liveid1           = liveid           end
-				if not xblid            then xblid1            = "N/A" else xblid1            = xblid           end
-				if not discord          then discord1          = "N/A" else discord1          = discord          end
-				if not playerip         then playerip1         = "N/A" else playerip1         = playerip         end
+				if not license          then license1       = "N/A" else license1          = license         end
+				if not identifier       then identifier1    = "N/A" else identifier1       = identifier      end
+				if not liveid           then liveid1        = "N/A" else liveid1           = liveid          end
+				if not xblid            then xblid1         = "N/A" else xblid1            = xblid           end
+				if not discord          then discord1       = "N/A" else discord1          = discord         end
+				if not playerip         then playerip1      = "N/A" else playerip1         = playerip        end
 				if not targetplayername then targetplayername1 = "N/A" else targetplayername1 = targetplayername end
 				if not sourceplayername then sourceplayername1 = "N/A" else sourceplayername1 = sourceplayername end
 				if permanent == 0 then
@@ -280,25 +275,23 @@ function ban(source,license,identifier,liveid,xblid,discord,playerip,targetplaye
 				else
 					message = (targetplayername1..Text.isban.." "..Text.permban..reason.." "..Text.by.." "..sourceplayername1.."```"..identifier1.."\n"..license1.."\n"..liveid1.."\n"..xblid1.."\n"..discord1.."\n"..playerip1.."```")
 				end
-				sendToDiscord(Config.webhookban, message)
+				sendToDiscord(webhookban, message)
 			end
 
-			MySQL.Async.execute(
-					'INSERT INTO banlisthistory (license,identifier,liveid,xblid,discord,playerip,targetplayername,sourceplayername,reason,added,expiration,timeat,permanent) VALUES (@license,@identifier,@liveid,@xblid,@discord,@playerip,@targetplayername,@sourceplayername,@reason,@added,@expiration,@timeat,@permanent)',
-					{ 
-					['@license']          = license,
-					['@identifier']       = identifier,
-					['@liveid']           = liveid,
-					['@xblid']            = xblid,
-					['@discord']          = discord,
-					['@playerip']         = playerip,
+			MySQL.Async.execute('INSERT INTO banlisthistory (license,identifier,liveid,xblid,discord,playerip,targetplayername,sourceplayername,reason,added,expiration,timeat,permanent) VALUES (@license,@identifier,@liveid,@xblid,@discord,@playerip,@targetplayername,@sourceplayername,@reason,@added,@expiration,@timeat,@permanent)',{ 
+					['@license'] = license,
+					['@identifier']  = identifier,
+					['@liveid']  = liveid,
+					['@xblid']  = xblid,
+					['@discord'] = discord,
+					['@playerip'] = playerip,
 					['@targetplayername'] = targetplayername,
 					['@sourceplayername'] = sourceplayername,
-					['@reason']           = reason,
-					['@added']            = added,
-					['@expiration']       = expiration,
-					['@timeat']           = timeat,
-					['@permanent']        = permanent,
+					['@reason'] = reason,
+					['@added'] = added,
+					['@expiration'] = expiration,
+					['@timeat'] = timeat,
+					['@permanent'] = permanent,
 					},
 					function ()
 			end)
@@ -311,8 +304,7 @@ function ban(source,license,identifier,liveid,xblid,discord,playerip,targetplaye
 end
 
 function loadBanList()
-	MySQL.Async.fetchAll(
-		'SELECT * FROM banlist',
+	MySQL.Async.fetchAll('SELECT * FROM banlist',
 		{},
 		function (data)
 		  BanList = {}
@@ -334,8 +326,7 @@ function loadBanList()
 end
 
 function loadBanListHistory()
-	MySQL.Async.fetchAll(
-		'SELECT * FROM banlisthistory',
+	MySQL.Async.fetchAll('SELECT * FROM banlisthistory',
 		{},
 		function (data)
 		  BanListHistory = {}
@@ -361,13 +352,10 @@ function loadBanListHistory()
 end
 
 function deletebanned(license) 
-	MySQL.Async.execute(
-		'DELETE FROM banlist WHERE license=@license',
-		{
+	MySQL.Async.execute('DELETE FROM banlist WHERE license=@license',{
 		  ['@license']  = license
-		},
-		function ()
-			loadBanList()
+		},function ()
+		loadBanList()
 	end)
 end
 
@@ -414,7 +402,6 @@ function doublecheck(player)
 					end
 
 				elseif (tonumber(BanList[i].expiration)) < os.time() and (tonumber(BanList[i].permanent)) == 0 then
-
 					deletebanned(license)
 					break
 
