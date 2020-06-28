@@ -6,12 +6,8 @@ Config.Permission        = "admin" --Permission need to use FiveM-BanSql command
 Config.ForceSteam        = true    --Set to false if you not use steam auth
 Config.MultiServerSync   = false   --This will check if a ban is add in the sql all 30 second, use it only if you have more then 1 server (true-false)
 
-
 --WEBHOOK
 Config.EnableDiscordLink = false --Turn this true if you want link the log to a discord (true-false)
-Config.webhookban        = "https://discordapp.com/api/webhooks/473571126690316298/oJZBU9YLz9ksOCG_orlf-wpMZ2pkFedfpEsC34DN_iHO0CBBp6X06W3mMJ2RvMMK7vIO"
-Config.webhookunban      = "https://discordapp.com/api/webhooks/473571126690316298/oJZBU9YLz9ksOCG_orlf-wpMZ2pkFedfpEsC34DN_iHO0CBBp6X06W3mMJ2RvMMK7vIO"
-
 
 --LANGUAGE
 Config.TextFr = {
