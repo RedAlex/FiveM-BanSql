@@ -2,10 +2,9 @@ fx_version 'adamant'
 
 game 'gta5'
 
-version '1.1'
+version '1.2.0'
 
 server_scripts {
-	'@async/async.lua',
 	'@mysql-async/lib/MySQL.lua',
 	'config.lua',
 	'server/framework.lua',
@@ -16,9 +15,4 @@ server_scripts {
 
 client_scripts {
   'client.lua'
-}
-
-dependencies {
-	'essentialmode',
-	'async'
 }
