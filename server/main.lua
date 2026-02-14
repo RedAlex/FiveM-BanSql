@@ -4,6 +4,10 @@ BanListLoad        = false
 BanListHistory     = {}
 BanListHistoryLoad = false
 if Config.Lang == "fr" then Text = Config.TextFr elseif Config.Lang == "en" then Text = Config.TextEn else print("FIveM-BanSql : Invalid Config.Lang") end
+if GetResourceState('es_extended') == 'missing' and GetResourceState('qbx_core') == 'missing' and GetResourceState('qbx_core') == 'missing' then 
+	print(Text.frameworkerror)
+	return 
+end
 
 CreateThread(function()
 	while true do
@@ -60,85 +64,6 @@ CreateThread(function()
 		)
 	end
 end)
-
-
-RegisterCommand("ban", function(source, args, raw)
-	if source == 0 then
-		cmdban(source, args)
-	end
-end, true)
-
-RegisterCommand("unban", function(source, args, raw)
-	if source == 0 then
-		cmdunban(source, args)
-	end
-end, true)
-
-
-RegisterCommand("search", function(source, args, raw)
-	if source == 0 then
-		cmdsearch(source, args)
-	end
-end, true)
-
-RegisterCommand("banoffline", function(source, args, raw)
-	if source == 0 then
-		cmdbanoffline(source, args)
-	end
-end, true)
-
-RegisterCommand("banhistory", function(source, args, raw)
-	if source == 0 then
-		cmdbanhistory(source, args)
-	end
-end, true)
-
-
-TriggerEvent('es:addGroupCommand', 'sqlban', Config.Permission, function (source, args, user)
-	cmdban(source, args)
-end, function(source, args, user)
-	TriggerClientEvent('chat:addMessage', source, { args = { '^1SYSTEM ', 'Insufficient Permissions.' } })
-end, {help = Text.ban, params = {{name = "id"}, {name = "day", help = Text.dayhelp}, {name = "reason", help = Text.reason}}})
-
-TriggerEvent('es:addGroupCommand', 'sqlunban', Config.Permission, function (source, args, user)
-	cmdunban(source, args)
-end, function(source, args, user)
-	TriggerClientEvent('chat:addMessage', source, { args = { '^1SYSTEM ', 'Insufficient Permissions.' } })
-end, {help = Text.unban, params = {{name = "name", help = Text.steamname}}})
-
-TriggerEvent('es:addGroupCommand', 'sqlsearch', Config.Permission, function (source, args, user)
-	cmdsearch(source, args)
-end, function(source, args, user)
-	TriggerClientEvent('chat:addMessage', source, { args = { '^1SYSTEM ', 'Insufficient Permissions.' } })
-end, {help = Text.bansearch, params = {{name = "name", help = Text.steamname}}})
-
-TriggerEvent('es:addGroupCommand', 'sqlbanoffline', Config.Permission, function (source, args, user)
-	cmdbanoffline(source, args)
-end, function(source, args, user)
-	TriggerClientEvent('chat:addMessage', source, { args = { '^1SYSTEM ', 'Insufficient Permissions.' } })
-end, {help = Text.banoff, params = {{name = "permid", help = Text.permid}, {name = "day", help = Text.dayhelp}, {name = "reason", help = Text.reason}}})
-
-TriggerEvent('es:addGroupCommand', 'sqlbanhistory', Config.Permission, function (source, args, user)
-	cmdbanhistory(source, args)
-end, function(source, args, user)
-	TriggerClientEvent('chat:addMessage', source, { args = { '^1SYSTEM ', 'Insufficient Permissions.' } })
-end, {help = Text.history, params = {{name = "name", help = Text.steamname}, }})
-
-TriggerEvent('es:addGroupCommand', 'sqlbanreload', Config.Permission, function (source)
-  BanListLoad        = false
-  BanListHistoryLoad = false
-  Wait(5000)
-  if BanListLoad == true then
-	TriggerEvent('bansql:sendMessage', source, Text.banlistloaded)
-	if BanListHistoryLoad == true then
-		TriggerEvent('bansql:sendMessage', source, Text.historyloaded)
-	end
-  else
-	TriggerEvent('bansql:sendMessage', source, Text.loaderror)
-  end
-end, function(source, args, user)
-	TriggerClientEvent('chat:addMessage', source, { args = { '^1SYSTEM ', 'Insufficient Permissions.' } })
-end, {help = Text.reload})
 
 
 --How to use from server side : TriggerEvent("BanSql:ICheat", "Auto-Cheat Custom Reason",TargetId)
@@ -292,69 +217,4 @@ AddEventHandler('playerConnecting', function (playerName,setKickReason)
 			end
 		end
 	end
-end)
-
-AddEventHandler('es:playerLoaded',function(source)
-	CreateThread(function()
-	Wait(5000)
-		local license,steamID,liveid,xblid,discord,playerip
-		local playername = tostring(GetPlayerName(source))
-
-		for k,v in ipairs(GetPlayerIdentifiers(source))do
-			if string.sub(v, 1, string.len("license:")) == "license:" then
-				license = v
-			elseif string.sub(v, 1, string.len("steam:")) == "steam:" then
-				steamID = v
-			elseif string.sub(v, 1, string.len("live:")) == "live:" then
-				liveid = v
-			elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
-				xblid  = v
-			elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
-				discord = v
-			elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
-				playerip = v
-			end
-		end
-
-		MySQL.Async.fetchAll('SELECT * FROM `baninfo` WHERE `license` = @license', {
-			['@license'] = license
-		}, function(data)
-		local found = false
-			for i=1, #data, 1 do
-				if data[i].license == license then
-					found = true
-				end
-			end
-			if not found then
-				MySQL.Async.execute('INSERT INTO baninfo (license,identifier,liveid,xblid,discord,playerip,playername) VALUES (@license,@identifier,@liveid,@xblid,@discord,@playerip,@playername)', 
-					{ 
-					['@license']    = license,
-					['@identifier'] = steamID,
-					['@liveid']     = liveid,
-					['@xblid']      = xblid,
-					['@discord']    = discord,
-					['@playerip']   = playerip,
-					['@playername'] = playername
-					},
-					function ()
-				end)
-			else
-				MySQL.Async.execute('UPDATE `baninfo` SET `identifier` = @identifier, `liveid` = @liveid, `xblid` = @xblid, `discord` = @discord, `playerip` = @playerip, `playername` = @playername WHERE `license` = @license', 
-					{ 
-					['@license']    = license,
-					['@identifier'] = steamID,
-					['@liveid']     = liveid,
-					['@xblid']      = xblid,
-					['@discord']    = discord,
-					['@playerip']   = playerip,
-					['@playername'] = playername
-					},
-					function ()
-				end)
-			end
-		end)
-		if Config.MultiServerSync then
-			doublecheck(source)
-		end
-	end)
 end)

@@ -493,3 +493,17 @@ function playerLoaded(source)
 		end
 	end)
 end)
+
+function cmdbanreload(source)
+	BanListLoad        = false
+	BanListHistoryLoad = false
+	Wait(5000)
+	if BanListLoad == true then
+		TriggerEvent('bansql:sendMessage', source, Text.banlistloaded)
+		if BanListHistoryLoad == true then
+			TriggerEvent('bansql:sendMessage', source, Text.historyloaded)
+		end
+	else
+		TriggerEvent('bansql:sendMessage', source, Text.loaderror)
+	end
+end
