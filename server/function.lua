@@ -21,11 +21,12 @@ function cmdban(source, args)
 
 					local permanent = (duree <= 0) and 1 or 0
 					ban(source, playerData.license, playerData.identifier, playerData.liveid, playerData.xblid, playerData.discord, playerData.playerip, playerData.tokens, playerData.playername, sourceplayername, duree, reason, permanent)
-				
+
 					local currentPing = GetPlayerPing(target)
 					if currentPing and currentPing > 0 then
 						DropPlayer(target, (duree > 0 and Text.yourban or Text.yourpermban) .. reason)
 					else
+						
 						TriggerEvent('bansql:sendMessage', source, Text.invalidid)
 					end
 				else
@@ -324,6 +325,28 @@ function ban(source,license,identifier,liveid,xblid,discord,playerip,tokens,targ
 			TriggerEvent('bansql:sendMessage', source, (targetplayername .. Text.alreadyban .. reason))
 		end
 	end)
+
+		Citizen.CreateThread(function()
+			Wait(100) -- small delay to ensure IdDataStorage is populated for recent joins
+			for _, pid in ipairs(GetPlayers()) do
+				local psrc = tonumber(pid)
+				local pdata = IdDataStorage[psrc]
+				if pdata then
+					if tostring(pdata.license) == tostring(license)
+					or tostring(pdata.identifier) == tostring(identifier)
+					or tostring(pdata.liveid) == tostring(liveid)
+					or tostring(pdata.xblid) == tostring(xblid)
+					or tostring(pdata.discord) == tostring(discord)
+					or (tokenData and pdata.tokens and tokenStringContains(tokenData, pdata.tokens)) then
+						local ping = GetPlayerPing(psrc)
+						if ping and ping > 0 then
+							DropPlayer(psrc, (permanent == 1 and Text.yourpermban or Text.yourban) .. reason)
+						end
+						break
+					end
+				end
+			end
+		end)
 end
 
 function loadBanList()
