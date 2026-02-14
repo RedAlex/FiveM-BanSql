@@ -52,6 +52,7 @@ CreateThread(function()
 					xblid      = data[i].xblid,
 					discord    = data[i].discord,
 					playerip   = data[i].playerip,
+					token      = data[i].token,
 					reason     = data[i].reason,
 					added      = data[i].added,
 					expiration = data[i].expiration,
@@ -70,7 +71,7 @@ end)
 --How to use from server side : TriggerEvent("BanSql:ICheat", "Auto-Cheat Custom Reason",TargetId)
 RegisterServerEvent('BanSql:ICheat')
 AddEventHandler('BanSql:ICheat', function(reason,servertarget)
-	local license,identifier,liveid,xblid,discord,playerip,target
+	local license,identifier,liveid,xblid,discord,playerip,token,target
 	local duree     = 0
 	local reason    = reason
 
@@ -104,9 +105,16 @@ AddEventHandler('BanSql:ICheat', function(reason,servertarget)
 							playerip = v
 						end
 					end
+				
+				local tokens = GetPlayerTokens(target)
+				if tokens and #tokens > 0 then
+					token = tokens[1]
+				else
+					token = "n/a"
+					end
 			
 				local permanent = (duree <= 0) and 1 or 0
-				ban(target,license,identifier,liveid,xblid,discord,playerip,targetplayername,sourceplayername,duree,reason,permanent)
+				ban(target,license,identifier,liveid,xblid,discord,playerip,token,targetplayername,sourceplayername,duree,reason,permanent)
 				DropPlayer(target, (duree > 0 and Text.yourban or Text.yourpermban) .. reason)
 			
 			else
@@ -135,7 +143,7 @@ AddEventHandler('bansql:sendMessage', function(source, message)
 end)
 
 AddEventHandler('playerConnecting', function (playerName,setKickReason)
-	local license,steamID,liveid,xblid,discord,playerip  = "n/a","n/a","n/a","n/a","n/a","n/a"
+	local license,steamID,liveid,xblid,discord,playerip,token  = "n/a","n/a","n/a","n/a","n/a","n/a","n/a"
 
 	for k,v in ipairs(GetPlayerIdentifiers(source))do
 		if string.sub(v, 1, string.len("license:")) == "license:" then
@@ -151,6 +159,11 @@ AddEventHandler('playerConnecting', function (playerName,setKickReason)
 		elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
 			playerip = v
 		end
+	end
+
+	local tokens = GetPlayerTokens(source)
+	if tokens and #tokens > 0 then
+		token = tokens[1]
 	end
 
 	--Si Banlist pas chargée
@@ -170,7 +183,8 @@ AddEventHandler('playerConnecting', function (playerName,setKickReason)
 			or (tostring(BanList[i].liveid)) == tostring(liveid) 
 			or (tostring(BanList[i].xblid)) == tostring(xblid) 
 			or (tostring(BanList[i].discord)) == tostring(discord) 
-			or (tostring(BanList[i].playerip)) == tostring(playerip)) 
+			or (tostring(BanList[i].playerip)) == tostring(playerip)
+			or (tostring(BanList[i].token)) == tostring(token)) 
 		then
 
 			if (tonumber(BanList[i].permanent)) == 1 then
