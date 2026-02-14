@@ -215,9 +215,9 @@ function sendToDiscord(canal,message)
 end
 
 function ban(source,license,identifier,liveid,xblid,discord,playerip,targetplayername,sourceplayername,duree,reason,permanent)
-	MySQL.Async.fetchAll('SELECT * FROM banlist WHERE targetplayername like @playername', 
+	MySQL.Async.fetchAll('SELECT * FROM banlist WHERE license = @license', 
 	{
-		['@playername'] = ("%"..targetplayername.."%")
+		['@license'] = (license)
 	}, function(data)
 		if not data[1] then
 			local expiration = duree * 86400 --calcul total expiration (en secondes)
