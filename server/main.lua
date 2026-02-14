@@ -5,6 +5,14 @@ BanListHistory     = {}
 BanListHistoryLoad = false
 IdDataStorage 	   = {}
 if Config.Lang == "fr" then Text = Config.TextFr elseif Config.Lang == "en" then Text = Config.TextEn else print("FIveM-BanSql : Invalid Config.Lang") end
+-- Warn if ForceSteam is enabled but steam_webApiKey is not set in server convars
+if Config.ForceSteam then
+	local steamKey = GetConvar('steam_webApiKey', '')
+	if not steamKey or steamKey == '' then
+		print('^3[FiveM-BanSql] '..Text.nosteamapikey..'^7')
+		Config.ForceSteam = false
+	end
+end
 if GetResourceState('es_extended') == 'missing' and GetResourceState('qbx_core') == 'missing' and GetResourceState('qbx_core') == 'missing' then 
 	print(Text.frameworkerror)
 	return 
@@ -233,3 +241,4 @@ AddEventHandler('playerConnecting', function (playerName,setKickReason)
 		end
 	end
 end)
+
