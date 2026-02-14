@@ -35,14 +35,10 @@ function cmdban(source, args)
 								playerip = v
 							end
 						end
-				
-					if duree > 0 then
-						ban(source,license,identifier,liveid,xblid,discord,playerip,targetplayername,sourceplayername,duree,reason,0) --Timed ban here
-						DropPlayer(target, Text.yourban .. reason)
-					else
-						ban(source,license,identifier,liveid,xblid,discord,playerip,targetplayername,sourceplayername,duree,reason,1) --Perm ban here
-						DropPlayer(target, Text.yourpermban .. reason)
-					end
+
+					local permanent = (duree <= 0) and 1 or 0
+					ban(source,license,identifier,liveid,xblid,discord,playerip,targetplayername,sourceplayername,duree,reason,permanent)
+					DropPlayer(target, (duree > 0 and Text.yourban or Text.yourpermban) .. reason)
 				
 				else
 					TriggerEvent('bansql:sendMessage', source, Text.invalidtime)
@@ -149,11 +145,8 @@ function cmdbanoffline(source, args)
 							if reason == "" then
 								reason = Text.noreason
 							end
-							if duree > 0 then --Here if not perm ban
-								ban(source,data[1].license,data[1].identifier,data[1].liveid,data[1].xblid,data[1].discord,data[1].playerip,data[1].playername,sourceplayername,duree,reason,0) --Timed ban here
-							else --Here if perm ban
-								ban(source,data[1].license,data[1].identifier,data[1].liveid,data[1].xblid,data[1].discord,data[1].playerip,data[1].playername,sourceplayername,duree,reason,1) --Perm ban here
-							end
+							local permanent = (duree <= 0) and 1 or 0
+							ban(source,data[1].license,data[1].identifier,data[1].liveid,data[1].xblid,data[1].discord,data[1].playerip,data[1].playername,sourceplayername,duree,reason,permanent)
 						else
 							TriggerEvent('bansql:sendMessage', source, Text.invalidtime)
 						end
@@ -423,3 +416,80 @@ function doublecheck(player)
 		end
 	end
 end
+
+
+function playerLoaded(source)
+	CreateThread(function()
+	Wait(5000)
+		local license,steamID,liveid,xblid,discord,playerip
+		local playername = tostring(GetPlayerName(source))
+
+		for k,v in ipairs(GetPlayerIdentifiers(source))do
+			if string.sub(v, 1, string.len("license:")) == "license:" then
+				license = v
+			elseif string.sub(v, 1, string.len("steam:")) == "steam:" then
+				steamID = v
+			elseif string.sub(v, 1, string.len("live:")) == "live:" then
+				liveid = v
+			elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
+				xblid  = v
+			elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
+				discord = v
+			elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
+				playerip = v
+			end
+		end
+
+		--Loading in memory until next server restart.
+		IdDataStorage[source] = {
+			license = license,
+			identifier = steamID,
+			liveid = liveid,
+			xblid = xblid,
+			discord = discord,
+			playerip = playerip,
+			playername = playername
+		}
+
+		MySQL.Async.fetchAll('SELECT * FROM `baninfo` WHERE `license` = @license', {
+			['@license'] = license
+		}, function(data)
+		local found = false
+			for i=1, #data, 1 do
+				if data[i].license == license then
+					found = true
+				end
+			end
+			if not found then
+				MySQL.Async.execute('INSERT INTO baninfo (license,identifier,liveid,xblid,discord,playerip,playername) VALUES (@license,@identifier,@liveid,@xblid,@discord,@playerip,@playername)', 
+					{ 
+					['@license']    = license,
+					['@identifier'] = steamID,
+					['@liveid']     = liveid,
+					['@xblid']      = xblid,
+					['@discord']    = discord,
+					['@playerip']   = playerip,
+					['@playername'] = playername
+					},
+					function ()
+				end)
+			else
+				MySQL.Async.execute('UPDATE `baninfo` SET `identifier` = @identifier, `liveid` = @liveid, `xblid` = @xblid, `discord` = @discord, `playerip` = @playerip, `playername` = @playername WHERE `license` = @license', 
+					{ 
+					['@license']    = license,
+					['@identifier'] = steamID,
+					['@liveid']     = liveid,
+					['@xblid']      = xblid,
+					['@discord']    = discord,
+					['@playerip']   = playerip,
+					['@playername'] = playername
+					},
+					function ()
+				end)
+			end
+		end)
+		if Config.MultiServerSync then
+			doublecheck(source)
+		end
+	end)
+end)
