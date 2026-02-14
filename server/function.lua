@@ -13,10 +13,10 @@ function cmdban(source, args)
         
 			if ping and ping > 0 then
 				if duree and duree < 365 then
-					local targetplayername = GetPlayerName(target)
+					local targetplayername = tostring(GetPlayerName(target))
 					local sourceplayername = ""
 						if source ~= 0 then
-							sourceplayername = GetPlayerName(source)
+							sourceplayername = tostring(GetPlayerName(source))
 						else
 							sourceplayername = "Console"
 						end
@@ -82,7 +82,7 @@ function cmdunban(source, args)
 					if Config.EnableDiscordLink then
 						local sourceplayername = ""
 						if source ~= 0 then
-							sourceplayername = GetPlayerName(source)
+							sourceplayername = tostring(GetPlayerName(source))
 						else
 							sourceplayername = "Console"
 						end
@@ -133,7 +133,7 @@ function cmdbanoffline(source, args)
 		local reason           = table.concat(args, " ",3)
 		local sourceplayername = ""
 		if source ~= 0 then
-			sourceplayername = GetPlayerName(source)
+			sourceplayername = tostring(GetPlayerName(source))
 		else
 			sourceplayername = "Console"
 		end

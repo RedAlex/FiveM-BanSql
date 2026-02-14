@@ -162,7 +162,7 @@ AddEventHandler('BanSql:ICheat', function(reason,servertarget)
 		if ping and ping > 0 then
 			if duree and duree < 365 then
 				local sourceplayername = "Anti-Cheat-System"
-				local targetplayername = GetPlayerName(target)
+				local targetplayername = tostring(GetPlayerName(target))
 					for k,v in ipairs(GetPlayerIdentifiers(target))do
 						if string.sub(v, 1, string.len("license:")) == "license:" then
 							license = v
@@ -302,7 +302,7 @@ AddEventHandler('es:playerLoaded',function(source)
 	CreateThread(function()
 	Wait(5000)
 		local license,steamID,liveid,xblid,discord,playerip
-		local playername = GetPlayerName(source)
+		local playername = tostring(GetPlayerName(source))
 
 		for k,v in ipairs(GetPlayerIdentifiers(source))do
 			if string.sub(v, 1, string.len("license:")) == "license:" then
