@@ -55,7 +55,12 @@ Config.TextFr = {
 	reload        = "Recharge la BanList et la BanListHistory",
 	unban         = "Retirez un ban de la liste",
 	steamname     = "(Nom Steam)",
-}
+	updateCheckTitle = "FiveM-BanSql - Nouvelle version disponible!",
+	updateCurrentVer = "Version actuelle: ",
+	updateLatestVer  = "Dernière version: ",
+	updateDownload   = "Télécharger: ",
+	updateUpToDate   = "[FiveM-BanSql] Version à jour (",
+	updateError      = "[FiveM-BanSql] Impossible de vérifier les mises à jour (Code: ",
 
 
 Config.TextEn = {
@@ -97,5 +102,11 @@ Config.TextEn = {
 	history       = "Shows all previous bans for a certain player",
 	reload        = "Refreshes the ban list and history.",
 	unban         = "Unban a player.",
-	steamname     = "Steam name"
+	steamname     = "Steam name",
+	updateCheckTitle = "FiveM-BanSql - New version available!",
+	updateCurrentVer = "Current version: ",
+	updateLatestVer  = "Latest version: ",
+	updateDownload   = "Download: ",
+	updateUpToDate   = "[FiveM-BanSql] Version up to date (",
+	updateError      = "[FiveM-BanSql] Unable to check for updates (Code: ",
 }

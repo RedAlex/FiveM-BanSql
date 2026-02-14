@@ -10,7 +10,8 @@ server_scripts {
 	'server/framework.lua',
 	'server/function.lua',
 	'server/main.lua',
-	'server/command.lua'
+	'server/command.lua',
+	'server/update.lua'
 }
 
 client_scripts {
