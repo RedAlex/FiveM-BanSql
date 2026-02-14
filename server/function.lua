@@ -1,5 +1,4 @@
 function cmdban(source, args)
-	local license,identifier,liveid,xblid,discord,playerip
 	local target    = tonumber(args[1])
 	local duree     = tonumber(args[2])
 	local reason    = table.concat(args, " ",3)
@@ -10,42 +9,31 @@ function cmdban(source, args)
 		end
 		if target and target > 0 then
 			local ping = GetPlayerPing(target)
-        
-			if ping and ping > 0 then
-				if duree and duree < 365 then
-					local targetplayername = tostring(GetPlayerName(target))
+			if duree and duree < 365 then
+				local playerData = IdDataStorage[target]
+				if playerData then
 					local sourceplayername = ""
-						if source ~= 0 then
-							sourceplayername = tostring(GetPlayerName(source))
-						else
-							sourceplayername = "Console"
-						end
-						for k,v in ipairs(GetPlayerIdentifiers(target))do
-							if string.sub(v, 1, string.len("license:")) == "license:" then
-								license = v
-							elseif string.sub(v, 1, string.len("steam:")) == "steam:" then
-								identifier = v
-							elseif string.sub(v, 1, string.len("live:")) == "live:" then
-								liveid = v
-							elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
-								xblid  = v
-							elseif string.sub(v, 1, string.len("discord:")) == "discord:" then
-								discord = v
-							elseif string.sub(v, 1, string.len("ip:")) == "ip:" then
-								playerip = v
-							end
-						end
+					if source ~= 0 then
+						sourceplayername = tostring(GetPlayerName(source))
+					else
+						sourceplayername = "Console"
+					end
 
 					local permanent = (duree <= 0) and 1 or 0
-					ban(source,license,identifier,liveid,xblid,discord,playerip,targetplayername,sourceplayername,duree,reason,permanent)
-					DropPlayer(target, (duree > 0 and Text.yourban or Text.yourpermban) .. reason)
+					ban(source, playerData.license, playerData.identifier, playerData.liveid, playerData.xblid, playerData.discord, playerData.playerip, playerData.playername, sourceplayername, duree, reason, permanent)
 				
+					local currentPing = GetPlayerPing(target)
+					if currentPing and currentPing > 0 then
+						DropPlayer(target, (duree > 0 and Text.yourban or Text.yourpermban) .. reason)
+					else
+						TriggerEvent('bansql:sendMessage', source, Text.invalidid)
+					end
 				else
-					TriggerEvent('bansql:sendMessage', source, Text.invalidtime)
-				end	
+					TriggerEvent('bansql:sendMessage', source, Text.invalidid)
+				end
 			else
-				TriggerEvent('bansql:sendMessage', source, Text.invalidid)
-			end
+				TriggerEvent('bansql:sendMessage', source, Text.invalidtime)
+			end	
 		else
 			TriggerEvent('bansql:sendMessage', source, Text.invalidid)
 		end

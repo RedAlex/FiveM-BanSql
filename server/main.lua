@@ -3,6 +3,7 @@ BanList            = {}
 BanListLoad        = false
 BanListHistory     = {}
 BanListHistoryLoad = false
+IdDataStorage 	   = {}
 if Config.Lang == "fr" then Text = Config.TextFr elseif Config.Lang == "en" then Text = Config.TextEn else print("FIveM-BanSql : Invalid Config.Lang") end
 if GetResourceState('es_extended') == 'missing' and GetResourceState('qbx_core') == 'missing' and GetResourceState('qbx_core') == 'missing' then 
 	print(Text.frameworkerror)
