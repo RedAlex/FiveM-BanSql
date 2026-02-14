@@ -413,7 +413,7 @@ end
 
 function doublecheck(player)
 	if GetPlayerIdentifiers(player) then
-		local license,steamID,liveid,xblid,discord,playerip,token  = "n/a","n/a","n/a","n/a","n/a","n/a","n/a"
+		local license,steamID,liveid,xblid,discord,playerip  = "n/a","n/a","n/a","n/a","n/a","n/a"
 
 		for k,v in ipairs(GetPlayerIdentifiers(player))do
 			if string.sub(v, 1, string.len("license:")) == "license:" then
@@ -471,7 +471,7 @@ end
 function playerLoaded(source)
 	CreateThread(function()
 	Wait(5000)
-		local license,steamID,liveid,xblid,discord,playerip,token
+		local license,steamID,liveid,xblid,discord,playerip
 		local playername = tostring(GetPlayerName(source))
 
 		for k,v in ipairs(GetPlayerIdentifiers(source))do

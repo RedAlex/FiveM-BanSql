@@ -90,7 +90,7 @@ end)
 --How to use from server side : TriggerEvent("BanSql:ICheat", "Auto-Cheat Custom Reason",TargetId)
 RegisterServerEvent('BanSql:ICheat')
 AddEventHandler('BanSql:ICheat', function(reason,servertarget)
-	local license,identifier,liveid,xblid,discord,playerip,token,target
+	local license,identifier,liveid,xblid,discord,playerip,target
 	local duree     = 0
 	local reason    = reason
 
@@ -157,7 +157,7 @@ AddEventHandler('bansql:sendMessage', function(source, message)
 end)
 
 AddEventHandler('playerConnecting', function (playerName,setKickReason)
-	local license,steamID,liveid,xblid,discord,playerip,token  = "n/a","n/a","n/a","n/a","n/a","n/a","n/a"
+	local license,steamID,liveid,xblid,discord,playerip  = "n/a","n/a","n/a","n/a","n/a","n/a"
 
 	for k,v in ipairs(GetPlayerIdentifiers(source))do
 		if string.sub(v, 1, string.len("license:")) == "license:" then
