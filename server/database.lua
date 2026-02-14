@@ -64,5 +64,54 @@ function initializeDatabase()
     end)
 end
 
+-- Migration from 1.0.9 to 1.2 function to add token column to existing tables
+function migrateDatabase()
+    -- Check and add token column to banlist table
+    MySQL.Async.fetchAll([[
+        SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
+        WHERE TABLE_NAME = 'banlist' AND COLUMN_NAME = 'token'
+    ]], {}, function(result)
+        if not result or #result == 0 then
+            MySQL.Async.execute([[
+                ALTER TABLE banlist ADD COLUMN token varchar(255) COLLATE utf8mb4_bin DEFAULT NULL
+            ]], {}, function()
+                print("^2[FiveM-BanSql] ✓ Token column added to 'banlist' table^7")
+            end)
+        end
+    end)
+
+    -- Check and add token column to banlisthistory table
+    MySQL.Async.fetchAll([[
+        SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
+        WHERE TABLE_NAME = 'banlisthistory' AND COLUMN_NAME = 'token'
+    ]], {}, function(result)
+        if not result or #result == 0 then
+            MySQL.Async.execute([[
+                ALTER TABLE banlisthistory ADD COLUMN token varchar(255) COLLATE utf8mb4_bin DEFAULT NULL
+            ]], {}, function()
+                print("^2[FiveM-BanSql] ✓ Token column added to 'banlisthistory' table^7")
+            end)
+        end
+    end)
+
+    -- Check and add token column to baninfo table
+    MySQL.Async.fetchAll([[
+        SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
+        WHERE TABLE_NAME = 'baninfo' AND COLUMN_NAME = 'token'
+    ]], {}, function(result)
+        if not result or #result == 0 then
+            MySQL.Async.execute([[
+                ALTER TABLE baninfo ADD COLUMN token varchar(255) COLLATE utf8mb4_bin DEFAULT NULL
+            ]], {}, function()
+                print("^2[FiveM-BanSql] ✓ Token column added to 'baninfo' table^7")
+            end)
+        end
+    end)
+end
+
 -- Initialize database on resource start
-initializeDatabase()
+CreateThread(function()
+    initializeDatabase()
+    Wait(1000)
+    migrateDatabase()
+end)
