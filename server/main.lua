@@ -179,13 +179,9 @@ AddEventHandler('BanSql:ICheat', function(reason,servertarget)
 						end
 					end
 			
-				if duree > 0 then
-					ban(target,license,identifier,liveid,xblid,discord,playerip,targetplayername,sourceplayername,duree,reason,0) --Timed ban here
-					DropPlayer(target, Text.yourban .. reason)
-				else
-					ban(target,license,identifier,liveid,xblid,discord,playerip,targetplayername,sourceplayername,duree,reason,1) --Perm ban here
-					DropPlayer(target, Text.yourpermban .. reason)
-				end
+				local permanent = (duree <= 0) and 1 or 0
+				ban(target,license,identifier,liveid,xblid,discord,playerip,targetplayername,sourceplayername,duree,reason,permanent)
+				DropPlayer(target, (duree > 0 and Text.yourban or Text.yourpermban) .. reason)
 			
 			else
 				print("BanSql Error : Auto-Cheat-Ban time invalid.")
