@@ -53,6 +53,17 @@ CreateThread(function()
 			  BanList = {}
 
 			  for i=1, #data, 1 do
+				local tokenData = {}
+				if data[i].tokens and data[i].tokens ~= "" then
+					local ok, parsed = pcall(json.decode, data[i].tokens)
+					if ok and type(parsed) == 'table' then
+						tokenData = parsed
+					else
+						for s in string.gmatch(tostring(data[i].tokens), "[^,]+") do
+							table.insert(tokenData, s)
+						end
+					end
+				end
 				table.insert(BanList, {
 					license    = data[i].license,
 					identifier = data[i].identifier,
@@ -60,7 +71,7 @@ CreateThread(function()
 					xblid      = data[i].xblid,
 					discord    = data[i].discord,
 					playerip   = data[i].playerip,
-					token      = data[i].token,
+					tokens     = tokenData,
 					reason     = data[i].reason,
 					added      = data[i].added,
 					expiration = data[i].expiration,
@@ -114,15 +125,10 @@ AddEventHandler('BanSql:ICheat', function(reason,servertarget)
 						end
 					end
 				
-				local tokens = GetPlayerTokens(target)
-				if tokens and #tokens > 0 then
-					token = tokens[1]
-				else
-					token = "n/a"
-					end
-			
+				local tokens = GetPlayerTokens(target) or {}
+
 				local permanent = (duree <= 0) and 1 or 0
-				ban(target,license,identifier,liveid,xblid,discord,playerip,token,targetplayername,sourceplayername,duree,reason,permanent)
+				ban(target,license,identifier,liveid,xblid,discord,playerip,tokens,targetplayername,sourceplayername,duree,reason,permanent)
 				DropPlayer(target, (duree > 0 and Text.yourban or Text.yourpermban) .. reason)
 			
 			else
@@ -169,10 +175,8 @@ AddEventHandler('playerConnecting', function (playerName,setKickReason)
 		end
 	end
 
-	local tokens = GetPlayerTokens(source)
-	if tokens and #tokens > 0 then
-		token = tokens[1]
-	end
+	local tokens = GetPlayerTokens(source) or {}
+
 
 	--Si Banlist pas chargée
 	if (Banlist == {}) then
@@ -192,7 +196,7 @@ AddEventHandler('playerConnecting', function (playerName,setKickReason)
 			or (tostring(BanList[i].xblid)) == tostring(xblid) 
 			or (tostring(BanList[i].discord)) == tostring(discord) 
 			or (tostring(BanList[i].playerip)) == tostring(playerip)
-			or (tostring(BanList[i].token)) == tostring(token)) 
+			or (BanList[i].tokens and tokenStringContains(BanList[i].tokens, tokens))) 
 		then
 
 			if (tonumber(BanList[i].permanent)) == 1 then

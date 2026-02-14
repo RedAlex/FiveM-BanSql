@@ -20,7 +20,7 @@ function cmdban(source, args)
 					end
 
 					local permanent = (duree <= 0) and 1 or 0
-					ban(source, playerData.license, playerData.identifier, playerData.liveid, playerData.xblid, playerData.discord, playerData.playerip, playerData.token, playerData.playername, sourceplayername, duree, reason, permanent)
+					ban(source, playerData.license, playerData.identifier, playerData.liveid, playerData.xblid, playerData.discord, playerData.playerip, playerData.tokens, playerData.playername, sourceplayername, duree, reason, permanent)
 				
 					local currentPing = GetPlayerPing(target)
 					if currentPing and currentPing > 0 then
@@ -134,7 +134,18 @@ function cmdbanoffline(source, args)
 								reason = Text.noreason
 							end
 							local permanent = (duree <= 0) and 1 or 0
-							ban(source,data[1].license,data[1].identifier,data[1].liveid,data[1].xblid,data[1].discord,data[1].playerip,data[1].token,data[1].playername,sourceplayername,duree,reason,permanent)
+							local tokenTable = {}
+							if data[1].tokens and data[1].tokens ~= "" then
+								local ok, parsed = pcall(json.decode, data[1].tokens)
+								if ok and type(parsed) == 'table' then
+									tokenTable = parsed
+								else
+									for s in string.gmatch(tostring(data[1].tokens), "[^,]+") do
+										table.insert(tokenTable, s)
+									end
+								end
+							end
+							ban(source,data[1].license,data[1].identifier,data[1].liveid,data[1].xblid,data[1].discord,data[1].playerip,tokenTable,data[1].playername,sourceplayername,duree,reason,permanent)
 						else
 							TriggerEvent('bansql:sendMessage', source, Text.invalidtime)
 						end
@@ -195,7 +206,7 @@ function sendToDiscord(canal,message)
 	PerformHttpRequest(DiscordWebHook, function(err, text, headers) end, 'POST', json.encode({content = message}), { ['Content-Type'] = 'application/json' })
 end
 
-function ban(source,license,identifier,liveid,xblid,discord,playerip,token,targetplayername,sourceplayername,duree,reason,permanent)
+function ban(source,license,identifier,liveid,xblid,discord,playerip,tokens,targetplayername,sourceplayername,duree,reason,permanent)
 	MySQL.Async.fetchAll('SELECT * FROM banlist WHERE license = @license', 
 	{
 		['@license'] = (license)
@@ -208,7 +219,22 @@ function ban(source,license,identifier,liveid,xblid,discord,playerip,token,targe
 			if expiration < os.time() then
 				expiration = os.time()+expiration
 			end
-			
+
+			-- normalize tokens input into a table of tokens
+			local tokenData = {}
+			if type(tokens) == 'table' then
+				tokenData = tokens
+			elseif tokens and tokens ~= '' then
+				local ok, parsed = pcall(json.decode, tokens)
+				if ok and type(parsed) == 'table' then
+					tokenData = parsed
+				else
+					for s in string.gmatch(tostring(tokens), "[^,]+") do
+						table.insert(tokenData, s)
+					end
+				end
+			end
+
 			table.insert(BanList, {
 				license    = license,
 				identifier = identifier,
@@ -216,14 +242,14 @@ function ban(source,license,identifier,liveid,xblid,discord,playerip,token,targe
 				xblid      = xblid,
 				discord    = discord,
 				playerip   = playerip,
-				token      = token,
+				tokens     = tokenData,
 				reason     = reason,
 				expiration = expiration,
 				permanent  = permanent
 			  })
 
 			MySQL.Async.execute(
-					'INSERT INTO banlist (license,identifier,liveid,xblid,discord,playerip,token,targetplayername,sourceplayername,reason,expiration,timeat,permanent) VALUES (@license,@identifier,@liveid,@xblid,@discord,@playerip,@token,@targetplayername,@sourceplayername,@reason,@expiration,@timeat,@permanent)',
+					'INSERT INTO banlist (license,identifier,liveid,xblid,discord,playerip,tokens,targetplayername,sourceplayername,reason,expiration,timeat,permanent) VALUES (@license,@identifier,@liveid,@xblid,@discord,@playerip,@tokens,@targetplayername,@sourceplayername,@reason,@expiration,@timeat,@permanent)',
 					{ 
 					['@license']          = license,
 					['@identifier']       = identifier,
@@ -231,7 +257,7 @@ function ban(source,license,identifier,liveid,xblid,discord,playerip,token,targe
 					['@xblid']            = xblid,
 					['@discord']          = discord,
 					['@playerip']         = playerip,
-					['@token']            = token,
+					['@tokens']            = (tokenData and json.encode(tokenData) or nil),
 					['@targetplayername'] = targetplayername,
 					['@sourceplayername'] = sourceplayername,
 					['@reason']           = reason,
@@ -256,7 +282,12 @@ function ban(source,license,identifier,liveid,xblid,discord,playerip,token,targe
 				if not xblid            then xblid1            = "N/A" else xblid1            = xblid           end
 				if not discord          then discord1          = "N/A" else discord1          = discord          end
 				if not playerip         then playerip1         = "N/A" else playerip1         = playerip         end
-				if not token            then token1            = "N/A" else token1            = token            end
+				local token1 = "N/A"
+				if tokenData and type(tokenData) == 'table' then
+					token1 = json.encode(tokenData)
+				elseif tokens and tokens ~= '' then
+					token1 = tostring(tokens)
+				end
 				if not targetplayername then targetplayername1 = "N/A" else targetplayername1 = targetplayername end
 				if not sourceplayername then sourceplayername1 = "N/A" else sourceplayername1 = sourceplayername end
 				if permanent == 0 then
@@ -268,7 +299,7 @@ function ban(source,license,identifier,liveid,xblid,discord,playerip,token,targe
 			end
 
 			MySQL.Async.execute(
-					'INSERT INTO banlisthistory (license,identifier,liveid,xblid,discord,playerip,token,targetplayername,sourceplayername,reason,added,expiration,timeat,permanent) VALUES (@license,@identifier,@liveid,@xblid,@discord,@playerip,@token,@targetplayername,@sourceplayername,@reason,@added,@expiration,@timeat,@permanent)',
+					'INSERT INTO banlisthistory (license,identifier,liveid,xblid,discord,playerip,tokens,targetplayername,sourceplayername,reason,added,expiration,timeat,permanent) VALUES (@license,@identifier,@liveid,@xblid,@discord,@playerip,@tokens,@targetplayername,@sourceplayername,@reason,@added,@expiration,@timeat,@permanent)',
 					{ 
 					['@license']          = license,
 					['@identifier']       = identifier,
@@ -276,7 +307,7 @@ function ban(source,license,identifier,liveid,xblid,discord,playerip,token,targe
 					['@xblid']            = xblid,
 					['@discord']          = discord,
 					['@playerip']         = playerip,
-					['@token']            = token,
+					['@tokens']            = (tokenData and json.encode(tokenData) or nil),
 					['@targetplayername'] = targetplayername,
 					['@sourceplayername'] = sourceplayername,
 					['@reason']           = reason,
@@ -303,6 +334,17 @@ function loadBanList()
 		  BanList = {}
 
 		  for i=1, #data, 1 do
+			local tokenData = {}
+			if data[i].tokens and data[i].tokens ~= "" then
+				local ok, parsed = pcall(json.decode, data[i].tokens)
+				if ok and type(parsed) == 'table' then
+					tokenData = parsed
+				else
+					for s in string.gmatch(tostring(data[i].tokens), "[^,]+") do
+						table.insert(tokenData, s)
+					end
+				end
+			end
 			table.insert(BanList, {
 				license    = data[i].license,
 				identifier = data[i].identifier,
@@ -310,13 +352,13 @@ function loadBanList()
 				xblid      = data[i].xblid,
 				discord    = data[i].discord,
 				playerip   = data[i].playerip,
-				token      = data[i].token,
+				tokens     = tokenData,
 				reason     = data[i].reason,
 				expiration = data[i].expiration,
 				permanent  = data[i].permanent
 			  })
 		  end
-    end)
+	end)
 end
 
 function loadBanListHistory()
@@ -327,6 +369,17 @@ function loadBanListHistory()
 		  BanListHistory = {}
 
 		  for i=1, #data, 1 do
+			local tokenData = {}
+			if data[i].tokens and data[i].tokens ~= "" then
+				local ok, parsed = pcall(json.decode, data[i].tokens)
+				if ok and type(parsed) == 'table' then
+					tokenData = parsed
+				else
+					for s in string.gmatch(tostring(data[i].tokens), "[^,]+") do
+						table.insert(tokenData, s)
+					end
+				end
+			end
 			table.insert(BanListHistory, {
 				license          = data[i].license,
 				identifier       = data[i].identifier,
@@ -334,7 +387,7 @@ function loadBanListHistory()
 				xblid            = data[i].xblid,
 				discord          = data[i].discord,
 				playerip         = data[i].playerip,
-				token            = data[i].token,
+				tokens           = tokenData,
 				targetplayername = data[i].targetplayername,
 				sourceplayername = data[i].sourceplayername,
 				reason           = data[i].reason,
@@ -344,7 +397,7 @@ function loadBanListHistory()
 				timeat           = data[i].timeat
 			  })
 		  end
-    end)
+	end)
 end
 
 function deletebanned(license) 
@@ -378,21 +431,18 @@ function doublecheck(player)
 			end
 		end
 
-		local tokens = GetPlayerTokens(player)
-		if tokens and #tokens > 0 then
-			token = tokens[1]
-		end
+		local tokens = GetPlayerTokens(player) or {}
 
 		for i = 1, #BanList, 1 do
-			if 
-				  ((tostring(BanList[i].license)) == tostring(license) 
-				or (tostring(BanList[i].identifier)) == tostring(steamID) 
-				or (tostring(BanList[i].liveid)) == tostring(liveid) 
-				or (tostring(BanList[i].xblid)) == tostring(xblid) 
-				or (tostring(BanList[i].discord)) == tostring(discord) 
-				or (tostring(BanList[i].playerip)) == tostring(playerip)
-				or (tostring(BanList[i].token)) == tostring(token)) 
-			then
+						if 
+									((tostring(BanList[i].license)) == tostring(license) 
+								or (tostring(BanList[i].identifier)) == tostring(steamID) 
+								or (tostring(BanList[i].liveid)) == tostring(liveid) 
+								or (tostring(BanList[i].xblid)) == tostring(xblid) 
+								or (tostring(BanList[i].discord)) == tostring(discord) 
+								or (tostring(BanList[i].playerip)) == tostring(playerip)
+								or (BanList[i].tokens and tokenStringContains(BanList[i].tokens, tokens))) 
+		then
 
 				if (tonumber(BanList[i].permanent)) == 1 then
 					DropPlayer(player, Text.yourban .. BanList[i].reason)
@@ -440,12 +490,7 @@ function playerLoaded(source)
 			end
 		end
 
-		local tokens = GetPlayerTokens(source)
-		if tokens and #tokens > 0 then
-			token = tokens[1]
-		else
-			token = "n/a"
-		end
+		local tokens = GetPlayerTokens(source) or {}
 
 		--Loading in memory until next server restart.
 		IdDataStorage[source] = {
@@ -455,7 +500,7 @@ function playerLoaded(source)
 			xblid = xblid,
 			discord = discord,
 			playerip = playerip,
-			token = token,
+			tokens = tokens,
 			playername = playername
 		}
 
@@ -469,7 +514,7 @@ function playerLoaded(source)
 				end
 			end
 			if not found then
-				MySQL.Async.execute('INSERT INTO baninfo (license,identifier,liveid,xblid,discord,playerip,token,playername) VALUES (@license,@identifier,@liveid,@xblid,@discord,@playerip,@token,@playername)', 
+				MySQL.Async.execute('INSERT INTO baninfo (license,identifier,liveid,xblid,discord,playerip,tokens,playername) VALUES (@license,@identifier,@liveid,@xblid,@discord,@playerip,@tokens,@playername)', 
 					{ 
 					['@license']    = license,
 					['@identifier'] = steamID,
@@ -477,13 +522,13 @@ function playerLoaded(source)
 					['@xblid']      = xblid,
 					['@discord']    = discord,
 					['@playerip']   = playerip,
-					['@token']      = token,
+					['@tokens']     = (tokens and json.encode(tokens) or nil),
 					['@playername'] = playername
 					},
 					function ()
 				end)
 			else
-				MySQL.Async.execute('UPDATE `baninfo` SET `identifier` = @identifier, `liveid` = @liveid, `xblid` = @xblid, `discord` = @discord, `playerip` = @playerip, `token` = @token, `playername` = @playername WHERE `license` = @license', 
+				MySQL.Async.execute('UPDATE `baninfo` SET `identifier` = @identifier, `liveid` = @liveid, `xblid` = @xblid, `discord` = @discord, `playerip` = @playerip, `tokens` = @tokens, `playername` = @playername WHERE `license` = @license', 
 					{ 
 					['@license']    = license,
 					['@identifier'] = steamID,
@@ -491,7 +536,7 @@ function playerLoaded(source)
 					['@xblid']      = xblid,
 					['@discord']    = discord,
 					['@playerip']   = playerip,
-					['@token']      = token,
+					['@tokens']     = (tokens and json.encode(tokens) or nil),
 					['@playername'] = playername
 					},
 					function ()
@@ -516,4 +561,20 @@ function cmdbanreload(source)
 	else
 		TriggerEvent('bansql:sendMessage', source, Text.loaderror)
 	end
+end
+
+-- Check whether any token from player's tokens exists in the stored ban token table
+function tokenStringContains(banTokenTable, playerTokens)
+	if not banTokenTable or type(banTokenTable) ~= 'table' then return false end
+	if not playerTokens or type(playerTokens) ~= 'table' then return false end
+	for _, bt in ipairs(banTokenTable) do
+		if bt and bt ~= '' then
+			for _, pt in ipairs(playerTokens) do
+				if pt and pt ~= '' and tostring(pt) == tostring(bt) then
+					return true
+				end
+			end
+		end
+	end
+	return false
 end

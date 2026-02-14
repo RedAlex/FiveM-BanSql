@@ -11,7 +11,7 @@ function initializeDatabase()
             xblid varchar(21) COLLATE utf8mb4_bin DEFAULT NULL,
             discord varchar(30) COLLATE utf8mb4_bin DEFAULT NULL,
             playerip varchar(25) COLLATE utf8mb4_bin DEFAULT NULL,
-            token varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+            tokens TEXT COLLATE utf8mb4_bin DEFAULT NULL,
             targetplayername varchar(32) COLLATE utf8mb4_bin DEFAULT NULL,
             sourceplayername varchar(32) COLLATE utf8mb4_bin DEFAULT NULL,
             reason varchar(255) NOT NULL,
@@ -33,7 +33,7 @@ function initializeDatabase()
             xblid varchar(21) COLLATE utf8mb4_bin DEFAULT NULL,
             discord varchar(30) COLLATE utf8mb4_bin DEFAULT NULL,
             playerip varchar(25) COLLATE utf8mb4_bin DEFAULT NULL,
-            token varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+            tokens TEXT COLLATE utf8mb4_bin DEFAULT NULL,
             targetplayername varchar(32) COLLATE utf8mb4_bin DEFAULT NULL,
             sourceplayername varchar(32) COLLATE utf8mb4_bin DEFAULT NULL,
             reason varchar(255) NOT NULL,
@@ -56,7 +56,7 @@ function initializeDatabase()
             xblid varchar(21) COLLATE utf8mb4_bin DEFAULT NULL,
             discord varchar(30) COLLATE utf8mb4_bin DEFAULT NULL,
             playerip varchar(25) COLLATE utf8mb4_bin DEFAULT NULL,
-            token varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+            tokens TEXT COLLATE utf8mb4_bin DEFAULT NULL,
             playername varchar(32) COLLATE utf8mb4_bin DEFAULT NULL
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin
     ]], {}, function()
@@ -66,44 +66,44 @@ end
 
 -- Migration from 1.0.9 to 1.2 function to add token column to existing tables
 function migrateDatabase()
-    -- Check and add token column to banlist table
+    -- Check and add tokens column to banlist table
     MySQL.Async.fetchAll([[
         SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
-        WHERE TABLE_NAME = 'banlist' AND COLUMN_NAME = 'token'
+        WHERE TABLE_NAME = 'banlist' AND COLUMN_NAME = 'tokens'
     ]], {}, function(result)
         if not result or #result == 0 then
             MySQL.Async.execute([[
-                ALTER TABLE banlist ADD COLUMN token varchar(255) COLLATE utf8mb4_bin DEFAULT NULL
+                ALTER TABLE banlist ADD COLUMN tokens TEXT COLLATE utf8mb4_bin DEFAULT NULL
             ]], {}, function()
-                print("^2[FiveM-BanSql] ✓ Token column added to 'banlist' table^7")
+                print("^2[FiveM-BanSql] ✓ 'tokens' column added to 'banlist' table^7")
             end)
         end
     end)
 
-    -- Check and add token column to banlisthistory table
+    -- Check and add tokens column to banlisthistory table
     MySQL.Async.fetchAll([[
         SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
-        WHERE TABLE_NAME = 'banlisthistory' AND COLUMN_NAME = 'token'
+        WHERE TABLE_NAME = 'banlisthistory' AND COLUMN_NAME = 'tokens'
     ]], {}, function(result)
         if not result or #result == 0 then
             MySQL.Async.execute([[
-                ALTER TABLE banlisthistory ADD COLUMN token varchar(255) COLLATE utf8mb4_bin DEFAULT NULL
+                ALTER TABLE banlisthistory ADD COLUMN tokens TEXT COLLATE utf8mb4_bin DEFAULT NULL
             ]], {}, function()
-                print("^2[FiveM-BanSql] ✓ Token column added to 'banlisthistory' table^7")
+                print("^2[FiveM-BanSql] ✓ 'tokens' column added to 'banlisthistory' table^7")
             end)
         end
     end)
 
-    -- Check and add token column to baninfo table
+    -- Check and add tokens column to baninfo table
     MySQL.Async.fetchAll([[
         SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
-        WHERE TABLE_NAME = 'baninfo' AND COLUMN_NAME = 'token'
+        WHERE TABLE_NAME = 'baninfo' AND COLUMN_NAME = 'tokens'
     ]], {}, function(result)
         if not result or #result == 0 then
             MySQL.Async.execute([[
-                ALTER TABLE baninfo ADD COLUMN token varchar(255) COLLATE utf8mb4_bin DEFAULT NULL
+                ALTER TABLE baninfo ADD COLUMN tokens TEXT COLLATE utf8mb4_bin DEFAULT NULL
             ]], {}, function()
-                print("^2[FiveM-BanSql] ✓ Token column added to 'baninfo' table^7")
+                print("^2[FiveM-BanSql] ✓ 'tokens' column added to 'baninfo' table^7")
             end)
         end
     end)
