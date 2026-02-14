@@ -480,7 +480,7 @@ function playerLoaded(source)
 			doublecheck(source)
 		end
 	end)
-end)
+end
 
 function cmdbanreload(source)
 	BanListLoad        = false

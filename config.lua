@@ -61,6 +61,7 @@ Config.TextFr = {
 	updateDownload   = "Télécharger: ",
 	updateUpToDate   = "[FiveM-BanSql] Version à jour (",
 	updateError      = "[FiveM-BanSql] Impossible de vérifier les mises à jour (Code: ",
+}
 
 
 Config.TextEn = {
