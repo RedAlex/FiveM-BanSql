@@ -25,6 +25,7 @@ CreateThread(function()
                 playerLoaded(playerId)
             end)
             print('FiveM-BanSql: using es_extended')
+            registerESXCommands()
             break
 
         elseif GetResourceState('qbx_core') == 'started' then
@@ -34,6 +35,7 @@ CreateThread(function()
                 playerLoaded(player.PlayerData.source)
             end)
             print('FiveM-BanSql: using qbx_core')
+            registerQBXCommands('qbx_core')
             break
 
         elseif GetResourceState('qbox_core') == 'started' then
@@ -43,6 +45,7 @@ CreateThread(function()
                 playerLoaded(player.PlayerData.source)
             end)
             print('FiveM-BanSql: using qbox_core')
+            registerQBXCommands('qbox_core')
             break
         end
 

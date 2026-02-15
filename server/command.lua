@@ -40,15 +40,8 @@ local function registerCommands()
         end
     end, true)
 
-    -- Framework-specific commands
-    if FrameworkName == 'es_extended' then
-        registerESXCommands()
-    elseif FrameworkName == 'qbx_core' or FrameworkName == 'qbox_core' then
-        registerQBXCommands(FrameworkName)
-    end
-end
 
-local function registerESXCommands()
+function registerESXCommands()
     ESX.RegisterCommand('sqlban', Config.Permission, function(xPlayer, args, showError)
         cmdban(xPlayer.source, args)
     end, {help = Text.ban, params = {{name = "id"}, {name = "day", help = Text.dayhelp}, {name = "reason", help = Text.reason}}})
