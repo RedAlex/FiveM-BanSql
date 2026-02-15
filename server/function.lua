@@ -46,7 +46,7 @@ end
 function cmdunban(source, args)
 	if args[1] then
 	local target = table.concat(args, " ")
-	MySQL.Async.fetchAll('SELECT * FROM banlist WHERE targetplayername like @playername', 
+	MySQL.Async.fetchAll('SELECT * FROM banlist WHERE LOWER(targetplayername) LIKE LOWER(@playername)', 
 	{
 		['@playername'] = ("%"..target.."%")
 	}, function(data)
