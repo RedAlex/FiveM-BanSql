@@ -4,6 +4,7 @@ BanListLoad        = false
 BanListHistory     = {}
 BanListHistoryLoad = false
 IdDataStorage 	   = {}
+PlayersLoaded      = false
 if Config.Lang == "fr" then Text = Config.TextFr elseif Config.Lang == "en" then Text = Config.TextEn else print("FIveM-BanSql : Invalid Config.Lang") end
 -- Warn if ForceSteam is enabled but steam_webApiKey is not set in server convars
 if Config.ForceSteam then
@@ -38,6 +39,14 @@ CreateThread(function()
 			else
 				print(Text.starterror)
 			end
+		end
+		-- Process connected players on resource restart
+		if BanListLoad == true and BanListHistoryLoad == true and PlayersLoaded == false then
+			local players = GetPlayers()
+			for _, playerId in ipairs(players) do
+				playerLoaded(tonumber(playerId))
+			end
+			PlayersLoaded = true
 		end
 	end
 end)
