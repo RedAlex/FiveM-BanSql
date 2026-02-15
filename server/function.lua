@@ -90,7 +90,7 @@ end
 function cmdsearch(source, args)
 	local target = table.concat(args, " ")
 	if target ~= "" then
-		MySQL.Async.fetchAll('SELECT * FROM baninfo WHERE playername like @playername', 
+		MySQL.Async.fetchAll('SELECT * FROM baninfo WHERE LOWER(playername) LIKE LOWER(@playername)', 
 		{
 			['@playername'] = ("%"..target.."%")
 		}, function(data)
