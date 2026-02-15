@@ -75,7 +75,8 @@ CreateThread(function()
 				end
 				table.insert(BanList, {
 					license    = data[i].license,
-					identifier = data[i].identifier,
+					steamid    = data[i].steamid,
+					fivemid    = data[i].fivemid,
 					liveid     = data[i].liveid,
 					xblid      = data[i].xblid,
 					discord    = data[i].discord,
@@ -99,7 +100,7 @@ end)
 --How to use from server side : TriggerEvent("BanSql:ICheat", "Auto-Cheat Custom Reason",TargetId)
 RegisterServerEvent('BanSql:ICheat')
 AddEventHandler('BanSql:ICheat', function(reason,servertarget)
-	local license,identifier,liveid,xblid,discord,playerip,target
+	local license,steamid,fivemid,liveid,xblid,discord,playerip,target
 	local duree     = 0
 	local reason    = reason
 
@@ -118,11 +119,13 @@ AddEventHandler('BanSql:ICheat', function(reason,servertarget)
 			if duree and duree < 365 then
 				local sourceplayername = "Anti-Cheat-System"
 				local targetplayername = tostring(GetPlayerName(target))
-					for k,v in ipairs(GetPlayerIdentifiers(target))do
+					for _, v in ipairs(GetPlayerIdentifiers(target))do
 						if string.sub(v, 1, string.len("license:")) == "license:" then
 							license = v
 						elseif string.sub(v, 1, string.len("steam:")) == "steam:" then
-							identifier = v
+							steamid = v
+						elseif string.sub(v, 1, string.len("fivem:")) == "fivem:" then
+							fivemid = v
 						elseif string.sub(v, 1, string.len("live:")) == "live:" then
 							liveid = v
 						elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
@@ -137,7 +140,7 @@ AddEventHandler('BanSql:ICheat', function(reason,servertarget)
 				local tokens = GetPlayerTokens(target) or {}
 
 				local permanent = (duree <= 0) and 1 or 0
-				ban(target,license,identifier,liveid,xblid,discord,playerip,tokens,targetplayername,sourceplayername,duree,reason,permanent)
+				ban(target,license,steamid,fivemid,liveid,xblid,discord,playerip,tokens,targetplayername,sourceplayername,duree,reason,permanent)
 				DropPlayer(target, (duree > 0 and Text.yourban or Text.yourpermban) .. reason)
 			
 			else
@@ -166,13 +169,15 @@ AddEventHandler('bansql:sendMessage', function(source, message)
 end)
 
 AddEventHandler('playerConnecting', function (playerName,setKickReason)
-	local license,steamID,liveid,xblid,discord,playerip  = "n/a","n/a","n/a","n/a","n/a","n/a"
+	local license,steamid,fivemid,liveid,xblid,discord,playerip  = "n/a","n/a","n/a","n/a","n/a","n/a","n/a"
 
-	for k,v in ipairs(GetPlayerIdentifiers(source))do
+	for _, v in ipairs(GetPlayerIdentifiers(source))do
 		if string.sub(v, 1, string.len("license:")) == "license:" then
 			license = v
 		elseif string.sub(v, 1, string.len("steam:")) == "steam:" then
-			steamID = v
+			steamid = v
+		elseif string.sub(v, 1, string.len("fivem:")) == "fivem:" then
+			fivemid = v
 		elseif string.sub(v, 1, string.len("live:")) == "live:" then
 			liveid = v
 		elseif string.sub(v, 1, string.len("xbl:")) == "xbl:" then
@@ -192,7 +197,7 @@ AddEventHandler('playerConnecting', function (playerName,setKickReason)
 		Citizen.Wait(1000)
 	end
 
-    if steamID == "n/a" and Config.ForceSteam then
+    if steamid == "n/a" and Config.ForceSteam then
 		setKickReason(Text.invalidsteam)
 		CancelEvent()
     end
@@ -200,7 +205,8 @@ AddEventHandler('playerConnecting', function (playerName,setKickReason)
 	for i = 1, #BanList, 1 do
 		if 
 			  ((tostring(BanList[i].license)) == tostring(license) 
-			or (tostring(BanList[i].identifier)) == tostring(steamID) 
+			or (tostring(BanList[i].steamid)) == tostring(steamid) 
+			or (tostring(BanList[i].fivemid)) == tostring(fivemid) 
 			or (tostring(BanList[i].liveid)) == tostring(liveid) 
 			or (tostring(BanList[i].xblid)) == tostring(xblid) 
 			or (tostring(BanList[i].discord)) == tostring(discord) 

@@ -6,7 +6,8 @@ function initializeDatabase()
     MySQL.Async.execute([[
         CREATE TABLE IF NOT EXISTS banlist (
             license varchar(50) COLLATE utf8mb4_bin PRIMARY KEY,
-            identifier varchar(25) COLLATE utf8mb4_bin DEFAULT NULL,
+            steamid varchar(25) COLLATE utf8mb4_bin DEFAULT NULL,
+            fivemid varchar(50) COLLATE utf8mb4_bin DEFAULT NULL,
             liveid varchar(21) COLLATE utf8mb4_bin DEFAULT NULL,
             xblid varchar(21) COLLATE utf8mb4_bin DEFAULT NULL,
             discord varchar(30) COLLATE utf8mb4_bin DEFAULT NULL,
@@ -28,7 +29,8 @@ function initializeDatabase()
         CREATE TABLE IF NOT EXISTS banlisthistory (
             id int(11) AUTO_INCREMENT PRIMARY KEY,
             license varchar(50) COLLATE utf8mb4_bin DEFAULT NULL,
-            identifier varchar(25) COLLATE utf8mb4_bin DEFAULT NULL,
+            steamid varchar(25) COLLATE utf8mb4_bin DEFAULT NULL,
+            fivemid varchar(50) COLLATE utf8mb4_bin DEFAULT NULL,
             liveid varchar(21) COLLATE utf8mb4_bin DEFAULT NULL,
             xblid varchar(21) COLLATE utf8mb4_bin DEFAULT NULL,
             discord varchar(30) COLLATE utf8mb4_bin DEFAULT NULL,
@@ -51,7 +53,8 @@ function initializeDatabase()
         CREATE TABLE IF NOT EXISTS baninfo (
             id int(11) AUTO_INCREMENT PRIMARY KEY,
             license varchar(50) COLLATE utf8mb4_bin DEFAULT NULL,
-            identifier varchar(25) COLLATE utf8mb4_bin DEFAULT NULL,
+            steamid varchar(25) COLLATE utf8mb4_bin DEFAULT NULL,
+            fivemid varchar(50) COLLATE utf8mb4_bin DEFAULT NULL,
             liveid varchar(21) COLLATE utf8mb4_bin DEFAULT NULL,
             xblid varchar(21) COLLATE utf8mb4_bin DEFAULT NULL,
             discord varchar(30) COLLATE utf8mb4_bin DEFAULT NULL,
@@ -66,6 +69,145 @@ end
 
 -- Migration from 1.0.9 to 1.2 function to add token column to existing tables
 function migrateDatabase()
+    -- Check if migration is necessary (identifier column exists)
+    MySQL.Async.fetchAll([[
+        SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
+        WHERE TABLE_NAME = 'banlist' AND COLUMN_NAME = 'identifier'
+    ]], {}, function(result)
+        if not result or #result == 0 then
+            -- Migration not necessary, identifier column doesn't exist
+            return
+        end
+        
+        -- Migration is necessary, proceed with renaming
+        print("^3[FiveM-BanSql] Starting migration - identifier column found, beginning rename process...^7")
+        
+    -- Check and rename identifier to steamid and add identifier for fivem in banlist table
+    MySQL.Async.fetchAll([[
+        SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
+        WHERE TABLE_NAME = 'banlist' AND COLUMN_NAME = 'steamid'
+    ]], {}, function(result)
+        if not result or #result == 0 then
+            -- Check if identifier exists (old version)
+            MySQL.Async.fetchAll([[
+                SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
+                WHERE TABLE_NAME = 'banlist' AND COLUMN_NAME = 'identifier'
+            ]], {}, function(result2)
+                if result2 and #result2 > 0 then
+                    -- Rename identifier to steamid
+                    MySQL.Async.execute([[
+                        ALTER TABLE banlist CHANGE COLUMN identifier steamid varchar(25) COLLATE utf8mb4_bin DEFAULT NULL
+                    ]], {}, function()
+                        print("^2[FiveM-BanSql] ✓ 'identifier' column renamed to 'steamid' in 'banlist' table^7")
+                    end)
+                else
+                    -- Add steamid column if it doesn't exist
+                    MySQL.Async.execute([[
+                        ALTER TABLE banlist ADD COLUMN steamid varchar(25) COLLATE utf8mb4_bin DEFAULT NULL
+                    ]], {}, function()
+                        print("^2[FiveM-BanSql] ✓ 'steamid' column added to 'banlist' table^7")
+                    end)
+                end
+            end)
+        end
+    end)
+
+    -- Add identifier column for FiveM ID to banlist
+    MySQL.Async.fetchAll([[
+        SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
+        WHERE TABLE_NAME = 'banlist' AND COLUMN_NAME = 'fivemid'
+    ]], {}, function(result)
+        if not result or #result == 0 then
+            MySQL.Async.execute([[
+                ALTER TABLE banlist ADD COLUMN fivemid varchar(50) COLLATE utf8mb4_bin DEFAULT NULL
+            ]], {}, function()
+                print("^2[FiveM-BanSql] ✓ 'fivemid' column added to 'banlist' table^7")
+            end)
+        end
+    end)
+
+    -- Check and rename identifier to steamid and add identifier for fivem in banlisthistory table
+    MySQL.Async.fetchAll([[
+        SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
+        WHERE TABLE_NAME = 'banlisthistory' AND COLUMN_NAME = 'steamid'
+    ]], {}, function(result)
+        if not result or #result == 0 then
+            MySQL.Async.fetchAll([[
+                SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
+                WHERE TABLE_NAME = 'banlisthistory' AND COLUMN_NAME = 'identifier'
+            ]], {}, function(result2)
+                if result2 and #result2 > 0 then
+                    MySQL.Async.execute([[
+                        ALTER TABLE banlisthistory CHANGE COLUMN identifier steamid varchar(25) COLLATE utf8mb4_bin DEFAULT NULL
+                    ]], {}, function()
+                        print("^2[FiveM-BanSql] ✓ 'identifier' column renamed to 'steamid' in 'banlisthistory' table^7")
+                    end)
+                else
+                    MySQL.Async.execute([[
+                        ALTER TABLE banlisthistory ADD COLUMN steamid varchar(25) COLLATE utf8mb4_bin DEFAULT NULL
+                    ]], {}, function()
+                        print("^2[FiveM-BanSql] ✓ 'steamid' column added to 'banlisthistory' table^7")
+                    end)
+                end
+            end)
+        end
+    end)
+
+    -- Add fivemid column to banlisthistory
+    MySQL.Async.fetchAll([[
+        SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
+        WHERE TABLE_NAME = 'banlisthistory' AND COLUMN_NAME = 'fivemid'
+    ]], {}, function(result)
+        if not result or #result == 0 then
+            MySQL.Async.execute([[
+                ALTER TABLE banlisthistory ADD COLUMN fivemid varchar(50) COLLATE utf8mb4_bin DEFAULT NULL
+            ]], {}, function()
+                print("^2[FiveM-BanSql] ✓ 'fivemid' column added to 'banlisthistory' table^7")
+            end)
+        end
+    end)
+
+    -- Check and rename identifier to steamid and add identifier for fivem in baninfo table
+    MySQL.Async.fetchAll([[
+        SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
+        WHERE TABLE_NAME = 'baninfo' AND COLUMN_NAME = 'steamid'
+    ]], {}, function(result)
+        if not result or #result == 0 then
+            MySQL.Async.fetchAll([[
+                SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
+                WHERE TABLE_NAME = 'baninfo' AND COLUMN_NAME = 'identifier'
+            ]], {}, function(result2)
+                if result2 and #result2 > 0 then
+                    MySQL.Async.execute([[
+                        ALTER TABLE baninfo CHANGE COLUMN identifier steamid varchar(25) COLLATE utf8mb4_bin DEFAULT NULL
+                    ]], {}, function()
+                        print("^2[FiveM-BanSql] ✓ 'identifier' column renamed to 'steamid' in 'baninfo' table^7")
+                    end)
+                else
+                    MySQL.Async.execute([[
+                        ALTER TABLE baninfo ADD COLUMN steamid varchar(25) COLLATE utf8mb4_bin DEFAULT NULL
+                    ]], {}, function()
+                        print("^2[FiveM-BanSql] ✓ 'steamid' column added to 'baninfo' table^7")
+                    end)
+                end
+            end)
+        end
+    end)
+
+    -- Add fivemid column to baninfo
+    MySQL.Async.fetchAll([[
+        SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
+        WHERE TABLE_NAME = 'baninfo' AND COLUMN_NAME = 'fivemid'
+    ]], {}, function(result)
+        if not result or #result == 0 then
+            MySQL.Async.execute([[
+                ALTER TABLE baninfo ADD COLUMN fivemid varchar(50) COLLATE utf8mb4_bin DEFAULT NULL
+            ]], {}, function()
+                print("^2[FiveM-BanSql] ✓ 'fivemid' column added to 'baninfo' table^7")
+            end)
+        end
+    end)
+
     -- Check and add tokens column to banlist table
     MySQL.Async.fetchAll([[
         SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
@@ -106,6 +248,7 @@ function migrateDatabase()
                 print("^2[FiveM-BanSql] ✓ 'tokens' column added to 'baninfo' table^7")
             end)
         end
+    end)
     end)
 end
 
