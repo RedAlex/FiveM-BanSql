@@ -1,141 +1,88 @@
-
 # FiveM-BanSql
 
-An SQL ban that does not overload the database.
-It precharges the database in a table when opening the server or adding / removing a ban.
+An SQL ban system that preloads data on server start and keeps bans in memory for fast checks.
 
-# Installation
-1. Download the .Zip from this repository.
+## Requirements
+- mysql-async or oxmysql
+- One framework: es_extended, qbx_core, or qbox_core
+
+## Installation
+1. Download the .zip from this repository.
 2. Extract it with your favorite program.
-3. Copy the project to your ressource folder.
-4. Add "start FiveM-BanSql" in your `server.cfg`
+3. Copy the resource to your resources folder.
+4. Add `ensure FiveM-BanSql-1.2.0` to your `server.cfg`.
+5. Configure options in `config.lua` (language, permissions, webhook, ForceSteam).
 
-# Commands
-___
-**Console**
+## Commands
 
-1. **ban id days reason** (	Allows ban a connected player	)
-2. **banoffline permid days reason** (	   Allows ban a offline player	  )
-2.1 **sqlsearch (name)**
-3. **unban "Steam Name"**
-4. **banhistory option** (Allows you to view the ban history of a player offline or online)
-___
-**In Game**
+### Console (RCON)
+- `ban <id> <days> <reason>`: Ban an online player.
+- `banoffline <permid> <days> <reason>`: Ban an offline player by permid.
+- `search <name>`: Find permid by player name.
+- `unban <steam name>`: Unban a player by name.
+- `banhistory <steam name|index>`: Show ban history by name or index.
+- `banreload`: Reload BanList and BanListHistory.
 
-1. **sqlban id days reason** (	Allows ban a connected player	)
- - "id" is the player's number in the list
- - "days" must be a number to say how many days it will be ban. (0 days mean permanent)
- - "reason" Ability to register why he is banished. Attention if there is no reason the player will see: "You are banned for: unknown reason"
- - Example /sqlban 3 1 Troll (Will give ban player # 3 for 1 days with Troll reason)
-___
+### In-game (ESX/QBX/QBOX)
+- `sqlban <id> <days> <reason>`: Ban an online player.
+- `sqlbanoffline <permid> <days> <reason>`: Ban an offline player by permid.
+- `sqlsearch <name>`: Find permid by player name.
+- `sqlunban <steam name>`: Unban a player by name.
+- `sqlbanhistory <steam name|index>`: Show ban history by name or index.
+- `sqlbanreload`: Reload BanList and BanListHistory.
 
-2. **sqlbanoffline permid days reason** (	   Allows ban a offline player	  )
- - "permid" get from command sqlsearch
- - "days" must be a number to say how many days it will be ban. (0 days mean permanent)
- - "reason" Ability to register why he is banished. Attention if there is no reason the player will see: "You are banned for: unknown reason"
- - example /sqlbanoffline 1 1 cheating (Will ban first player in database 1 day for cheating)
-2.1 **sqlsearch (name)**
- - "name" is the player's steam name
- - Example /sqlsearch name (Will show you permid and name of found players)
-___
+### Notes
+- `days` set to `0` means permanent.
+- `permid` can be found with `sqlsearch`.
+- If a player has connected since the last server restart, you do not need `sqlbanoffline` to ban them.
 
-3. **sqlunban "Steam Name"**
- - Deban the player matching the written name.
- - Example sqlunban Alex Garcio (Will remove from the ban list the player)
-___
-
-4. **sqlbanreload ** (reload the BanList and the BanListHistory)
-  - Can be used if you edit directly in your database.
-___
-
-5. **sqlbanhistory option** (Allows you to view the ban history of a player offline or online)
-- "option"
-- (Name of a player) To display all the banns of a player
-- 1 To display only the first ban
-- 2 To display only the second ban
-- 3 ect ......
-- 4 ect ......
-- Example /sqlbanhistory Alex Garcio (Go to display all the list of player's bans)
-___
-
-
-# Required resource
-- Async
-
-
-# Created by
+## Created by
 - Alex Garcio    https://github.com/RedAlex
 - Alain Proviste https://github.com/EagleOnee
 - Aiko-Suzuki    https://github.com/Aiko-Suzuki
 - Zeemahh        https://github.com/Zeemahh
 
-___
+---
+
 # FiveM-BanSql
 
-Un ban SQL qui ne surcharge pas la base de donnée.
-Il précharge la base de données dans une table lors de l'ouverture du serveur ou à l'ajout/retrait d'un ban.
+Un systeme de ban SQL qui precharge les donnees au demarrage et garde les bans en memoire pour des verifications rapides.
 
-# Installation
-1. Téléchargez le .Zip
-2. Extractez-le avec votre programme favori.
-3. Copiez le projet dans votre dossier ressource.
-4. Ajoutez "start FiveM-BanSql" dans votre `server.cfg`
+## Prerequis
+- mysql-async ou oxmysql
+- Un framework: es_extended, qbx_core, ou qbox_core
 
+## Installation
+1. Telechargez le .zip depuis ce depot.
+2. Extrayez-le avec votre programme favori.
+3. Copiez la ressource dans votre dossier resources.
+4. Ajoutez `ensure FiveM-BanSql-1.2.0` dans votre `server.cfg`.
+5. Configurez les options dans `config.lua` (langue, permissions, webhook, ForceSteam).
 
-# Commandes
-___
-**Console**
+## Commandes
 
-1. **ban id jours raison** (  Permet de ban un joueur connecté 	)
-2. **banoffline permid jours raison (	   Vous permet de ban un jours hors ligne	)
-2.1 **search (nom)**
-3. **unban "Nom Steam"**
-5. **banhistory option ** (	 Permet d'afficher l'historique de ban d'un joueur hors ligne ou en ligne	)
-___
-**En Jeu**
+### Console (RCON)
+- `ban <id> <jours> <raison>`: Ban un joueur en ligne.
+- `banoffline <permid> <jours> <raison>`: Ban un joueur hors ligne via permid.
+- `search <nom>`: Trouver le permid via le nom.
+- `unban <nom steam>`: Deban un joueur par nom.
+- `banhistory <nom steam|index>`: Historique des bans par nom ou index.
+- `banreload`: Recharge BanList et BanListHistory.
 
-1. **sqlban id jours raison** (  Permet de ban un joueur connecté 	)
- -  "id" correspond au chiffre du joueur dans la liste
- -  "jours" doit être un chiffre pour dire combien de jours il va etre ban. (0 jours veux dire permanent)
- -  "raison" Possibilité d'inscrire pourquoi il est bani. Attention si il n'y a pas de raison le joueur va voir : "Vous etes banni pour : Raison Inconnue"
- -  Exemple /sqlban 3 1 Troll (Va donner bannir le joueur #3 pour 1 jours avec la raison Troll)
-___
+### En jeu (ESX/QBX/QBOX)
+- `sqlban <id> <jours> <raison>`: Ban un joueur en ligne.
+- `sqlbanoffline <permid> <jours> <raison>`: Ban un joueur hors ligne via permid.
+- `sqlsearch <nom>`: Trouver le permid via le nom.
+- `sqlunban <nom steam>`: Deban un joueur par nom.
+- `sqlbanhistory <nom steam|index>`: Historique des bans par nom ou index.
+- `sqlbanreload`: Recharge BanList et BanListHistory.
 
-2. **sqlbanoffline permid jours raison (	   Vous permet de ban un jours hors ligne	)
- -  "permid" correspond au chiffre du joueur dans la liste
- -  "jours" doit être un chiffre pour dire combien de jours il va etre ban. (0 jours veux dire permanent)
- -  "raison" Possibilité d'inscrire pourquoi il est bani. Attention si il n'y a pas de raison le joueur va voir : "Vous etes banni pour : Raison Inconnue"
- - Example /sqlbanoffline 1 1 Triche (Va bannir le premier joueur de la base de donnée 1 jours pour Triche)
-2.1 ***sqlsearch (nom)
- -  "nom" correspond au nom steam du joueur
- - Example /sqlreason reason (Va donner bannir le joueur que vous avez entré plus tot pour la raison entrer ici)
-___
+### Notes
+- `jours` a `0` signifie permanent.
+- `permid` se trouve via `sqlsearch`.
+- Si un joueur s'est connecte depuis le dernier redemarrage, `sqlbanoffline` n'est pas necessaire pour le ban.
 
-3. **sqlunban "Nom Steam"**
- - Déban le joueur correcpondant au nom écrit.
- - Exemple /sqlunban Alex Garcio (Va enlever de la liste de ban le joueur)
-___
-
-4. **sqlbanreload** (   Recharge la BanList et la BanListHistory   )
-  - Peut etre utilisé si vous modifiez directement dans votre base de données.
-___
-
-5. **sqlbanhistory option ** (	 Permet d'afficher l'historique de ban d'un joueur hors ligne ou en ligne	)
--   "option" 
--		(Nom Steam) Pour afficher tout les bans d'un joueur
--		1 Pour afficher seulement le premier ban
--		2 Pour afficher seulement le deuxième ban
--		3 ect......
--		4 ect......
--   Exemple /sqlbanhistory Alex Garcio (Va afficher toute la liste des bans du joueur)
-___
-
-
-# Ressource requis
-- Async
-
-
-# Créer par
+## Cree par
 - Alex Garcio    https://github.com/RedAlex
 - Alain Proviste https://github.com/EagleOnee
 - Aiko-Suzuki    https://github.com/Aiko-Suzuki
