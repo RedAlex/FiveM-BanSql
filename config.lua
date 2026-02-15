@@ -1,10 +1,13 @@
 Config                   = {}
 
 --GENERAL
-Config.Lang              = 'fr'    --Set lang (fr-en)
-Config.Permission        = "admin" --Permission need to use FiveM-BanSql commands (mod-admin-superadmin)
-Config.ForceSteam        = true    --Set to false if you not use steam auth
-Config.MultiServerSync   = false   --This will check if a ban is add in the sql all 30 second, use it only if you have more then 1 server (true-false)
+Config.Lang              = 'fr'   	--Set lang (fr-en)
+Config.ForceSteam        = true    	--Set to false if you not use steam auth
+Config.MultiServerSync   = false   	--This will check if a ban is add in the sql all 30 second, use it only if you have more then 1 server (true-false)
+Config.Permission = { 				--Permission need to use FiveM-BanSql commands (mod-admin-superadmin)
+	"owner", 
+	"admin"
+ }
 
 
 --WEBHOOK
