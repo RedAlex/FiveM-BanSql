@@ -5,7 +5,7 @@ BanListHistory     = {}
 BanListHistoryLoad = false
 IdDataStorage 	   = {}
 PlayersLoaded      = false
-if Config.Lang == "fr" then Text = Config.TextFr elseif Config.Lang == "en" then Text = Config.TextEn else print("FIveM-BanSql : Invalid Config.Lang") end
+if Config.Lang == "fr" then Text = Config.TextFr elseif Config.Lang == "en" then Text = Config.TextEn else print("FiveM-BanSql : Invalid Config.Lang") end
 -- Warn if ForceSteam is enabled but steam_webApiKey is not set in server convars
 if Config.ForceSteam then
 	local steamKey = GetConvar('steam_webApiKey', '')
