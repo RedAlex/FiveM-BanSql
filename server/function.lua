@@ -71,7 +71,7 @@ function cmdunban(source, args)
 							sourceplayername = "Console"
 						end
 						local message = (data[1].targetplayername .. Text.isunban .." ".. Text.by .." ".. sourceplayername)
-						sendToDiscord(Config.webhookunban, message)
+						sendToDiscord(Config.webhookurl, message)
 					end
 					TriggerEvent('bansql:sendMessage', source, data[1].targetplayername .. Text.isunban)
 				end)
@@ -298,7 +298,7 @@ function ban(source,license,steamid,fivemid,liveid,xblid,discord,playerip,tokens
 				else
 					message = (targetplayername1..Text.isban.." "..Text.permban..reason.." "..Text.by.." "..sourceplayername1.."```"..steamid1.."\n"..fivemid1.."\n"..license1.."\n"..liveid1.."\n"..xblid1.."\n"..discord1.."\n"..playerip1.."\n"..token1.."```")
 				end
-				sendToDiscord(Config.webhookban, message)
+				sendToDiscord(Config.webhookurl, message)
 			end
 
 			MySQL.Async.execute(

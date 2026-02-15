@@ -12,8 +12,8 @@ Config.Permission = { 				--Permission need to use FiveM-BanSql commands (mod-ad
 
 --WEBHOOK
 Config.EnableDiscordLink = false --Turn this true if you want link the log to a discord (true-false)
-Config.webhookban        = "https://discordapp.com/api/webhooks/473571126690316298/oJZBU9YLz9ksOCG_orlf-wpMZ2pkFedfpEsC34DN_iHO0CBBp6X06W3mMJ2RvMMK7vIO"
-Config.webhookunban      = "https://discordapp.com/api/webhooks/473571126690316298/oJZBU9YLz9ksOCG_orlf-wpMZ2pkFedfpEsC34DN_iHO0CBBp6X06W3mMJ2RvMMK7vIO"
+Config.EnableUpdateNotif = false --Send Discord notification when new update is available (true-false)
+Config.webhookurl        = '' --Discord webhook URL: https://discord.com/api/webhooks/YOUR_WEBHOOK_ID/YOUR_WEBHOOK_TOKEN
 
 
 --LANGUAGE
@@ -65,6 +65,7 @@ Config.TextFr = {
 	updateDownload   = "Télécharger: ",
 	updateUpToDate   = "[FiveM-BanSql] Version à jour (",
 	updateError      = "[FiveM-BanSql] Impossible de vérifier les mises à jour (Code: ",
+	updateAvailable  = "🚀 Nouvelle mise à jour disponible!",
 }
 
 
@@ -115,4 +116,5 @@ Config.TextEn = {
 	updateDownload   = "Download: ",
 	updateUpToDate   = "[FiveM-BanSql] Version up to date (",
 	updateError      = "[FiveM-BanSql] Unable to check for updates (Code: ",
+	updateAvailable  = "🚀 New update available!",
 }

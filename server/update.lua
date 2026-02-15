@@ -3,6 +3,36 @@ local CURRENT_VERSION = GetResourceMetadata(GetCurrentResourceName(), 'version')
 local GITHUB_REPO = "RedAlex/FiveM-BanSql"
 local GITHUB_API = "https://api.github.com/repos/" .. GITHUB_REPO .. "/releases/latest"
 
+function sendUpdateNotification(currentVer, latestVer)
+    if not Config.EnableUpdateNotif or not Config.webhookurl then
+        return
+    end
+    
+    local downloadUrl = "https://github.com/" .. GITHUB_REPO .. "/releases/latest"
+    local payload = {
+        embeds = {{
+            title = Text.updateAvailable,
+            description = "**" .. Text.updateCurrentVer .. "** " .. currentVer .. "\n**" .. Text.updateLatestVer .. "** " .. latestVer,
+            color = 16776960, -- Yellow
+            fields = {{
+                name = "🔗 Action Required",
+                value = "[Download Latest Release](" .. downloadUrl .. ")",
+                inline = false
+            }},
+            footer = {
+                text = "FiveM-BanSql Auto Update Notification"
+            },
+            timestamp = os.date('!%Y-%m-%dT%H:%M:%SZ')
+        }}
+    }
+    
+    PerformHttpRequest(Config.webhookurl, function(err, text, headers)
+        if err ~= 200 then
+            print("^3[FiveM-BanSql] Error sending update notification to Discord (Code: " .. err .. ")^7")
+        end
+    end, 'POST', json.encode(payload), { ['Content-Type'] = 'application/json' })
+end
+
 function checkForUpdates()
     PerformHttpRequest(GITHUB_API, function(errorCode, resultData, resultHeaders)
         if errorCode == 200 then
@@ -21,6 +51,8 @@ function checkForUpdates()
                     print("^2" .. Text.updateLatestVer .. "^7" .. latestVersion)
                     print("^4" .. Text.updateDownload .. "^7https://github.com/" .. GITHUB_REPO .. "/releases/latest")
                     print("^2========================================^7")
+                    -- Send Discord notification
+                    sendUpdateNotification(CURRENT_VERSION, latestVersion)
                 else
                     print("^2" .. Text.updateUpToDate .. CURRENT_VERSION .. ")^7")
                 end
