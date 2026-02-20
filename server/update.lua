@@ -3,22 +3,36 @@ local CURRENT_VERSION = GetResourceMetadata(GetCurrentResourceName(), 'version')
 local GITHUB_REPO = "RedAlex/FiveM-BanSql"
 local GITHUB_API = "https://api.github.com/repos/" .. GITHUB_REPO .. "/releases/latest"
 
-function sendUpdateNotification(currentVer, latestVer)
+function sendUpdateNotification(currentVer, latestVer, changelog)
     if not Config.EnableUpdateNotif or Config.DiscordWebhook == '' then
         return
     end
     
     local downloadUrl = "https://github.com/" .. GITHUB_REPO .. "/releases/latest"
+    local fields = {{
+        name = "🔗 Action Required",
+        value = "[Download Latest Release](" .. downloadUrl .. ")",
+        inline = false
+    }}
+
+    if changelog and tostring(changelog) ~= "" then
+        local notes = tostring(changelog)
+        if #notes > 1000 then
+            notes = notes:sub(1, 1000) .. "\n..."
+        end
+        table.insert(fields, {
+            name = "Changelog",
+            value = notes,
+            inline = false
+        })
+    end
+
     local payload = {
         embeds = {{
             title = Text.updateAvailable,
             description = "**" .. Text.updateCurrentVer .. "** " .. currentVer .. "\n**" .. Text.updateLatestVer .. "** " .. latestVer,
             color = 16776960, -- Yellow
-            fields = {{
-                name = "🔗 Action Required",
-                value = "[Download Latest Release](" .. downloadUrl .. ")",
-                inline = false
-            }},
+            fields = fields,
             footer = {
                 text = "FiveM-BanSql Auto Update Notification"
             },
@@ -39,6 +53,7 @@ function checkForUpdates()
             local success, response = pcall(json.decode, resultData)
             if success and response then
                 local latestVersion = response.tag_name or response.name
+                local releaseNotes = response.body
                 -- Remove 'v' prefix if present
                 if latestVersion:sub(1, 1) == 'v' then
                     latestVersion = latestVersion:sub(2)
@@ -50,9 +65,16 @@ function checkForUpdates()
                     print("^1" .. Text.updateCurrentVer .. "^7" .. CURRENT_VERSION)
                     print("^2" .. Text.updateLatestVer .. "^7" .. latestVersion)
                     print("^4" .. Text.updateDownload .. "^7https://github.com/" .. GITHUB_REPO .. "/releases/latest")
+                    if releaseNotes and tostring(releaseNotes) ~= "" then
+                        local notes = tostring(releaseNotes)
+                        if #notes > 2000 then
+                            notes = notes:sub(1, 2000) .. "\n..."
+                        end
+                        print("^6Changelog:^7\n" .. notes)
+                    end
                     print("^2========================================^7")
                     -- Send Discord notification
-                    sendUpdateNotification(CURRENT_VERSION, latestVersion)
+                    sendUpdateNotification(CURRENT_VERSION, latestVersion, releaseNotes)
                 else
                     print("^2" .. Text.updateUpToDate .. CURRENT_VERSION .. ")^7")
                 end
