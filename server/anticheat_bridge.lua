@@ -82,7 +82,7 @@ local function banFromAnticheat(playerId, reason, sourceName)
 
     ban(0, IdDataStorage[target].license or "n/a", IdDataStorage[target].steamid or "n/a", IdDataStorage[target].fivemid or "n/a", IdDataStorage[target].liveid or "n/a", IdDataStorage[target].xblid or "n/a", IdDataStorage[target].discord or "n/a", IdDataStorage[target].playerip or "n/a", IdDataStorage[target].tokens or {}, targetPlayerName, sourcePlayerName, 0, banReason, 1)
 
-    local permanentText = (Text and Text.yourpermban) and Text.yourpermban or "You are permanently banned: "
+    local permanentText = Lang:t('yourpermban')
     DropPlayer(target, permanentText .. banReason)
 end
 
@@ -127,8 +127,8 @@ end
 exports("addBan", function(playerId, reason)
     local invoker, allowed = isAuthorizedInvoker()
     if not allowed or not invoker then
-        local blockReason = not invoker and ((Text and Text.anticheatBridgeNoInvoker) or "missing invoker")
-            or ((Text and Text.anticheatBridgeUnauthorized) or "unauthorized invoker")
+        local blockReason = not invoker and Lang:t('anticheatBridgeNoInvoker')
+            or Lang:t('anticheatBridgeUnauthorized')
         print("[BanSql anticheat] blocked addBan export call (" .. blockReason .. ") from " .. tostring(invoker))
         sendAnticheatBridgeAlert("addBan", invoker, blockReason)
         return
@@ -140,8 +140,8 @@ end)
 exports("takeScreenshot", function(playerId)
     local invoker, allowed = isAuthorizedInvoker()
     if not allowed or not invoker then
-        local blockReason = not invoker and ((Text and Text.anticheatBridgeNoInvoker) or "missing invoker")
-            or ((Text and Text.anticheatBridgeUnauthorized) or "unauthorized invoker")
+        local blockReason = not invoker and Lang:t('anticheatBridgeNoInvoker')
+            or Lang:t('anticheatBridgeUnauthorized')
         print("[BanSql anticheat] blocked takeScreenshot export call (" .. blockReason .. ") from " .. tostring(invoker))
         sendAnticheatBridgeAlert("takeScreenshot", invoker, blockReason)
         return

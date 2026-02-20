@@ -29,8 +29,8 @@ function sendUpdateNotification(currentVer, latestVer, changelog)
 
     local payload = {
         embeds = {{
-            title = Text.updateAvailable,
-            description = "**" .. Text.updateCurrentVer .. "** " .. currentVer .. "\n**" .. Text.updateLatestVer .. "** " .. latestVer,
+            title = Lang:t('updateAvailable'),
+            description = "**" .. Lang:t('updateCurrentVer') .. "** " .. currentVer .. "\n**" .. Lang:t('updateLatestVer') .. "** " .. latestVer,
             color = 16776960, -- Yellow
             fields = fields,
             footer = {
@@ -61,10 +61,10 @@ function checkForUpdates()
                 
                 if compareVersions(latestVersion, CURRENT_VERSION) > 0 then
                     print("^2========================================^7")
-                    print("^3" .. Text.updateCheckTitle .. "^7")
-                    print("^1" .. Text.updateCurrentVer .. "^7" .. CURRENT_VERSION)
-                    print("^2" .. Text.updateLatestVer .. "^7" .. latestVersion)
-                    print("^4" .. Text.updateDownload .. "^7https://github.com/" .. GITHUB_REPO .. "/releases/latest")
+                    print("^3" .. Lang:t('updateCheckTitle') .. "^7")
+                    print("^1" .. Lang:t('updateCurrentVer') .. "^7" .. CURRENT_VERSION)
+                    print("^2" .. Lang:t('updateLatestVer') .. "^7" .. latestVersion)
+                    print("^4" .. Lang:t('updateDownload') .. "^7https://github.com/" .. GITHUB_REPO .. "/releases/latest")
                     if releaseNotes and tostring(releaseNotes) ~= "" then
                         local notes = tostring(releaseNotes)
                         if #notes > 2000 then
@@ -76,11 +76,11 @@ function checkForUpdates()
                     -- Send Discord notification
                     sendUpdateNotification(CURRENT_VERSION, latestVersion, releaseNotes)
                 else
-                    print("^2" .. Text.updateUpToDate .. CURRENT_VERSION .. ")^7")
+                    print("^2" .. Lang:t('updateUpToDate') .. CURRENT_VERSION .. ")^7")
                 end
             end
         else
-            print("^3" .. Text.updateError .. errorCode .. ")^7")
+            print("^3" .. Lang:t('updateError') .. errorCode .. ")^7")
         end
     end, 'GET')
 end

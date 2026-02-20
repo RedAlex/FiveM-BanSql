@@ -5,7 +5,7 @@ function cmdban(source, args)
 
 	if args[1] then		
 		if reason == "" then
-			reason = Text.noreason
+			reason = Lang:t('noreason')
 		end
 		if target and target > 0 then
 			if duree and duree < 365 then
@@ -23,22 +23,22 @@ function cmdban(source, args)
 
 					local currentPing = GetPlayerPing(target)
 					if currentPing and currentPing > 0 then
-						DropPlayer(target, (duree > 0 and Text.yourban or Text.yourpermban) .. reason)
+						DropPlayer(target, (duree > 0 and Lang:t('yourban') or Lang:t('yourpermban')) .. reason)
 					else
 						
-						TriggerEvent('bansql:sendMessage', source, Text.invalidid)
+						TriggerEvent('bansql:sendMessage', source, Lang:t('invalidid'))
 					end
 				else
-					TriggerEvent('bansql:sendMessage', source, Text.invalidid)
+					TriggerEvent('bansql:sendMessage', source, Lang:t('invalidid'))
 				end
 			else
-				TriggerEvent('bansql:sendMessage', source, Text.invalidtime)
+				TriggerEvent('bansql:sendMessage', source, Lang:t('invalidtime'))
 			end	
 		else
-			TriggerEvent('bansql:sendMessage', source, Text.invalidid)
+			TriggerEvent('bansql:sendMessage', source, Lang:t('invalidid'))
 		end
 	else
-		TriggerEvent('bansql:sendMessage', source, Text.cmdban)
+		TriggerEvent('bansql:sendMessage', source, Lang:t('cmdban'))
 	end
 end
 
@@ -51,7 +51,7 @@ function cmdunban(source, args)
 	}, function(data)
 		if data[1] then
 			if #data > 1 then
-				TriggerEvent('bansql:sendMessage', source, Text.toomanyresult)
+				TriggerEvent('bansql:sendMessage', source, Lang:t('toomanyresult'))
 				for i=1, #data, 1 do
 					TriggerEvent('bansql:sendMessage', source, data[i].targetplayername)
 				end
@@ -70,19 +70,19 @@ function cmdunban(source, args)
 						else
 							sourceplayername = "Console"
 						end
-						local message = (data[1].targetplayername .. Text.isunban .." ".. Text.by .." ".. sourceplayername)
-						sendToDiscord(Config.DiscordWebhook, message)
-					end
-					TriggerEvent('bansql:sendMessage', source, data[1].targetplayername .. Text.isunban)
+					local message = (data[1].targetplayername .. Lang:t('isunban') .." ".. Lang:t('by') .." ".. sourceplayername)
+					sendToDiscord(Config.DiscordWebhook, message)
+				end
+				TriggerEvent('bansql:sendMessage', source, data[1].targetplayername .. Lang:t('isunban'))
 				end)
 			end
 		else
-			TriggerEvent('bansql:sendMessage', source, Text.invalidname)
+			TriggerEvent('bansql:sendMessage', source, Lang:t('invalidname'))
 		end
 
 	end)
 	else
-		TriggerEvent('bansql:sendMessage', source, Text.invalidname)
+		TriggerEvent('bansql:sendMessage', source, Lang:t('invalidname'))
 	end
 end
 
@@ -99,14 +99,14 @@ function cmdsearch(source, args)
 						TriggerEvent('bansql:sendMessage', source, data[i].id.." "..data[i].playername)
 					end
 				else
-					TriggerEvent('bansql:sendMessage', source, Text.toomanyresult)
+					TriggerEvent('bansql:sendMessage', source, Lang:t('toomanyresult'))
 				end
 			else
-				TriggerEvent('bansql:sendMessage', source, Text.invalidname)
+				TriggerEvent('bansql:sendMessage', source, Lang:t('invalidname'))
 			end
 		end)
 	else
-		TriggerEvent('bansql:sendMessage', source, Text.invalidname)
+		TriggerEvent('bansql:sendMessage', source, Lang:t('invalidname'))
 	end
 end
 
@@ -131,7 +131,7 @@ function cmdbanoffline(source, args)
 					if data[1] then
 						if duree and duree < 365 then
 							if reason == "" then
-								reason = Text.noreason
+								reason = Lang:t('noreason')
 							end
 							local permanent = (duree <= 0) and 1 or 0
 							local tokenTable = {}
@@ -147,21 +147,21 @@ function cmdbanoffline(source, args)
 							end
 						ban(source,data[1].license,data[1].steamid,data[1].fivemid,data[1].liveid,data[1].xblid,data[1].discord,data[1].playerip,tokenTable,data[1].playername,sourceplayername,duree,reason,permanent)
 						else
-							TriggerEvent('bansql:sendMessage', source, Text.invalidtime)
+							TriggerEvent('bansql:sendMessage', source, Lang:t('invalidtime'))
 						end
 					else
-						TriggerEvent('bansql:sendMessage', source, Text.invalidid)
+						TriggerEvent('bansql:sendMessage', source, Lang:t('invalidid'))
 					end
 				end)
 			else
-				TriggerEvent('bansql:sendMessage', source, Text.invalidname)
+				TriggerEvent('bansql:sendMessage', source, Lang:t('invalidname'))
 			end
 		else
-			TriggerEvent('bansql:sendMessage', source, Text.invalidtime)
-			TriggerEvent('bansql:sendMessage', source, Text.cmdbanoff)
+			TriggerEvent('bansql:sendMessage', source, Lang:t('invalidtime'))
+			TriggerEvent('bansql:sendMessage', source, Lang:t('cmdbanoff'))
 		end
 	else
-		TriggerEvent('bansql:sendMessage', source, Text.cmdbanoff)
+		TriggerEvent('bansql:sendMessage', source, Lang:t('cmdbanoff'))
 	end
 end
 
@@ -176,7 +176,7 @@ function cmdbanhistory(source, args)
 				local calcul1    = expiration - timeat
 				local calcul2    = calcul1 / 86400
 				local calcul2 	 = math.ceil(calcul2)
-				local resultat   = tostring(BanListHistory[nombre].targetplayername.." , "..BanListHistory[nombre].sourceplayername.." , "..BanListHistory[nombre].reason.." , "..calcul2..Text.day.." , "..BanListHistory[nombre].added)
+				local resultat   = tostring(BanListHistory[nombre].targetplayername.." , "..BanListHistory[nombre].sourceplayername.." , "..BanListHistory[nombre].reason.." , "..calcul2..Lang:t('day').." , "..BanListHistory[nombre].added)
 
 				TriggerEvent('bansql:sendMessage', source, (nombre .." : ".. resultat))
 			else
@@ -187,17 +187,16 @@ function cmdbanhistory(source, args)
 						local calcul1    = expiration - timeat
 						local calcul2    = calcul1 / 86400
 						local calcul2 	 = math.ceil(calcul2)					
-						local resultat   = tostring(BanListHistory[i].targetplayername.." , "..BanListHistory[i].sourceplayername.." , "..BanListHistory[i].reason.." , "..calcul2..Text.day.." , "..BanListHistory[i].added)
-
+						local resultat   = tostring(BanListHistory[i].targetplayername.." , "..BanListHistory[i].sourceplayername.." , "..BanListHistory[i].reason.." , "..calcul2..Lang:t('day').." , "..BanListHistory[i].added)
 						TriggerEvent('bansql:sendMessage', source, (i .." : ".. resultat))
 					end
 				end
 			end
 		else
-			TriggerEvent('bansql:sendMessage', source, Text.invalidname)
+			TriggerEvent('bansql:sendMessage', source, Lang:t('invalidname'))
 		end
 	else
-		TriggerEvent('bansql:sendMessage', source, Text.cmdhistory)
+		TriggerEvent('bansql:sendMessage', source, Lang:t('cmdhistory'))
 	end
 end
 
@@ -271,10 +270,9 @@ function ban(source,license,steamid,fivemid,liveid,xblid,discord,playerip,tokens
 			end)
 
 			if permanent == 0 then
-				TriggerEvent('bansql:sendMessage', source, (Text.youban .. targetplayername .. Text.during .. duree .. Text.forr .. reason))
-			else
-				TriggerEvent('bansql:sendMessage', source, (Text.youban .. targetplayername .. Text.permban .. reason))
-			end
+			TriggerEvent('bansql:sendMessage', source, (Lang:t('youban') .. targetplayername .. Lang:t('during') .. duree .. Lang:t('forr') .. reason))
+		else
+			TriggerEvent('bansql:sendMessage', source, (Lang:t('youban') .. targetplayername .. Lang:t('permban') .. reason))
 
 			if Config.DiscordWebhook and tostring(Config.DiscordWebhook) ~= "" then
 				local license1,steamid1,fivemid1,liveid1,xblid1,discord1,playerip1,token1,targetplayername1,sourceplayername1,message
@@ -294,9 +292,9 @@ function ban(source,license,steamid,fivemid,liveid,xblid,discord,playerip,tokens
 				if not targetplayername then targetplayername1 = "N/A" else targetplayername1 = targetplayername end
 				if not sourceplayername then sourceplayername1 = "N/A" else sourceplayername1 = sourceplayername end
 				if permanent == 0 then
-					message = (targetplayername1..Text.isban.." "..duree..Text.forr..reason.." "..Text.by.." "..sourceplayername1.."```"..steamid1.."\n"..fivemid1.."\n"..license1.."\n"..liveid1.."\n"..xblid1.."\n"..discord1.."\n"..playerip1.."\n"..token1.."```")
-				else
-					message = (targetplayername1..Text.isban.." "..Text.permban..reason.." "..Text.by.." "..sourceplayername1.."```"..steamid1.."\n"..fivemid1.."\n"..license1.."\n"..liveid1.."\n"..xblid1.."\n"..discord1.."\n"..playerip1.."\n"..token1.."```")
+				message = (targetplayername1..Lang:t('isban').." "..duree..Lang:t('forr')..reason.." "..Lang:t('by').." "..sourceplayername1.."```"..steamid1.."\n"..fivemid1.."\n"..license1.."\n"..liveid1.."\n"..xblid1.."\n"..discord1.."\n"..playerip1.."\n"..token1.."```")
+			else
+				message = (targetplayername1..Lang:t('isban').." "..Lang:t('permban')..reason.." "..Lang:t('by').." "..sourceplayername1.."```"..steamid1.."\n"..fivemid1.."\n"..license1.."\n"..liveid1.."\n"..xblid1.."\n"..discord1.."\n"..playerip1.."\n"..token1.."```")
 				end
 				sendToDiscord(Config.DiscordWebhook, message)
 			end
@@ -325,7 +323,7 @@ function ban(source,license,steamid,fivemid,liveid,xblid,discord,playerip,tokens
 			
 			BanListHistoryLoad = false
 		else
-			TriggerEvent('bansql:sendMessage', source, (targetplayername .. Text.alreadyban .. reason))
+			TriggerEvent('bansql:sendMessage', source, (targetplayername .. Lang:t('alreadyban') .. reason))
 		end
 	end)
 
@@ -344,7 +342,7 @@ function ban(source,license,steamid,fivemid,liveid,xblid,discord,playerip,tokens
 					or (tokenData and pdata.tokens and tokenStringContains(tokenData, pdata.tokens)) then
 						local ping = GetPlayerPing(psrc)
 						if ping and ping > 0 then
-							DropPlayer(psrc, (permanent == 1 and Text.yourpermban or Text.yourban) .. reason)
+							DropPlayer(psrc, (permanent == 1 and Lang:t('yourpermban') or Lang:t('yourban')) .. reason)
 						end
 						break
 					end
@@ -477,14 +475,13 @@ function doublecheck(player)
 		then
 
 				if (tonumber(BanList[i].permanent)) == 1 then
-					DropPlayer(player, Text.yourban .. BanList[i].reason)
+					DropPlayer(player, Lang:t('yourban') .. BanList[i].reason)
 					break
-
 				elseif (tonumber(BanList[i].expiration)) > os.time() then
 
 					local tempsrestant     = (((tonumber(BanList[i].expiration)) - os.time())/60)
 					if tempsrestant > 0 then
-						DropPlayer(player, Text.yourban .. BanList[i].reason)
+					DropPlayer(player, Lang:t('yourban') .. BanList[i].reason)
 						break
 					end
 
@@ -591,12 +588,12 @@ function cmdbanreload(source)
 	BanListHistoryLoad = false
 	Wait(5000)
 	if BanListLoad == true then
-		TriggerEvent('bansql:sendMessage', source, Text.banlistloaded)
+		TriggerEvent('bansql:sendMessage', source, Lang:t('banlistloaded'))
 		if BanListHistoryLoad == true then
-			TriggerEvent('bansql:sendMessage', source, Text.historyloaded)
+			TriggerEvent('bansql:sendMessage', source, Lang:t('historyloaded'))
 		end
 	else
-		TriggerEvent('bansql:sendMessage', source, Text.loaderror)
+		TriggerEvent('bansql:sendMessage', source, Lang:t('loaderror'))
 	end
 end
 

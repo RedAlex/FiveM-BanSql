@@ -1,21 +1,19 @@
-Text               = {}
 BanList            = {}
 BanListLoad        = false
 BanListHistory     = {}
 BanListHistoryLoad = false
 IdDataStorage 	   = {}
 PlayersLoaded      = false
-if Config.Lang == "fr" then Text = Config.TextFr elseif Config.Lang == "en" then Text = Config.TextEn else print("FiveM-BanSql : Invalid Config.Lang") end
 -- Warn if ForceSteam is enabled but steam_webApiKey is not set in server convars
 if Config.ForceSteam then
 	local steamKey = GetConvar('steam_webApiKey', '')
 	if not steamKey or steamKey == '' then
-		print('^3[FiveM-BanSql] '..Text.nosteamapikey..'^7')
+		print('^3[FiveM-BanSql] '..Lang:t('nosteamapikey')..'^7')
 		Config.ForceSteam = false
 	end
 end
 if GetResourceState('es_extended') == 'missing' and GetResourceState('qbx_core') == 'missing' and GetResourceState('qbox_core') == 'missing' then
-	print(Text.frameworkerror)
+	print(Lang:t('frameworkerror'))
 	return 
 end
 
@@ -25,19 +23,19 @@ CreateThread(function()
         if BanListLoad == false then
 			loadBanList()
 			if BanList ~= {} then
-				print(Text.banlistloaded)
+				print(Lang:t('banlistloaded'))
 				BanListLoad = true
 			else
-				print(Text.starterror)
+				print(Lang:t('starterror'))
 			end
 		end
 		if BanListHistoryLoad == false then
 			loadBanListHistory()
             if BanListHistory ~= {} then
-				print(Text.historyloaded)
+				print(Lang:t('historyloaded'))
 				BanListHistoryLoad = true
 			else
-				print(Text.starterror)
+				print(Lang:t('starterror'))
 			end
 		end
 		-- Process connected players on resource restart
@@ -141,7 +139,7 @@ AddEventHandler('BanSql:ICheat', function(reason,servertarget)
 
 				local permanent = (duree <= 0) and 1 or 0
 				ban(target,license,steamid,fivemid,liveid,xblid,discord,playerip,tokens,targetplayername,sourceplayername,duree,reason,permanent)
-				DropPlayer(target, (duree > 0 and Text.yourban or Text.yourpermban) .. reason)
+				DropPlayer(target, (duree > 0 and Lang:t('yourban') or Lang:t('yourpermban')) .. reason)
 			
 			else
 				print("BanSql Error : Auto-Cheat-Ban time invalid.")
@@ -198,7 +196,7 @@ AddEventHandler('playerConnecting', function (playerName,setKickReason)
 	end
 
     if steamid == "n/a" and Config.ForceSteam then
-		setKickReason(Text.invalidsteam)
+		setKickReason(Lang:t('invalidsteam'))
 		CancelEvent()
     end
 
@@ -216,7 +214,7 @@ AddEventHandler('playerConnecting', function (playerName,setKickReason)
 
 			if (tonumber(BanList[i].permanent)) == 1 then
 
-				setKickReason(Text.yourpermban .. BanList[i].reason)
+				setKickReason(Lang:t('yourpermban') .. BanList[i].reason)
 				CancelEvent()
 				break
 
@@ -230,7 +228,7 @@ AddEventHandler('playerConnecting', function (playerName,setKickReason)
 					local txtday     = math.floor(day)
 					local txthrs     = math.floor(hrs)
 					local txtminutes = math.ceil(minutes)
-						setKickReason(Text.yourban .. BanList[i].reason .. Text.timeleft .. txtday .. Text.day ..txthrs .. Text.hour ..txtminutes .. Text.minute)
+						setKickReason(Lang:t('yourban') .. BanList[i].reason .. Lang:t('timeleft') .. txtday .. Lang:t('day') ..txthrs .. Lang:t('hour') ..txtminutes .. Lang:t('minute'))
 						CancelEvent()
 						break
 				elseif tempsrestant >= 60 and tempsrestant < 1440 then
@@ -240,14 +238,14 @@ AddEventHandler('playerConnecting', function (playerName,setKickReason)
 					local txtday     = math.floor(day)
 					local txthrs     = math.floor(hrs)
 					local txtminutes = math.ceil(minutes)
-						setKickReason(Text.yourban .. BanList[i].reason .. Text.timeleft .. txtday .. Text.day .. txthrs .. Text.hour .. txtminutes .. Text.minute)
+						setKickReason(Lang:t('yourban') .. BanList[i].reason .. Lang:t('timeleft') .. txtday .. Lang:t('day') .. txthrs .. Lang:t('hour') .. txtminutes .. Lang:t('minute'))
 						CancelEvent()
 						break
 				elseif tempsrestant < 60 then
 					local txtday     = 0
 					local txthrs     = 0
 					local txtminutes = math.ceil(tempsrestant)
-						setKickReason(Text.yourban .. BanList[i].reason .. Text.timeleft .. txtday .. Text.day .. txthrs .. Text.hour .. txtminutes .. Text.minute)
+						setKickReason(Lang:t('yourban') .. BanList[i].reason .. Lang:t('timeleft') .. txtday .. Lang:t('day') .. txthrs .. Lang:t('hour') .. txtminutes .. Lang:t('minute'))
 						CancelEvent()
 						break
 				end

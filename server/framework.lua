@@ -4,7 +4,7 @@ QBCore = nil
 
 -- If none of the frameworks are present at this moment, show a warning and continue polling
 if GetResourceState('es_extended') == 'missing' and GetResourceState('qbx_core') == 'missing' and GetResourceState('qbox_core') == 'missing' then 
-    print(Text.frameworkerror)
+    print(Lang:t('frameworkerror'))
     return
 end
 
