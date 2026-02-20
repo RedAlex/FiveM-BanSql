@@ -21,3 +21,14 @@ server_scripts {
 client_scripts {
   'client.lua'
 }
+
+-- At least one of these frameworks must be installed
+optional_dependencies {
+    'es_extended',
+    'qb-core',
+    'qbox_core',
+}
+
+-- Database provider is required (oxmysql can satisfy this via provide 'mysql-async')
+dependency 'mysql-async'
+
