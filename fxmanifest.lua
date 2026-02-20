@@ -10,6 +10,7 @@ server_scripts {
 	'server/database.lua',
 	'server/framework.lua',
 	'server/function.lua',
+	'server/anticheat_bridge.lua',
 	'server/main.lua',
 	'server/command.lua',
 	'server/update.lua'
