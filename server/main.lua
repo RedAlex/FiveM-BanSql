@@ -14,7 +14,7 @@ if Config.ForceSteam then
 		Config.ForceSteam = false
 	end
 end
-if GetResourceState('es_extended') == 'missing' and GetResourceState('qbx_core') == 'missing' and GetResourceState('qbx_core') == 'missing' then 
+if GetResourceState('es_extended') == 'missing' and GetResourceState('qbx_core') == 'missing' and GetResourceState('qbox_core') == 'missing' then
 	print(Text.frameworkerror)
 	return 
 end
