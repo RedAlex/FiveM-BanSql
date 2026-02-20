@@ -124,20 +124,26 @@ local function buildScreenshotOptions(target)
     return options
 end
 
-exports("addBan", function(playerId, reason, sourceName)
+exports("addBan", function(playerId, reason)
     local invoker, allowed = isAuthorizedInvoker()
-    if not allowed then
-        print("[BanSql anticheat] blocked unauthorized addBan export call from " .. tostring(invoker))
+    if not allowed or not invoker then
+        local blockReason = not invoker and ((Text and Text.anticheatBridgeNoInvoker) or "missing invoker")
+            or ((Text and Text.anticheatBridgeUnauthorized) or "unauthorized invoker")
+        print("[BanSql anticheat] blocked addBan export call (" .. blockReason .. ") from " .. tostring(invoker))
+        sendAnticheatBridgeAlert("addBan", invoker, blockReason)
         return
     end
 
-    banFromAnticheat(playerId, reason, sourceName)
+    banFromAnticheat(playerId, reason, invoker)
 end)
 
 exports("takeScreenshot", function(playerId)
     local invoker, allowed = isAuthorizedInvoker()
-    if not allowed then
-        print("[BanSql anticheat] blocked unauthorized takeScreenshot export call from " .. tostring(invoker))
+    if not allowed or not invoker then
+        local blockReason = not invoker and ((Text and Text.anticheatBridgeNoInvoker) or "missing invoker")
+            or ((Text and Text.anticheatBridgeUnauthorized) or "unauthorized invoker")
+        print("[BanSql anticheat] blocked takeScreenshot export call (" .. blockReason .. ") from " .. tostring(invoker))
+        sendAnticheatBridgeAlert("takeScreenshot", invoker, blockReason)
         return
     end
 

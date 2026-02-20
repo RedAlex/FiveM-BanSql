@@ -95,6 +95,8 @@ Config.TextFr = {
 	updateUpToDate   = "[FiveM-BanSql] Version à jour (",
 	updateError      = "[FiveM-BanSql] Impossible de vérifier les mises à jour (Code: ",
 	updateAvailable  = "🚀 Nouvelle mise à jour disponible!",
+	anticheatBridgeNoInvoker = "appelant manquant",
+	anticheatBridgeUnauthorized = "appelant non autorise",
 }
 
 
@@ -146,4 +148,6 @@ Config.TextEn = {
 	updateUpToDate   = "[FiveM-BanSql] Version up to date (",
 	updateError      = "[FiveM-BanSql] Unable to check for updates (Code: ",
 	updateAvailable  = "🚀 New update available!",
+	anticheatBridgeNoInvoker = "missing invoker",
+	anticheatBridgeUnauthorized = "unauthorized invoker",
 }
