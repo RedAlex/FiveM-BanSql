@@ -10,8 +10,18 @@ An SQL ban system that preloads data on server start and keeps bans in memory fo
 1. Download the .zip from this repository.
 2. Extract it with your favorite program.
 3. Copy the resource to your resources folder.
-4. Add `ensure FiveM-BanSql-1.2.0` to your `server.cfg`.
-5. Configure options in `config.lua` (language, permissions, webhook, ForceSteam).
+4. Rename Folder to `bansql`
+5. Add `ensure bansql` to your `server.cfg`.
+6. Configure options in `config.lua` (language, permissions, webhook, ForceSteam).
+
+## AntiCheat Bridge
+- Allowlist control: `Config.AntiCheatBridgeUseAllowList` (true = enforce allowlist, false = allow any server resource).
+- Allowlist entries: `Config.AntiCheatBridgeAllowedResources`.
+- Screenshots: `Config.AntiCheatScreenshotSaveToFile` only controls file saving; the webhook still receives the screenshot when false.
+
+## Update Check
+- The update checker prints the latest release changelog to the console when a newer version is found.
+- The Discord webhook notification also includes the changelog (truncated).
 
 ## Commands
 
@@ -50,14 +60,24 @@ Un systeme de ban SQL qui precharge les donnees au demarrage et garde les bans e
 
 ## Prerequis
 - mysql-async ou oxmysql
-- Un framework: es_extended, qbx_core, ou qbox_core
+- Un framework : es_extended, qbx_core, ou qbox_core
 
 ## Installation
 1. Telechargez le .zip depuis ce depot.
 2. Extrayez-le avec votre programme favori.
 3. Copiez la ressource dans votre dossier resources.
-4. Ajoutez `ensure FiveM-BanSql-1.2.0` dans votre `server.cfg`.
-5. Configurez les options dans `config.lua` (langue, permissions, webhook, ForceSteam).
+4. Renommez le dossier en `bansql`.
+5. Ajoutez `ensure bansql` dans votre `server.cfg`.
+6. Configurez les options dans `config.lua` (langue, permissions, webhook, ForceSteam).
+
+## AntiCheat Bridge
+- Controle de la whitelist : `Config.AntiCheatBridgeUseAllowList` (true = applique la liste, false = autorise toute ressource serveur).
+- Liste autorisee : `Config.AntiCheatBridgeAllowedResources`.
+- Captures d'ecran : `Config.AntiCheatScreenshotSaveToFile` ne gere que la sauvegarde fichier ; le webhook recoit quand meme la capture si false.
+
+## Verification des mises a jour
+- Le check d'update affiche le changelog de la derniere release en console quand une version plus recente est detectee.
+- La notification Discord inclut aussi le changelog (tronque).
 
 ## Commandes
 
