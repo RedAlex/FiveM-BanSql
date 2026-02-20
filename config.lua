@@ -11,9 +11,8 @@ Config.Permission = { 				--Permission need to use FiveM-BanSql commands (mod-ad
 
 
 --WEBHOOK
-Config.EnableDiscordLink = false --Turn this true if you want link the log to a discord (true-false)
-Config.EnableUpdateNotif = false --Send Discord notification when new update is available (true-false)
-Config.webhookurl        = '' --Discord webhook URL: https://discord.com/api/webhooks/YOUR_WEBHOOK_ID/YOUR_WEBHOOK_TOKEN
+Config.DiscordWebhook = '' --Default Discord webhook URL for server notifications: https://discord.com/api/webhooks/YOUR_WEBHOOK_ID/YOUR_WEBHOOK_TOKEN
+Config.EnableUpdateNotif = true --Send Discord notification when new update is available (true-false)
 
 
 --LANGUAGE

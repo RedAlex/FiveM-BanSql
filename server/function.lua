@@ -63,7 +63,7 @@ function cmdunban(source, args)
 				},
 					function ()
 					loadBanList()
-					if Config.EnableDiscordLink then
+						if Config.DiscordWebhook and tostring(Config.DiscordWebhook) ~= "" then
 						local sourceplayername = ""
 						if source ~= 0 then
 							sourceplayername = tostring(GetPlayerName(source))
@@ -71,7 +71,7 @@ function cmdunban(source, args)
 							sourceplayername = "Console"
 						end
 						local message = (data[1].targetplayername .. Text.isunban .." ".. Text.by .." ".. sourceplayername)
-						sendToDiscord(Config.webhookurl, message)
+						sendToDiscord(Config.DiscordWebhook, message)
 					end
 					TriggerEvent('bansql:sendMessage', source, data[1].targetplayername .. Text.isunban)
 				end)
@@ -276,7 +276,7 @@ function ban(source,license,steamid,fivemid,liveid,xblid,discord,playerip,tokens
 				TriggerEvent('bansql:sendMessage', source, (Text.youban .. targetplayername .. Text.permban .. reason))
 			end
 
-			if Config.EnableDiscordLink then
+			if Config.DiscordWebhook and tostring(Config.DiscordWebhook) ~= "" then
 				local license1,steamid1,fivemid1,liveid1,xblid1,discord1,playerip1,token1,targetplayername1,sourceplayername1,message
 				if not license          then license1          = "N/A" else license1          = license          end
 				if not steamid          then steamid1         = "N/A" else steamid1         = steamid          end
@@ -298,7 +298,7 @@ function ban(source,license,steamid,fivemid,liveid,xblid,discord,playerip,tokens
 				else
 					message = (targetplayername1..Text.isban.." "..Text.permban..reason.." "..Text.by.." "..sourceplayername1.."```"..steamid1.."\n"..fivemid1.."\n"..license1.."\n"..liveid1.."\n"..xblid1.."\n"..discord1.."\n"..playerip1.."\n"..token1.."```")
 				end
-				sendToDiscord(Config.webhookurl, message)
+				sendToDiscord(Config.DiscordWebhook, message)
 			end
 
 			MySQL.Async.execute(

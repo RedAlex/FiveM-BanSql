@@ -4,7 +4,7 @@ local GITHUB_REPO = "RedAlex/FiveM-BanSql"
 local GITHUB_API = "https://api.github.com/repos/" .. GITHUB_REPO .. "/releases/latest"
 
 function sendUpdateNotification(currentVer, latestVer)
-    if not Config.EnableUpdateNotif or not Config.webhookurl then
+    if not Config.EnableUpdateNotif or Config.DiscordWebhook == '' then
         return
     end
     
@@ -26,7 +26,7 @@ function sendUpdateNotification(currentVer, latestVer)
         }}
     }
     
-    PerformHttpRequest(Config.webhookurl, function(err, text, headers)
+    PerformHttpRequest(Config.DiscordWebhook, function(err, text, headers)
         if err ~= 200 then
             print("^3[FiveM-BanSql] Error sending update notification to Discord (Code: " .. err .. ")^7")
         end
