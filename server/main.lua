@@ -4,6 +4,13 @@ BanListHistory     = {}
 BanListHistoryLoad = false
 IdDataStorage 	   = {}
 PlayersLoaded      = false
+
+local selectedLang = (Config and Config.Lang and string.lower(Config.Lang)) or 'en'
+Lang = Locale:new({
+	phrases = Locales[selectedLang] or Locales['en'] or {},
+	warnOnMissing = true
+})
+
 -- Warn if ForceSteam is enabled but steam_webApiKey is not set in server convars
 if Config.ForceSteam then
 	local steamKey = GetConvar('steam_webApiKey', '')
