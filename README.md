@@ -24,7 +24,7 @@ Add your anticheat resource name to `Config.AntiCheatBridgeAllowedResources` (or
 
 Server-side usage:
 ```
-exports["bansql"]:addBan(playerId, "Cheating", "MyAntiCheat")
+exports["bansql"]:addBan(playerId, "Cheating")
 exports["bansql"]:takeScreenshot(playerId)
 ```
 
@@ -89,7 +89,7 @@ Ajoutez le nom de votre ressource anticheat dans `Config.AntiCheatBridgeAllowedR
 
 Utilisation cote serveur :
 ```
-exports["bansql"]:addBan(playerId, "Cheating", "MyAntiCheat")
+exports["bansql"]:addBan(playerId, "Cheating")
 exports["bansql"]:takeScreenshot(playerId)
 ```
 
