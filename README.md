@@ -19,6 +19,15 @@ An SQL ban system that preloads data on server start and keeps bans in memory fo
 - Allowlist entries: `Config.AntiCheatBridgeAllowedResources`.
 - Screenshots: `Config.AntiCheatScreenshotSaveToFile` only controls file saving; the webhook still receives the screenshot when false.
 
+### Exports (for anticheat resources)
+Add your anticheat resource name to `Config.AntiCheatBridgeAllowedResources` (or disable allowlist).
+
+Server-side usage:
+```
+exports["bansql"]:addBan(playerId, "Cheating", "MyAntiCheat")
+exports["bansql"]:takeScreenshot(playerId)
+```
+
 ## Update Check
 - The update checker prints the latest release changelog to the console when a newer version is found.
 - The Discord webhook notification also includes the changelog (truncated).
@@ -74,6 +83,15 @@ Un systeme de ban SQL qui precharge les donnees au demarrage et garde les bans e
 - Controle de la whitelist : `Config.AntiCheatBridgeUseAllowList` (true = applique la liste, false = autorise toute ressource serveur).
 - Liste autorisee : `Config.AntiCheatBridgeAllowedResources`.
 - Captures d'ecran : `Config.AntiCheatScreenshotSaveToFile` ne gere que la sauvegarde fichier ; le webhook recoit quand meme la capture si false.
+
+### Exports (pour les ressources anticheat)
+Ajoutez le nom de votre ressource anticheat dans `Config.AntiCheatBridgeAllowedResources` (ou desactivez la whitelist).
+
+Utilisation cote serveur :
+```
+exports["bansql"]:addBan(playerId, "Cheating", "MyAntiCheat")
+exports["bansql"]:takeScreenshot(playerId)
+```
 
 ## Verification des mises a jour
 - Le check d'update affiche le changelog de la derniere release en console quand une version plus recente est detectee.
