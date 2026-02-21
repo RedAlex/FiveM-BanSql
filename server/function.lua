@@ -44,43 +44,42 @@ end
 
 function cmdunban(source, args)
 	if args[1] then
-	local target = table.concat(args, " ")
-	MySQL.Async.fetchAll('SELECT * FROM banlist WHERE LOWER(targetplayername) LIKE LOWER(@playername)', 
-	{
-		['@playername'] = ("%"..target.."%")
-	}, function(data)
-		if data[1] then
-			if #data > 1 then
-				TriggerEvent('bansql:sendMessage', source, Lang:t('toomanyresult'))
-				for i=1, #data, 1 do
-					TriggerEvent('bansql:sendMessage', source, data[i].targetplayername)
+		local target = table.concat(args, " ")
+		MySQL.Async.fetchAll('SELECT * FROM banlist WHERE LOWER(targetplayername) LIKE LOWER(@playername)', 
+		{
+			['@playername'] = ("%"..target.."%")
+		}, function(data)
+			if data[1] then
+				if #data > 1 then
+					TriggerEvent('bansql:sendMessage', source, Lang:t('toomanyresult'))
+					for i=1, #data, 1 do
+						TriggerEvent('bansql:sendMessage', source, data[i].targetplayername)
+					end
+				else
+					MySQL.Async.execute(
+					'DELETE FROM banlist WHERE targetplayername = @name',
+					{
+						['@name']  = data[1].targetplayername
+					},
+						function ()
+							loadBanList()
+							if Config.DiscordWebhook and tostring(Config.DiscordWebhook) ~= "" then
+								local sourceplayername = ""
+								if source ~= 0 then
+									sourceplayername = tostring(GetPlayerName(source))
+								else
+									sourceplayername = "Console"
+								end
+								local message = (data[1].targetplayername .. Lang:t('isunban') .." ".. Lang:t('by') .." ".. sourceplayername)
+								sendToDiscord(Config.DiscordWebhook, message)
+							end
+							TriggerEvent('bansql:sendMessage', source, data[1].targetplayername .. Lang:t('isunban'))
+						end)
 				end
 			else
-				MySQL.Async.execute(
-				'DELETE FROM banlist WHERE targetplayername = @name',
-				{
-				  ['@name']  = data[1].targetplayername
-				},
-					function ()
-					loadBanList()
-						if Config.DiscordWebhook and tostring(Config.DiscordWebhook) ~= "" then
-						local sourceplayername = ""
-						if source ~= 0 then
-							sourceplayername = tostring(GetPlayerName(source))
-						else
-							sourceplayername = "Console"
-						end
-					local message = (data[1].targetplayername .. Lang:t('isunban') .." ".. Lang:t('by') .." ".. sourceplayername)
-					sendToDiscord(Config.DiscordWebhook, message)
-				end
-				TriggerEvent('bansql:sendMessage', source, data[1].targetplayername .. Lang:t('isunban'))
-				end)
+				TriggerEvent('bansql:sendMessage', source, Lang:t('invalidname'))
 			end
-		else
-			TriggerEvent('bansql:sendMessage', source, Lang:t('invalidname'))
-		end
-
-	end)
+		end)
 	else
 		TriggerEvent('bansql:sendMessage', source, Lang:t('invalidname'))
 	end
@@ -145,7 +144,7 @@ function cmdbanoffline(source, args)
 									end
 								end
 							end
-						ban(source,data[1].license,data[1].steamid,data[1].fivemid,data[1].liveid,data[1].xblid,data[1].discord,data[1].playerip,tokenTable,data[1].playername,sourceplayername,duree,reason,permanent)
+							ban(source, data[1].license, data[1].steamid, data[1].fivemid, data[1].liveid, data[1].xblid, data[1].discord, data[1].playerip, tokenTable, data[1].playername, sourceplayername, duree, reason, permanent)
 						else
 							TriggerEvent('bansql:sendMessage', source, Lang:t('invalidtime'))
 						end
@@ -167,15 +166,14 @@ end
 
 function cmdbanhistory(source, args)
 	if args[1] and BanListHistory then
-	local nombre = (tonumber(args[1]))
-	local name   = table.concat(args, " ",1)
+		local nombre = (tonumber(args[1]))
+		local name   = table.concat(args, " ",1)
 		if name ~= "" then
 			if nombre and nombre > 0 then
 				local expiration = BanListHistory[nombre].expiration
 				local timeat     = BanListHistory[nombre].timeat
 				local calcul1    = expiration - timeat
-				local calcul2    = calcul1 / 86400
-				local calcul2 	 = math.ceil(calcul2)
+				local calcul2    = math.ceil(calcul1 / 86400)
 				local resultat   = tostring(BanListHistory[nombre].targetplayername.." , "..BanListHistory[nombre].sourceplayername.." , "..BanListHistory[nombre].reason.." , "..calcul2..Lang:t('day').." , "..BanListHistory[nombre].added)
 
 				TriggerEvent('bansql:sendMessage', source, (nombre .." : ".. resultat))
@@ -185,8 +183,7 @@ function cmdbanhistory(source, args)
 						local expiration = BanListHistory[i].expiration
 						local timeat     = BanListHistory[i].timeat
 						local calcul1    = expiration - timeat
-						local calcul2    = calcul1 / 86400
-						local calcul2 	 = math.ceil(calcul2)					
+						local calcul2    = math.ceil(calcul1 / 86400)
 						local resultat   = tostring(BanListHistory[i].targetplayername.." , "..BanListHistory[i].sourceplayername.." , "..BanListHistory[i].reason.." , "..calcul2..Lang:t('day').." , "..BanListHistory[i].added)
 						TriggerEvent('bansql:sendMessage', source, (i .." : ".. resultat))
 					end
@@ -233,7 +230,7 @@ function ban(source,license,steamid,fivemid,liveid,xblid,discord,playerip,tokens
 					end
 				end
 			end
-
+							ban(source, data[1].license, data[1].steamid, data[1].fivemid, data[1].liveid, data[1].xblid, data[1].discord, data[1].playerip, tokenTable, data[1].playername, sourceplayername, duree, reason, permanent)
 			table.insert(BanList, {
 				license    = license,
 				steamid    = steamid,
@@ -251,72 +248,73 @@ function ban(source,license,steamid,fivemid,liveid,xblid,discord,playerip,tokens
 			MySQL.Async.execute(
 					'INSERT INTO banlist (license,steamid,fivemid,liveid,xblid,discord,playerip,tokens,targetplayername,sourceplayername,reason,expiration,timeat,permanent) VALUES (@license,@steamid,@fivemid,@liveid,@xblid,@discord,@playerip,@tokens,@targetplayername,@sourceplayername,@reason,@expiration,@timeat,@permanent)',
 					{ 
-					['@license']          = license,
-					['@steamid']          = steamid,
-					['@fivemid']          = fivemid,
-					['@liveid']           = liveid,
-					['@xblid']            = xblid,
-					['@discord']          = discord,
-					['@playerip']         = playerip,
-					['@tokens']            = (tokenData and json.encode(tokenData) or nil),
-					['@targetplayername'] = targetplayername,
-					['@sourceplayername'] = sourceplayername,
-					['@reason']           = reason,
-					['@expiration']       = expiration,
-					['@timeat']           = timeat,
-					['@permanent']        = permanent,
+						['@license']          = license,
+						['@steamid']          = steamid,
+						['@fivemid']          = fivemid,
+						['@liveid']           = liveid,
+						['@xblid']            = xblid,
+						['@discord']          = discord,
+						['@playerip']         = playerip,
+						['@tokens']           = (tokenData and json.encode(tokenData) or nil),
+						['@targetplayername'] = targetplayername,
+						['@sourceplayername'] = sourceplayername,
+						['@reason']           = reason,
+						['@expiration']       = expiration,
+						['@timeat']           = timeat,
+						['@permanent']        = permanent,
 					},
 					function ()
 			end)
 
 			if permanent == 0 then
-			TriggerEvent('bansql:sendMessage', source, (Lang:t('youban') .. targetplayername .. Lang:t('during') .. duree .. Lang:t('forr') .. reason))
-		else
-			TriggerEvent('bansql:sendMessage', source, (Lang:t('youban') .. targetplayername .. Lang:t('permban') .. reason))
-
-			if Config.DiscordWebhook and tostring(Config.DiscordWebhook) ~= "" then
-				local license1,steamid1,fivemid1,liveid1,xblid1,discord1,playerip1,token1,targetplayername1,sourceplayername1,message
-				if not license          then license1          = "N/A" else license1          = license          end
-				if not steamid          then steamid1         = "N/A" else steamid1         = steamid          end
-				if not fivemid          then fivemid1         = "N/A" else fivemid1         = fivemid          end
-				if not liveid           then liveid1           = "N/A" else liveid1           = liveid           end
-				if not xblid            then xblid1            = "N/A" else xblid1            = xblid           end
-				if not discord          then discord1          = "N/A" else discord1          = discord          end
-				if not playerip         then playerip1         = "N/A" else playerip1         = playerip         end
-				local token1 = "N/A"
-				if tokenData and type(tokenData) == 'table' then
-					token1 = json.encode(tokenData)
-				elseif tokens and tokens ~= '' then
-					token1 = tostring(tokens)
-				end
-				if not targetplayername then targetplayername1 = "N/A" else targetplayername1 = targetplayername end
-				if not sourceplayername then sourceplayername1 = "N/A" else sourceplayername1 = sourceplayername end
-				if permanent == 0 then
-				message = (targetplayername1..Lang:t('isban').." "..duree..Lang:t('forr')..reason.." "..Lang:t('by').." "..sourceplayername1.."```"..steamid1.."\n"..fivemid1.."\n"..license1.."\n"..liveid1.."\n"..xblid1.."\n"..discord1.."\n"..playerip1.."\n"..token1.."```")
+				TriggerEvent('bansql:sendMessage', source, (Lang:t('youban') .. targetplayername .. Lang:t('during') .. duree .. Lang:t('forr') .. reason))
 			else
-				message = (targetplayername1..Lang:t('isban').." "..Lang:t('permban')..reason.." "..Lang:t('by').." "..sourceplayername1.."```"..steamid1.."\n"..fivemid1.."\n"..license1.."\n"..liveid1.."\n"..xblid1.."\n"..discord1.."\n"..playerip1.."\n"..token1.."```")
+				TriggerEvent('bansql:sendMessage', source, (Lang:t('youban') .. targetplayername .. Lang:t('permban') .. reason))
+
+				if Config.DiscordWebhook and tostring(Config.DiscordWebhook) ~= "" then
+					local license1,steamid1,fivemid1,liveid1,xblid1,discord1,playerip1,token1,targetplayername1,sourceplayername1,message
+					if not license          then license1          = "N/A" else license1          = license          end
+					if not steamid          then steamid1         = "N/A" else steamid1         = steamid          end
+					if not fivemid          then fivemid1         = "N/A" else fivemid1         = fivemid          end
+					if not liveid           then liveid1           = "N/A" else liveid1           = liveid           end
+					if not xblid            then xblid1            = "N/A" else xblid1            = xblid           end
+					if not discord          then discord1          = "N/A" else discord1          = discord          end
+					if not playerip         then playerip1         = "N/A" else playerip1         = playerip         end
+					local token1 = "N/A"
+					if tokenData and type(tokenData) == 'table' then
+						token1 = json.encode(tokenData)
+					elseif tokens and tokens ~= '' then
+						token1 = tostring(tokens)
+					end
+					if not targetplayername then targetplayername1 = "N/A" else targetplayername1 = targetplayername end
+					if not sourceplayername then sourceplayername1 = "N/A" else sourceplayername1 = sourceplayername end
+					if permanent == 0 then
+						message = (targetplayername1..Lang:t('isban').." "..duree..Lang:t('forr')..reason.." "..Lang:t('by').." "..sourceplayername1.."```"..steamid1.."\n"..fivemid1.."\n"..license1.."\n"..liveid1.."\n"..xblid1.."\n"..discord1.."\n"..playerip1.."\n"..token1.."```")
+					else
+						message = (targetplayername1..Lang:t('isban').." "..Lang:t('permban')..reason.." "..Lang:t('by').." "..sourceplayername1.."```"..steamid1.."\n"..fivemid1.."\n"..license1.."\n"..liveid1.."\n"..xblid1.."\n"..discord1.."\n"..playerip1.."\n"..token1.."```")
+					end
+					sendToDiscord(Config.DiscordWebhook, message)
 				end
-				sendToDiscord(Config.DiscordWebhook, message)
 			end
 
 			MySQL.Async.execute(
 					'INSERT INTO banlisthistory (license,steamid,fivemid,liveid,xblid,discord,playerip,tokens,targetplayername,sourceplayername,reason,added,expiration,timeat,permanent) VALUES (@license,@steamid,@fivemid,@liveid,@xblid,@discord,@playerip,@tokens,@targetplayername,@sourceplayername,@reason,@added,@expiration,@timeat,@permanent)',
 					{ 
-					['@license']          = license,
-					['@steamid']          = steamid,
-					['@fivemid']          = fivemid,
-					['@liveid']           = liveid,
-					['@xblid']            = xblid,
-					['@discord']          = discord,
-					['@playerip']         = playerip,
-					['@tokens']            = (tokenData and json.encode(tokenData) or nil),
-					['@targetplayername'] = targetplayername,
-					['@sourceplayername'] = sourceplayername,
-					['@reason']           = reason,
-					['@added']            = added,
-					['@expiration']       = expiration,
-					['@timeat']           = timeat,
-					['@permanent']        = permanent,
+						['@license']          = license,
+						['@steamid']          = steamid,
+						['@fivemid']          = fivemid,
+						['@liveid']           = liveid,
+						['@xblid']            = xblid,
+						['@discord']          = discord,
+						['@playerip']         = playerip,
+						['@tokens']           = (tokenData and json.encode(tokenData) or nil),
+						['@targetplayername'] = targetplayername,
+						['@sourceplayername'] = sourceplayername,
+						['@reason']           = reason,
+						['@added']            = added,
+						['@expiration']       = expiration,
+						['@timeat']           = timeat,
+						['@permanent']        = permanent,
 					},
 					function ()
 			end)
