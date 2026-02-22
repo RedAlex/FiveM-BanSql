@@ -230,7 +230,6 @@ function ban(source,license,steamid,fivemid,liveid,xblid,discord,playerip,tokens
 					end
 				end
 			end
-							ban(source, data[1].license, data[1].steamid, data[1].fivemid, data[1].liveid, data[1].xblid, data[1].discord, data[1].playerip, tokenTable, data[1].playername, sourceplayername, duree, reason, permanent)
 			table.insert(BanList, {
 				license    = license,
 				steamid    = steamid,
