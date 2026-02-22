@@ -9,7 +9,6 @@ Locales['fr'] = {
 	
 	-- Command help messages
 	cmdban = "/sqlban (ID) (Durée en jours) (Raison)",
-	cmdbanoff = "/sqlbanoffline (Permid) (Durée en jours) (Raison)",
 	cmdhistory = "/sqlbanhistory (Steam name) ou /sqlbanhistory 1,2,2,4......",
 	
 	-- General messages
@@ -42,12 +41,9 @@ Locales['fr'] = {
 	
 	-- Command descriptions
 	ban = "Bannir un joueurs qui est en ligne",
-	banoff = "Bannir un joueurs qui est hors ligne",
-	bansearch = "Trouver l'id permanent d'un joueur qui est hors ligne",
 	playeridhelp = "ID du joueur",
 	dayhelp = "Nombre de jours",
 	reason = "Raison du ban",
-	permid = "Trouver l'id permanent avec la commande (sqlsearch)",
 	history = "Affiche tout les bans d'un joueur",
 	reload = "Recharge la BanList et la BanListHistory",
 	unban = "Retirez un ban de la liste",
@@ -65,4 +61,19 @@ Locales['fr'] = {
 	-- Anticheat bridge messages
 	anticheatBridgeNoInvoker = "appelant manquant",
 	anticheatBridgeUnauthorized = "appelant non autorise",
+
+	-- UI messages
+	ui_title = "BanSql Admin",
+	ui_search_title = "Rechercher un joueur",
+	ui_search_placeholder = "Nom du joueur...",
+	ui_search_button = "Rechercher",
+	ui_searching = "Recherche en cours...",
+	ui_results_title = "Resultats",
+	ui_ban_title = "Ban hors ligne",
+	ui_reason_label = "Raison",
+	ui_ban_button = "Ban Offline",
+	ui_banning = "Ban en cours...",
+	ui_ban_sent = "Demande de ban envoyee.",
+	ui_close_button = "Fermer",
+	ui_invalid_session = "Session UI invalide, relancez la commande.",
 }

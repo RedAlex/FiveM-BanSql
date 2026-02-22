@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BanSql Admin</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="bansql-menu" class="menu-container" style="display: none;">
+        <div class="menu-content">
+            <div class="menu-header">
+                <h1 id="menu-title">BanSql Admin</h1>
+                <label class="toggle-line">
+                    <input id="toggle-sensitive" type="checkbox" checked>
+                    <span id="toggle-sensitive-label">Masqué les informations confidentiel</span>
+                </label>
+                <button class="close-btn" id="close-menu">&times;</button>
+            </div>
+
+            <div id="page-1" class="page section">
+                <h2 id="page1-title">Choix de l'action</h2>
+                <div class="card">
+                    <h3 id="search-by-name-title">Recherche par steamname</h3>
+                    <div class="search-row">
+                        <input type="text" id="search-input" placeholder="Steamname...">
+                        <button class="btn btn-primary" id="search-btn">Search</button>
+                    </div>
+                </div>
+
+                <div class="card actions-stack">
+                    <button class="btn btn-primary" id="recent-btn">Affiché les derniere joueurs connecté</button>
+                    <button class="btn btn-secondary" id="history-btn">Affichage de l'historique de ban</button>
+                </div>
+                <div id="page1-status" class="status"></div>
+            </div>
+
+            <div id="page-2" class="page section" style="display:none;">
+                <h2 id="results-title">Résultats</h2>
+                <div id="results-list" class="results-list"></div>
+                <div class="actions">
+                    <button id="results-more-btn" class="btn btn-secondary" style="display:none;">Continuer les recherche</button>
+                    <button id="results-back-btn" class="btn btn-secondary">Retour</button>
+                </div>
+                <div id="page2-status" class="status"></div>
+            </div>
+
+            <div id="page-3" class="page section" style="display:none;">
+                <h2 id="history-title">Historique de ban</h2>
+                <div id="history-list" class="results-list"></div>
+                <div class="actions">
+                    <button id="history-more-btn" class="btn btn-secondary" style="display:none;">Continuer les recherche</button>
+                    <button id="history-back-btn" class="btn btn-secondary">Retour</button>
+                </div>
+                <div id="page3-status" class="status"></div>
+            </div>
+
+            <div id="page-4" class="page section" style="display:none;">
+                <h2 id="ban-args-title">Arguments du ban</h2>
+                <div id="selected-player" class="card"></div>
+                <div class="form-grid">
+                    <div class="form-group full">
+                        <div class="permanent-row">
+                            <input type="checkbox" id="ban-permanent">
+                            <span id="permanent-label">Permanent</span>
+                        </div>
+                    </div>
+                    <div class="form-group" id="days-group">
+                        <label id="label-days" for="ban-days">Nombre de jours</label>
+                        <input type="number" id="ban-days" min="0" max="364" placeholder="0">
+                    </div>
+                    <div class="form-group full">
+                        <label id="label-reason" for="ban-reason">Raison</label>
+                        <input type="text" id="ban-reason" placeholder="Raison">
+                    </div>
+                </div>
+                <div class="actions">
+                    <button class="btn btn-primary" id="to-confirm-btn">Continuer</button>
+                    <button class="btn btn-secondary" id="page4-back-btn">Retour</button>
+                </div>
+                <div id="page4-status" class="status"></div>
+            </div>
+
+            <div id="page-5" class="page section" style="display:none;">
+                <h2 id="confirm-title">Confirmation</h2>
+                <div id="confirm-box" class="card"></div>
+                <div class="actions">
+                    <button class="btn btn-danger" id="confirm-ban-btn">Confirmer</button>
+                    <button class="btn btn-secondary" id="page5-back-btn">Retour</button>
+                </div>
+                <div id="page5-status" class="status"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

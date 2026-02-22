@@ -9,7 +9,6 @@ Locales['en'] = {
 	
 	-- Command help messages
 	cmdban = "/sqlban (ID) (Duration in days) (Ban reason)",
-	cmdbanoff = "/sqlbanoffline (Permid) (Duration in days) (Steam name)",
 	cmdhistory = "/sqlbanhistory (Steam name) or /sqlbanhistory 1,2,2,4......",
 	forcontinu = " days. To continue, execute /sqlreason [reason]",
 	
@@ -43,7 +42,6 @@ Locales['en'] = {
 	
 	-- Command descriptions
 	ban = "Ban a player",
-	banoff = "Ban an offline player",
 	playeridhelp = "Player ID",
 	dayhelp = "Duration (days) of ban",
 	reason = "Reason for ban",
@@ -64,4 +62,19 @@ Locales['en'] = {
 	-- Anticheat bridge messages
 	anticheatBridgeNoInvoker = "missing invoker",
 	anticheatBridgeUnauthorized = "unauthorized invoker",
+
+	-- UI messages
+	ui_title = "BanSql Admin",
+	ui_search_title = "Search player",
+	ui_search_placeholder = "Player name...",
+	ui_search_button = "Search",
+	ui_searching = "Searching...",
+	ui_results_title = "Results",
+	ui_ban_title = "Offline ban",
+	ui_reason_label = "Reason",
+	ui_ban_button = "Ban Offline",
+	ui_banning = "Sending ban...",
+	ui_ban_sent = "Ban request sent.",
+	ui_close_button = "Close",
+	ui_invalid_session = "Invalid UI session, run the command again.",
 }

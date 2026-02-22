@@ -2,7 +2,9 @@ fx_version 'adamant'
 
 game 'gta5'
 
-version '1.2.2'
+version '1.3.0'
+
+ui_page 'html/index.html'
 
 server_scripts {
 	'@mysql-async/lib/MySQL.lua',
@@ -12,6 +14,7 @@ server_scripts {
 	'server/database.lua',
 	'server/framework.lua',
 	'server/function.lua',
+	'server/ui.lua',
 	'server/anticheat_bridge.lua',
 	'server/main.lua',
 	'server/command.lua',
@@ -20,6 +23,12 @@ server_scripts {
 
 client_scripts {
   'client.lua'
+}
+
+files {
+	'html/index.html',
+	'html/style.css',
+	'html/script.js'
 }
 
 -- At least one of these frameworks must be installed

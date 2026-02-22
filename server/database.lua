@@ -25,7 +25,7 @@ function initializeDatabase()
     end)
 
     -- Check and create banlisthistory table
-    MySQL.Async.execute([[
+    MySQL.Async.execute([[ 
         CREATE TABLE IF NOT EXISTS banlisthistory (
             id int(11) AUTO_INCREMENT PRIMARY KEY,
             license varchar(50) COLLATE utf8mb4_bin DEFAULT NULL,
@@ -48,6 +48,7 @@ function initializeDatabase()
         print("^2[FiveM-BanSql] Table 'banlisthistory' initialized^7")
     end)
 
+
     -- Check and create baninfo table
     MySQL.Async.execute([[
         CREATE TABLE IF NOT EXISTS baninfo (
@@ -60,15 +61,72 @@ function initializeDatabase()
             discord varchar(30) COLLATE utf8mb4_bin DEFAULT NULL,
             playerip varchar(25) COLLATE utf8mb4_bin DEFAULT NULL,
             tokens TEXT COLLATE utf8mb4_bin DEFAULT NULL,
-            playername varchar(32) COLLATE utf8mb4_bin DEFAULT NULL
+            playername varchar(32) COLLATE utf8mb4_bin DEFAULT NULL,
+            last_modified_at int(11) NOT NULL DEFAULT 0
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin
     ]], {}, function()
         print("^2[FiveM-BanSql] Table 'baninfo' initialized^7")
     end)
 end
 
--- Migration from 1.0.9 to 1.2 function to add token column to existing tables
+-- Migration from (1.0.9 or 1.2.*) to 1.3 function to add token column to existing tables
 function migrateDatabase()
+    -- Ensure baninfo supports ordering by latest update (run regardless of legacy identifier migration)
+    MySQL.Async.fetchAll([[
+        SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'baninfo' AND COLUMN_NAME = 'last_modified_at'
+    ]], {}, function(lastModifiedResult)
+        if not lastModifiedResult or #lastModifiedResult == 0 then
+            MySQL.Async.execute([[
+                ALTER TABLE baninfo ADD COLUMN last_modified_at int(11) NOT NULL DEFAULT 0
+            ]], {}, function()
+                print("^2[FiveM-BanSql] ✓ 'last_modified_at' column added to 'baninfo' table^7")
+
+                MySQL.Async.execute([[
+                    UPDATE baninfo
+                    SET last_modified_at = UNIX_TIMESTAMP()
+                    WHERE last_modified_at IS NULL OR last_modified_at <= 0
+                ]], {}, function()
+                    print("^2[FiveM-BanSql] ✓ 'baninfo.last_modified_at' backfilled for existing rows^7")
+
+                    MySQL.Async.fetchAll([[
+                        SELECT INDEX_NAME FROM INFORMATION_SCHEMA.STATISTICS
+                        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'baninfo' AND INDEX_NAME = 'idx_baninfo_last_modified_at'
+                    ]], {}, function(indexResult)
+                        if not indexResult or #indexResult == 0 then
+                            MySQL.Async.execute([[
+                                ALTER TABLE baninfo ADD INDEX idx_baninfo_last_modified_at (last_modified_at)
+                            ]], {}, function()
+                                print("^2[FiveM-BanSql] ✓ Index 'idx_baninfo_last_modified_at' added to 'baninfo' table^7")
+                            end)
+                        end
+                    end)
+                end)
+            end)
+        else
+            MySQL.Async.execute([[
+                UPDATE baninfo
+                SET last_modified_at = UNIX_TIMESTAMP()
+                WHERE last_modified_at IS NULL OR last_modified_at <= 0
+            ]], {}, function()
+                print("^2[FiveM-BanSql] ✓ 'baninfo.last_modified_at' backfilled for existing rows^7")
+
+                MySQL.Async.fetchAll([[
+                    SELECT INDEX_NAME FROM INFORMATION_SCHEMA.STATISTICS
+                    WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'baninfo' AND INDEX_NAME = 'idx_baninfo_last_modified_at'
+                ]], {}, function(indexResult)
+                    if not indexResult or #indexResult == 0 then
+                        MySQL.Async.execute([[
+                            ALTER TABLE baninfo ADD INDEX idx_baninfo_last_modified_at (last_modified_at)
+                        ]], {}, function()
+                            print("^2[FiveM-BanSql] ✓ Index 'idx_baninfo_last_modified_at' added to 'baninfo' table^7")
+                        end)
+                    end
+                end)
+            end)
+        end
+    end)
+
     -- Check if migration is necessary (identifier column exists)
     MySQL.Async.fetchAll([[
         SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 

@@ -15,18 +15,6 @@ RegisterCommand("unban", function(source, args, raw)
     end
 end, true)
 
-RegisterCommand("search", function(source, args, raw)
-    if source == 0 then
-        cmdsearch(source, args)
-    end
-end, true)
-
-RegisterCommand("banoffline", function(source, args, raw)
-    if source == 0 then
-        cmdbanoffline(source, args)
-    end
-end, true)
-
 RegisterCommand("banhistory", function(source, args, raw)
     if source == 0 then
         cmdbanhistory(source, args)
@@ -41,6 +29,10 @@ end, true)
 
 
 function registerESXCommands()
+    ESX.RegisterCommand('sqlbanmenu', Config.Permission, function(xPlayer, args, showError)
+        openBanSqlUI(xPlayer.source)
+    end, true, {help = 'Open BanSql UI', validate = false, arguments = {}})
+
     ESX.RegisterCommand('sqlban', Config.Permission, function(xPlayer, args, showError)
         local esxArgs = {args.id, args.day, args.reason}
         cmdban(xPlayer.source, esxArgs)
@@ -57,22 +49,6 @@ function registerESXCommands()
         {name = "name", help = Lang:t('steamname'), type = "string"}
     }})
 
-    ESX.RegisterCommand('sqlsearch', Config.Permission, function(xPlayer, args, showError)
-        local esxArgs = {args.name}
-        cmdsearch(xPlayer.source, esxArgs)
-    end, true, {help = Lang:t('bansearch'), validate = false, arguments = {
-        {name = "name", help = Lang:t('steamname'), type = "string"}
-    }})
-
-    ESX.RegisterCommand('sqlbanoffline', Config.Permission, function(xPlayer, args, showError)
-        local esxArgs = {args.permid, args.day, args.reason}
-        cmdbanoffline(xPlayer.source, esxArgs)
-    end, true, {help = Lang:t('banoff'), validate = true, arguments = {
-        {name = "permid", help = Lang:t('permid'), type = "number"},
-        {name = "day", help = Lang:t('dayhelp'), type = "number"},
-        {name = "reason", help = Lang:t('reason'), type = "string"}
-    }})
-
     ESX.RegisterCommand('sqlbanhistory', Config.Permission, function(xPlayer, args, showError)
         local esxArgs = {args.name}
         cmdbanhistory(xPlayer.source, esxArgs)
@@ -87,6 +63,14 @@ end
 
 function registerQBXCommands(framework)
     local exports_name = (framework == 'qbox_core') and 'qbox_core' or 'qbx_core'
+
+    exports[exports_name]:CreateCommand({
+        name = 'sqlbanmenu',
+        description = 'Open BanSql UI',
+        permission = Config.Permission,
+    }, function(source)
+        openBanSqlUI(source)
+    end)
     
     exports[exports_name]:CreateCommand({
         name = 'sqlban',
@@ -104,24 +88,6 @@ function registerQBXCommands(framework)
         params = {{name = "name", help = Lang:t('steamname')}},
     }, function(source, args)
         cmdunban(source, args)
-    end)
-
-    exports[exports_name]:CreateCommand({
-        name = 'sqlsearch',
-        description = Lang:t('bansearch'),
-        permission = Config.Permission,
-        params = {{name = "name", help = Lang:t('steamname')}},
-    }, function(source, args)
-        cmdsearch(source, args)
-    end)
-
-    exports[exports_name]:CreateCommand({
-        name = 'sqlbanoffline',
-        description = Lang:t('banoff'),
-        permission = Config.Permission,
-        params = {{name = "permid", help = Lang:t('permid')}, {name = "day", help = Lang:t('dayhelp')}, {name = "reason", help = Lang:t('reason')}},
-    }, function(source, args)
-        cmdbanoffline(source, args)
     end)
 
     exports[exports_name]:CreateCommand({

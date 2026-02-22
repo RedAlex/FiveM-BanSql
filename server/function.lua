@@ -85,85 +85,6 @@ function cmdunban(source, args)
 	end
 end
 
-function cmdsearch(source, args)
-	local target = table.concat(args, " ")
-	if target ~= "" then
-		MySQL.Async.fetchAll('SELECT * FROM baninfo WHERE LOWER(playername) LIKE LOWER(@playername)', 
-		{
-			['@playername'] = ("%"..target.."%")
-		}, function(data)
-			if data[1] then
-				if #data < 50 then
-					for i=1, #data, 1 do
-						TriggerEvent('bansql:sendMessage', source, data[i].id.." "..data[i].playername)
-					end
-				else
-					TriggerEvent('bansql:sendMessage', source, Lang:t('toomanyresult'))
-				end
-			else
-				TriggerEvent('bansql:sendMessage', source, Lang:t('invalidname'))
-			end
-		end)
-	else
-		TriggerEvent('bansql:sendMessage', source, Lang:t('invalidname'))
-	end
-end
-
-function cmdbanoffline(source, args)
-	if args ~= "" then
-		local target           = tonumber(args[1])
-		local duree            = tonumber(args[2])
-		local reason           = table.concat(args, " ",3)
-		local sourceplayername = ""
-		if source ~= 0 then
-			sourceplayername = tostring(GetPlayerName(source))
-		else
-			sourceplayername = "Console"
-		end
-
-		if duree ~= "" then
-			if target ~= "" then
-				MySQL.Async.fetchAll('SELECT * FROM baninfo WHERE id = @id', 
-				{
-					['@id'] = target
-				}, function(data)
-					if data[1] then
-						if duree and duree < 365 then
-							if reason == "" then
-								reason = Lang:t('noreason')
-							end
-							local permanent = (duree <= 0) and 1 or 0
-							local tokenTable = {}
-							if data[1].tokens and data[1].tokens ~= "" then
-								local ok, parsed = pcall(json.decode, data[1].tokens)
-								if ok and type(parsed) == 'table' then
-									tokenTable = parsed
-								else
-									for s in string.gmatch(tostring(data[1].tokens), "[^,]+") do
-										table.insert(tokenTable, s)
-									end
-								end
-							end
-							ban(source, data[1].license, data[1].steamid, data[1].fivemid, data[1].liveid, data[1].xblid, data[1].discord, data[1].playerip, tokenTable, data[1].playername, sourceplayername, duree, reason, permanent)
-						else
-							TriggerEvent('bansql:sendMessage', source, Lang:t('invalidtime'))
-						end
-					else
-						TriggerEvent('bansql:sendMessage', source, Lang:t('invalidid'))
-					end
-				end)
-			else
-				TriggerEvent('bansql:sendMessage', source, Lang:t('invalidname'))
-			end
-		else
-			TriggerEvent('bansql:sendMessage', source, Lang:t('invalidtime'))
-			TriggerEvent('bansql:sendMessage', source, Lang:t('cmdbanoff'))
-		end
-	else
-		TriggerEvent('bansql:sendMessage', source, Lang:t('cmdbanoff'))
-	end
-end
-
 function cmdbanhistory(source, args)
 	if args[1] and BanListHistory then
 		local nombre = (tonumber(args[1]))
@@ -537,13 +458,14 @@ function playerLoaded(source)
 			['@license'] = license
 		}, function(data)
 		local found = false
+			local lastModifiedAt = os.time()
 			for i=1, #data, 1 do
 				if data[i].license == license then
 					found = true
 				end
 			end
 			if not found then
-				MySQL.Async.execute('INSERT INTO baninfo (license,steamid,fivemid,liveid,xblid,discord,playerip,tokens,playername) VALUES (@license,@steamid,@fivemid,@liveid,@xblid,@discord,@playerip,@tokens,@playername)', 
+				MySQL.Async.execute('INSERT INTO baninfo (license,steamid,fivemid,liveid,xblid,discord,playerip,tokens,playername,last_modified_at) VALUES (@license,@steamid,@fivemid,@liveid,@xblid,@discord,@playerip,@tokens,@playername,@last_modified_at)', 
 					{ 
 					['@license']    = license,
 					['@steamid']    = steamid,
@@ -553,12 +475,13 @@ function playerLoaded(source)
 					['@discord']    = discord,
 					['@playerip']   = playerip,
 					['@tokens']     = (tokens and json.encode(tokens) or nil),
-					['@playername'] = playername
+					['@playername'] = playername,
+					['@last_modified_at'] = lastModifiedAt
 					},
 					function ()
 				end)
 			else
-				MySQL.Async.execute('UPDATE `baninfo` SET `steamid` = @steamid, `fivemid` = @fivemid, `liveid` = @liveid, `xblid` = @xblid, `discord` = @discord, `playerip` = @playerip, `tokens` = @tokens, `playername` = @playername WHERE `license` = @license', 
+				MySQL.Async.execute('UPDATE `baninfo` SET `steamid` = @steamid, `fivemid` = @fivemid, `liveid` = @liveid, `xblid` = @xblid, `discord` = @discord, `playerip` = @playerip, `tokens` = @tokens, `playername` = @playername, `last_modified_at` = @last_modified_at WHERE `license` = @license', 
 					{ 
 					['@license']    = license,
 					['@steamid']    = steamid,
@@ -568,7 +491,8 @@ function playerLoaded(source)
 					['@discord']    = discord,
 					['@playerip']   = playerip,
 					['@tokens']     = (tokens and json.encode(tokens) or nil),
-					['@playername'] = playername
+					['@playername'] = playername,
+					['@last_modified_at'] = lastModifiedAt
 					},
 					function ()
 				end)
